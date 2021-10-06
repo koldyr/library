@@ -50,6 +50,12 @@ open class BookServiceImpl(
     @Transactional
     override fun delete(bookId: Int) = bookRepository.deleteById(bookId)
 
+    override fun findBooks(authorId: Int): List<BookDTO> {
+        return bookRepository.findBooksByAuthorId(authorId).stream()
+                .map(this::mapBook)
+                .collect(toList())
+    }
+
     private fun mapBook(source: BookDTO, target: Book) {
         if (source.authorId != null) {
             target.author = authorRepository.findById(source.authorId!!)

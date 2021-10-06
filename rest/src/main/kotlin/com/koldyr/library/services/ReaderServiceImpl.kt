@@ -1,5 +1,6 @@
 package com.koldyr.library.services
 
+import com.koldyr.library.model.Order
 import com.koldyr.library.model.Reader
 import com.koldyr.library.persistence.ReaderRepository
 import org.springframework.http.HttpStatus.*
@@ -11,25 +12,25 @@ import org.springframework.web.server.ResponseStatusException
  * @created: 2021-09-28
  */
 open class ReaderServiceImpl(
-    private val personRepository: ReaderRepository
+    private val readerRepository: ReaderRepository
 ) : ReaderService {
 
-    override fun findAll(): List<Reader> = personRepository.findAll()
+    override fun findAll(): List<Reader> = readerRepository.findAll()
     
     @Transactional
     override fun create(person: Reader): Int {
-        val saved = personRepository.save(person)
+        val saved = readerRepository.save(person)
         return saved.id!!
     }
 
     override fun findById(personId: Int): Reader {
-        return personRepository.findById(personId)
+        return readerRepository.findById(personId)
             .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$personId' is not found") }
     }
 
     @Transactional
     override fun update(readeId: Int, reader: Reader) {
-        val persisted: Reader = personRepository.findById(readeId)
+        val persisted: Reader = readerRepository.findById(readeId)
             .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readeId' is not found") }
 
         persisted.firstName = reader.firstName
@@ -39,9 +40,13 @@ open class ReaderServiceImpl(
         persisted.phoneNumber = reader.phoneNumber
         persisted.note = reader.note
 
-        personRepository.save(persisted);
+        readerRepository.save(persisted);
     }
 
     @Transactional
-    override fun delete(readerId: Int) = personRepository.deleteById(readerId)
+    override fun delete(readerId: Int) = readerRepository.deleteById(readerId)
+
+    override fun findOrders(readerId: Int): Collection<Order> {
+        return readerRepository.findOrders(readerId)
+    }
 }

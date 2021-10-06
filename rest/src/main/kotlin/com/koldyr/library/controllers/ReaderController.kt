@@ -1,5 +1,6 @@
 package com.koldyr.library.controllers
 
+import com.koldyr.library.model.Order
 import com.koldyr.library.model.Reader
 import com.koldyr.library.services.ReaderService
 import org.springframework.http.ResponseEntity
@@ -23,7 +24,7 @@ import java.net.URI
 class ReaderController(private val readerService: ReaderService) {
 
     @GetMapping
-    fun persons(): Collection<Reader> = readerService.findAll()
+    fun readers(): Collection<Reader> = readerService.findAll()
 
     @PostMapping
     fun create(@RequestBody reader: Reader): ResponseEntity<String> {
@@ -33,16 +34,19 @@ class ReaderController(private val readerService: ReaderService) {
         return created(uri).build()
     }
 
-    @PutMapping("/{personId}")
-    fun update(@PathVariable personId: Int, @RequestBody person: Reader) = readerService.update(personId, person)
+    @PutMapping("/{readerId}")
+    fun update(@PathVariable readerId: Int, @RequestBody reader: Reader) = readerService.update(readerId, reader)
 
-    @GetMapping("/{personId}")
-    fun personById(@PathVariable personId: Int): Reader = readerService.findById(personId)
+    @GetMapping("/{readerId}")
+    fun readerById(@PathVariable readerId: Int): Reader = readerService.findById(readerId)
     
-    @DeleteMapping("/{personId}")
-    fun delete(@PathVariable personId: Int): ResponseEntity<Unit> {
-        readerService.delete(personId)
+    @DeleteMapping("/{readerId}")
+    fun delete(@PathVariable readerId: Int): ResponseEntity<Unit> {
+        readerService.delete(readerId)
         
         return noContent().build()
     }
+
+    @GetMapping("/{readerId}/orders")
+    fun orders(@PathVariable readerId: Int): Collection<Order> = readerService.findOrders(readerId)
 }

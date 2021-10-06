@@ -5,7 +5,6 @@ import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.*
 import javax.persistence.Id
-import javax.persistence.OneToMany
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
 
@@ -35,9 +34,6 @@ class Reader : Cloneable {
     var phoneNumber:  String? = null
 
     var note: String? = null
-
-    @OneToMany(targetEntity = Order::class)
-    val orders: MutableSet<Order> = mutableSetOf()
     
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

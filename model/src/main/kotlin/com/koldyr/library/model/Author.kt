@@ -16,7 +16,7 @@ import javax.persistence.Table
  */
 @Entity
 @Table(name = "T_AUTHOR")
-@SequenceGenerator(name = "AuthorIds", sequenceName = "SEQ_READER", allocationSize = 1)
+@SequenceGenerator(name = "AuthorIds", sequenceName = "SEQ_AUTHOR", allocationSize = 1)
 class Author {
 
     @Id
@@ -31,6 +31,6 @@ class Author {
     @Column(columnDefinition = "DATE")
     var dateOfBirth: LocalDate? = null
 
-    @OneToMany(targetEntity = Book::class)
+    @OneToMany(mappedBy = "author")
     var books: Collection<Book>? = mutableSetOf()
 }

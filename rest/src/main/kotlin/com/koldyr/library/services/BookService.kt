@@ -12,4 +12,6 @@ interface BookService {
     fun findById(bookId: Int): BookDTO
     fun update(bookId: Int, book: BookDTO)
     fun delete(bookId: Int)
+
+    fun findBooks(authorId: Int): List<BookDTO>
 }

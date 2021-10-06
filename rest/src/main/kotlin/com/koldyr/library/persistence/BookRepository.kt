@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository
  * @created: 2021-09-25
  */
 @Repository("bookRepository")
-interface BookRepository : JpaRepository<Book, Int>
+interface BookRepository : JpaRepository<Book, Int> {
+    fun findBooksByAuthorId(authorId: Int): List<Book>
+}

@@ -13,6 +13,6 @@ import org.springframework.stereotype.Repository
  */
 @Repository("readerRepository")
 interface ReaderRepository : JpaRepository<Reader, Int> {
-    @Query("select p.orders from Reader as p where p.id = :personId")
-    fun findEvents(@Param("personId") personId: Int): Collection<Order>
+    @Query("from Order where reader.id = :readerId")
+    fun findOrders(@Param("readerId") readerId: Int): Collection<Order>
 }

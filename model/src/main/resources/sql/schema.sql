@@ -40,11 +40,6 @@ alter table T_ORDER
     add constraint PK_ORDER PRIMARY KEY (ORDER_ID);
 create sequence SEQ_ORDER start with 1;
 
-CREATE TABLE T_READER_ORDERS (
-    orders_order_id INTEGER   NOT NULL,
-    reader_reader_id INTEGER   NOT NULL
-);
-
 
 CREATE TABLE T_AUTHOR
 (
