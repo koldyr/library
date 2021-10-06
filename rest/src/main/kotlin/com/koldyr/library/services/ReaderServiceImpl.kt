@@ -1,9 +1,12 @@
 package com.koldyr.library.services
 
+import java.util.stream.Collectors.toList
+import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Order
 import com.koldyr.library.model.Reader
 import com.koldyr.library.persistence.ReaderRepository
-import org.springframework.http.HttpStatus.*
+import ma.glasnost.orika.MapperFacade
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 
@@ -12,20 +15,21 @@ import org.springframework.web.server.ResponseStatusException
  * @created: 2021-09-28
  */
 open class ReaderServiceImpl(
-    private val readerRepository: ReaderRepository
+    private val readerRepository: ReaderRepository,
+    private val mapper: MapperFacade
 ) : ReaderService {
 
     override fun findAll(): List<Reader> = readerRepository.findAll()
-    
+
     @Transactional
     override fun create(person: Reader): Int {
         val saved = readerRepository.save(person)
         return saved.id!!
     }
 
-    override fun findById(personId: Int): Reader {
-        return readerRepository.findById(personId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$personId' is not found") }
+    override fun findById(readeId: Int): Reader {
+        return readerRepository.findById(readeId)
+            .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readeId' is not found") }
     }
 
     @Transactional
@@ -33,12 +37,8 @@ open class ReaderServiceImpl(
         val persisted: Reader = readerRepository.findById(readeId)
             .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readeId' is not found") }
 
-        persisted.firstName = reader.firstName
-        persisted.lastName = reader.lastName
-        persisted.address = reader.address
-        persisted.mail = reader.mail
-        persisted.phoneNumber = reader.phoneNumber
-        persisted.note = reader.note
+        reader.id = persisted.id
+        mapper.map(reader, persisted)
 
         readerRepository.save(persisted);
     }
@@ -46,7 +46,13 @@ open class ReaderServiceImpl(
     @Transactional
     override fun delete(readerId: Int) = readerRepository.deleteById(readerId)
 
-    override fun findOrders(readerId: Int): Collection<Order> {
-        return readerRepository.findOrders(readerId)
+    override fun findOrders(readerId: Int): Collection<OrderDTO> {
+        return readerRepository.findOrders(readerId).stream()
+            .map(this::mapOrder)
+            .collect(toList())
+    }
+
+    private fun mapOrder(entity: Order): OrderDTO {
+        return mapper.map(entity, OrderDTO::class.java)
     }
 }

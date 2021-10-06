@@ -10,15 +10,12 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "name": {
-    "first": "p5_name",
-    "middle": "p5_middle",
-    "last": "p5_last"
-  },
-  "gender": "MALE",
-  "place": "p5_place",
-  "occupation": "p5_occup",
-  "note": "p5_note"
+  "firstName": "r1_first",
+  "lastName": "r1_last",
+  "mail": "r1_mail",
+  "address": "r1_address",
+  "phoneNumber": "r1-111-222-333",
+  "note": "r1_note"
 }
 
 ### Update Reader
@@ -27,15 +24,12 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "name": {
-    "first": "p5_name",
-    "middle": "p5_middle",
-    "last": "p5_last"
-  },
-  "gender": "FEMALE",
-  "place": "p5_place",
-  "occupation": "p5_occup",
-  "note": "p5_note"
+  "firstName": "r1_first",
+  "lastName": "r1_last",
+  "mail": "r1_mail",
+  "address": "r1_address",
+  "phoneNumber": "r1-111-222-333",
+  "note": "r1_note"
 }
 
 ### Delete Reader

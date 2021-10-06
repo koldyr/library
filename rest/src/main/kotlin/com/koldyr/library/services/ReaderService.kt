@@ -1,6 +1,6 @@
 package com.koldyr.library.services
 
-import com.koldyr.library.model.Order
+import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Reader
 
 /**
@@ -10,9 +10,9 @@ import com.koldyr.library.model.Reader
 interface ReaderService {
     fun create(person: Reader): Int
     fun findAll(): List<Reader>
-    fun findById(personId: Int): Reader
+    fun findById(readeId: Int): Reader
     fun update(readeId: Int, reader: Reader)
     fun delete(readerId: Int)
 
-    fun findOrders(readerId: Int): Collection<Order>
+    fun findOrders(readerId: Int): Collection<OrderDTO>
 }

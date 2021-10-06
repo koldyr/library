@@ -1,5 +1,6 @@
 package com.koldyr.library.controllers
 
+import java.net.URI
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.model.Author
 import com.koldyr.library.services.AuthorService
@@ -13,7 +14,6 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.net.URI
 
 /**
  * Description of class AuthorController
@@ -21,7 +21,11 @@ import java.net.URI
  */
 @RestController
 @RequestMapping("/api/library/authors")
-class AuthorController(private val authorService: AuthorService, private val bookService: BookService) {
+class AuthorController(
+    private val authorService: AuthorService,
+    private val bookService: BookService
+) {
+
     @GetMapping
     fun authors(): Collection<Author> = authorService.findAll()
 

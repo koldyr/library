@@ -1,10 +1,12 @@
 package com.koldyr.library.controllers
 
-import com.koldyr.library.model.Order
+import java.net.URI
+import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Reader
 import com.koldyr.library.services.ReaderService
 import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.*
+import org.springframework.http.ResponseEntity.created
+import org.springframework.http.ResponseEntity.noContent
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -13,7 +15,6 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.net.URI
 
 /**
  * Description of class ReaderController
@@ -48,5 +49,5 @@ class ReaderController(private val readerService: ReaderService) {
     }
 
     @GetMapping("/{readerId}/orders")
-    fun orders(@PathVariable readerId: Int): Collection<Order> = readerService.findOrders(readerId)
+    fun orders(@PathVariable readerId: Int): Collection<OrderDTO> = readerService.findOrders(readerId)
 }

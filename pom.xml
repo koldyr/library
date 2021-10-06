@@ -8,7 +8,7 @@
     <artifactId>application</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>library</name>
+    <name>Library Application</name>
     <url>http://www.koldyr.com</url>
 
     <properties>
