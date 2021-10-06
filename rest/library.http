@@ -55,8 +55,13 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "husband": 1,
-  "wife": 2
+  "title": "b1_title",
+  "authorId": 1,
+  "genre": "SCIFI",
+  "publishingHouse": "b1_house",
+  "publicationDate": "2021-09-09",
+  "bookCover": null,
+  "note": "b1_note"
 }
 
 ### Update Book
@@ -65,8 +70,13 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "husband": 1,
-  "wife": 2
+  "title": "b1_title",
+  "authorId": 1,
+  "genre": "SCIFI",
+  "publishingHouse": "b1_house",
+  "publicationDate": "2021-09-09",
+  "bookCover": null,
+  "note": "b1_note"
 }
 
 ### Delete Book
