@@ -11,5 +11,5 @@ class AuthorDTO {
     var firstName: String? = null
     var lastName: String? = null
     var dateOfBirth: LocalDate? = null
-    var books: Collection<Int>? = null
+    var books: MutableCollection<Int> = mutableSetOf()
 }

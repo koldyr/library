@@ -11,6 +11,8 @@ import com.koldyr.library.model.Feedback
 import com.koldyr.library.model.Order
 import com.koldyr.library.persistence.AuthorRepository
 import com.koldyr.library.persistence.BookRepository
+import com.koldyr.library.persistence.FeedbackRepository
+import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
 import com.koldyr.library.services.AuthorService
 import com.koldyr.library.services.AuthorServiceImpl
@@ -41,6 +43,12 @@ open class ServiceConfig {
     @Autowired
     lateinit var authorRepository: AuthorRepository
 
+    @Autowired
+    lateinit var orderRepository: OrderRepository
+
+    @Autowired
+    lateinit var feedbackRepository: FeedbackRepository
+
     @Bean
     open fun readerService(mapper: MapperFacade): ReaderService {
         return ReaderServiceImpl(readerRepository, mapper)
@@ -48,7 +56,7 @@ open class ServiceConfig {
 
     @Bean
     open fun bookService(mapper: MapperFacade): BookService {
-        return BookServiceImpl(bookRepository, authorRepository, mapper)
+        return BookServiceImpl(bookRepository, authorRepository, readerRepository, orderRepository, feedbackRepository, mapper)
     }
 
     @Bean
@@ -61,20 +69,21 @@ open class ServiceConfig {
         val mapperFactory: MapperFactory = DefaultMapperFactory.Builder().build()
 
         mapperFactory.classMap(Order::class.java, OrderDTO::class.java)
-                .field("reader.id", "readerId")
-                .byDefault()
-                .register()
-
+            .field("reader.id", "readerId")
+            .byDefault()
+            .register()
         mapperFactory.classMap(Book::class.java, BookDTO::class.java)
-                .field("author.id", "authorId")
-                .byDefault()
-                .register()
-
+            .field("author.id", "authorId")
+            .byDefault()
+            .register()
         mapperFactory.classMap(Feedback::class.java, FeedbackDTO::class.java)
-                .field("reader.id", "readerId")
-                .field("book.id", "bookId")
-                .byDefault()
-                .register()
+            .field("reader.id", "readerId")
+            .field("book.id", "bookId")
+            .byDefault()
+            .register()
+        mapperFactory.classMap(Order::class.java, OrderDTO::class.java)
+            .byDefault()
+            .register()
 
         val converterFactory = mapperFactory.converterFactory
         converterFactory.registerConverter(BookConverter(bookRepository))

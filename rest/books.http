@@ -12,13 +12,13 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "title": "b3_title",
-  "authorId": 3,
-  "genre": "DETECTIVE",
-  "publishingHouse": "b3_house",
-  "publicationDate": "2021-09-09",
+  "title": "b4_title",
+  "authorId": 4,
+  "genre": "MYSTERY",
+  "publishingHouse": "b4_house",
+  "publicationDate": "2021-04-09",
   "bookCover": null,
-  "note": "b3_note",
+  "note": "b4_note",
   "count": 10
 }
 
@@ -28,13 +28,13 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "title": "b32_title",
+  "title": "b22_title",
   "authorId": 1,
   "genre": "CRIME",
-  "publishingHouse": "b32_house",
+  "publishingHouse": "b22_house",
   "publicationDate": "2021-09-09",
   "bookCover": null,
-  "note": "b32_note",
+  "note": "b22_note",
   "count": 20
 }
 
@@ -42,10 +42,10 @@ Accept: application/json
 DELETE http://localhost:8080/api/library/books/1
 
 ### Get all Feedbacks for Book
-GET http://localhost:8080/api/library/books/1/feedbacks
+GET http://localhost:8080/api/library/books/2/feedbacks
 
 ### Get all Books of Author
-GET http://localhost:8080/api/library/authors/1/books
+GET http://localhost:8080/api/library/authors/2/books
 
 ### Search Books
 POST http://localhost:8080/api/library/books/search
@@ -55,4 +55,21 @@ Accept: application/json
 {
   "publishYearFrom": 2000,
   "publishYearTill": 2030
+}
+
+### Order Book
+POST http://localhost:8080/api/library/books/4/reader/3
+Accept: application/json
+
+
+### Feedback on Book
+POST http://localhost:8080/api/library/books/1/feedbacks
+Content-Type: application/json
+Accept: application/json
+
+{
+  "readerId": 2,
+  "bookId": 2,
+  "text": "f1_feedback",
+  "rate": 8
 }

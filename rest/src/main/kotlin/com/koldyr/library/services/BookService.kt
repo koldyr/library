@@ -1,6 +1,8 @@
 package com.koldyr.library.services
 
 import com.koldyr.library.dto.BookDTO
+import com.koldyr.library.dto.FeedbackDTO
+import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.SearchCriteria
 
 /**
@@ -16,4 +18,6 @@ interface BookService {
 
     fun findBooks(authorId: Int): List<BookDTO>
     fun findBooks(criteria: SearchCriteria): List<BookDTO>
+    fun takeBook(bookId: Int, readerId: Int): OrderDTO
+    fun feedbackBook(bookId: Int, feedback: FeedbackDTO): Int
 }

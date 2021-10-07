@@ -1,20 +1,28 @@
 package com.koldyr.library.services
 
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.util.Objects.isNull
+import java.util.Objects.nonNull
+import java.util.stream.Collectors.toList
 import com.koldyr.library.dto.BookDTO
+import com.koldyr.library.dto.FeedbackDTO
+import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.model.Book
+import com.koldyr.library.model.Feedback
+import com.koldyr.library.model.Order
 import com.koldyr.library.persistence.AuthorRepository
 import com.koldyr.library.persistence.BookRepository
-
+import com.koldyr.library.persistence.FeedbackRepository
+import com.koldyr.library.persistence.OrderRepository
+import com.koldyr.library.persistence.ReaderRepository
 import ma.glasnost.orika.MapperFacade
 import org.springframework.data.jpa.domain.Specification
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-
-import java.time.LocalDate
-import java.util.Objects.*
-import java.util.stream.Collectors.*
 import javax.persistence.criteria.Path
 import javax.persistence.criteria.Predicate
 
@@ -23,9 +31,13 @@ import javax.persistence.criteria.Predicate
  * @created: 2021-09-28
  */
 open class BookServiceImpl(
-        private val bookRepository: BookRepository,
-        private val authorRepository: AuthorRepository,
-        private val mapper: MapperFacade) : BookService {
+    private val bookRepository: BookRepository,
+    private val authorRepository: AuthorRepository,
+    private val readerRepository: ReaderRepository,
+    private val orderRepository: OrderRepository,
+    private val feedbackRepository: FeedbackRepository,
+    private val mapper: MapperFacade
+) : BookService {
 
     override fun findAll(available: Boolean): List<BookDTO> {
         if (available) {
@@ -44,15 +56,13 @@ open class BookServiceImpl(
     }
 
     override fun findById(bookId: Int): BookDTO {
-        return bookRepository.findById(bookId)
-                .map(this::mapBook)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '$bookId' is not found") }
+        val book = find(bookId)
+        return mapBook(book)
     }
 
     @Transactional
     override fun update(bookId: Int, book: BookDTO) {
-        val persisted: Book = bookRepository.findById(bookId)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '$bookId' is not found") }
+        val persisted: Book = find(bookId)
 
         mapBook(book, persisted)
 
@@ -62,20 +72,50 @@ open class BookServiceImpl(
     @Transactional
     override fun delete(bookId: Int) = bookRepository.deleteById(bookId)
 
+    @Transactional
+    override fun feedbackBook(bookId: Int, feedback: FeedbackDTO): Int {
+        if (isNull(feedback.readerId)) {
+            throw ResponseStatusException(BAD_REQUEST, "Reader id must be provided")
+        }
+
+        feedback.bookId = bookId
+        val newFeedback = mapper.map(feedback, Feedback::class.java)
+        newFeedback.id = null
+        newFeedback.date = LocalDateTime.now()
+        feedbackRepository.save(newFeedback)
+        return newFeedback.id!!
+    }
+
+    @Transactional
+    override fun takeBook(bookId: Int, readerId: Int): OrderDTO {
+        if (!bookRepository.existsById(bookId)) {
+            throw ResponseStatusException(NOT_FOUND, "Book with id '$bookId' is not found")
+        }
+        val reader = readerRepository.findById(readerId)
+            .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readerId' is not found") }
+
+        val order = Order()
+        order.bookId = bookId
+        order.reader = reader
+        orderRepository.save(order)
+        
+        return mapper.map(order, OrderDTO::class.java)
+    }
+
     override fun findBooks(authorId: Int): List<BookDTO> {
         if (!authorRepository.existsById(authorId)) {
             throw ResponseStatusException(NOT_FOUND, "Author with id '$authorId' is not found")
         }
         return bookRepository.findBooksByAuthorId(authorId).stream()
-                .map(this::mapBook)
-                .collect(toList())
+            .map(this::mapBook)
+            .collect(toList())
     }
 
     override fun findBooks(criteria: SearchCriteria): List<BookDTO> {
         val filter = createFilter(criteria)
         return bookRepository.findAll(filter).stream()
-                .map(this::mapBook)
-                .collect(toList())
+            .map(this::mapBook)
+            .collect(toList())
     }
 
     private fun createFilter(criteria: SearchCriteria): Specification<Book> {
@@ -106,8 +146,8 @@ open class BookServiceImpl(
             if (isNull(criteria.publishYear)) {
                 if (nonNull(criteria.publishYearFrom) || nonNull(criteria.publishYearTill)) {
                     val publicationDate: Path<LocalDate> = book.get("publicationDate")
-                    val from = LocalDate.of(criteria.publishYearFrom!!, 1 ,1)
-                    val to = LocalDate.of(criteria.publishYearTill!!, 12,31)
+                    val from = LocalDate.of(criteria.publishYearFrom!!, 1, 1)
+                    val to = LocalDate.of(criteria.publishYearTill!!, 12, 31)
                     val predicate = builder.between(publicationDate, from, to)
                     filter = if (isNull(filter)) predicate else builder.and(predicate)
                 }
@@ -128,6 +168,11 @@ open class BookServiceImpl(
 
     private fun mapBook(book: Book): BookDTO {
         return mapper.map(book, BookDTO::class.java)
+    }
+
+    private fun find(bookId: Int): Book {
+        return bookRepository.findById(bookId)
+            .orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '$bookId' is not found") }
     }
 }
 

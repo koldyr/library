@@ -1,10 +1,14 @@
 package com.koldyr.library.controllers
 
+import java.net.URI
 import com.koldyr.library.dto.BookDTO
+import com.koldyr.library.dto.FeedbackDTO
+import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.services.BookService
 import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.*
+import org.springframework.http.ResponseEntity.created
+import org.springframework.http.ResponseEntity.noContent
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -14,7 +18,6 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.net.URI
 
 /**
  * Description of class BookController
@@ -50,4 +53,16 @@ class BookController(private val bookService: BookService) {
 
         return noContent().build()
     }
+
+    @PostMapping("/{bookId}/reader/{readerId}")
+    fun takeBook(@PathVariable bookId: Int, @PathVariable readerId: Int): OrderDTO = bookService.takeBook(bookId, readerId)
+
+    @PostMapping("/{bookId}/feedback")
+    fun feedbackBook(@PathVariable bookId: Int, @RequestBody feedback: FeedbackDTO): ResponseEntity<Unit> {
+        val feedbackId: Int = bookService.feedbackBook(bookId, feedback)
+
+        val uri = URI.create("/api/library/books/${bookId}/feedback")
+        return created(uri).build()
+    }
+
 }

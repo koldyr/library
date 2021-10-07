@@ -11,35 +11,35 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "firstName": "r33_first",
-  "lastName": "r33_last",
-  "mail": "r33_mail",
-  "address": "r33_address",
-  "phoneNumber": "r33-111-222-333",
-  "note": "r33_note"
+  "firstName": "r3_first",
+  "lastName": "r3_last",
+  "mail": "r3_mail",
+  "address": "r3_address",
+  "phoneNumber": "r3-111-222-333",
+  "note": "r3_note"
 }
 
 ### Update Reader
-PUT http://localhost:8080/api/library/readers/33
+PUT http://localhost:8080/api/library/readers/3
 Content-Type: application/json
 Accept: application/json
 
 {
-  "firstName": "r33_first",
-  "lastName": "r33_last",
-  "mail": "r33_mail",
-  "address": "r33_address",
-  "phoneNumber": "r33-111-222-333",
-  "note": "r33_note"
+  "firstName": "r3_first",
+  "lastName": "r3_last",
+  "mail": "r3_mail",
+  "address": "r3_address",
+  "phoneNumber": "r3-111-222-333",
+  "note": "r3_note"
 }
 
 ### Delete Reader
 DELETE http://localhost:8080/api/library/readers/1
 
 ### Reader Orders
-GET http://localhost:8080/api/library/readers/1/orders?returned=true
+GET http://localhost:8080/api/library/readers/3/orders
 Accept: application/json
 
 ### Reader Feedbacks
-GET http://localhost:8080/api/library/readers/1/feedbacks
+GET http://localhost:8080/api/library/readers/2/feedbacks
 Accept: application/json

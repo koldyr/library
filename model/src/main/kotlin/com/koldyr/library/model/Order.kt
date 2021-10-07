@@ -33,7 +33,7 @@ class Order : Cloneable {
     var reader: Reader? = null
 
     @Column(columnDefinition = "TIMESTAMP", nullable = false)
-    var ordered: LocalDateTime? = null
+    var ordered: LocalDateTime = LocalDateTime.now()
 
     @Column(columnDefinition = "TIMESTAMP")
     var returned: LocalDateTime? = null

@@ -2,7 +2,6 @@ package com.koldyr.library.services
 
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
-import com.koldyr.library.model.Author
 
 /**
  * Description of class AuthorService
@@ -11,7 +10,7 @@ import com.koldyr.library.model.Author
 interface AuthorService {
     fun findAll(): List<AuthorDTO>
     fun create(author: AuthorDTO): Int
-    fun findById(authorId: Int): Author
+    fun findById(authorId: Int): AuthorDTO
     fun update(authorId: Int, author: AuthorDTO)
     fun delete(authorId: Int)
     fun addBook(authorId: Int, book: BookDTO): Int
