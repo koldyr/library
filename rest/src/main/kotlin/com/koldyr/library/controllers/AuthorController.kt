@@ -1,6 +1,6 @@
 package com.koldyr.library.controllers
 
-import java.net.URI
+import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.model.Author
 import com.koldyr.library.services.AuthorService
@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.net.URI
 
 /**
  * Description of class AuthorController
@@ -22,15 +23,14 @@ import org.springframework.web.bind.annotation.RestController
 @RestController
 @RequestMapping("/api/library/authors")
 class AuthorController(
-    private val authorService: AuthorService,
-    private val bookService: BookService
-) {
+        private val authorService: AuthorService,
+        private val bookService: BookService) {
 
     @GetMapping
-    fun authors(): Collection<Author> = authorService.findAll()
+    fun authors(): List<AuthorDTO> = authorService.findAll()
 
     @PostMapping
-    fun create(@RequestBody author: Author): ResponseEntity<String> {
+    fun create(@RequestBody author: AuthorDTO): ResponseEntity<String> {
         val authorId: Int = authorService.create(author)
 
         val uri = URI.create("/api/library/authors/$authorId")
@@ -38,7 +38,7 @@ class AuthorController(
     }
 
     @PutMapping("/{authorId}")
-    fun update(@PathVariable authorId: Int, @RequestBody author: Author) = authorService.update(authorId, author)
+    fun update(@PathVariable authorId: Int, @RequestBody author: AuthorDTO) = authorService.update(authorId, author)
 
     @GetMapping("/{authorId}")
     fun authorById(@PathVariable authorId: Int): Author = authorService.findById(authorId)

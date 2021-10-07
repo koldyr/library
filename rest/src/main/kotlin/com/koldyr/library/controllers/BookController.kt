@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import java.net.URI
 
@@ -23,12 +24,12 @@ import java.net.URI
 class BookController(private val bookService: BookService) {
 
     @GetMapping
-    fun books(): Collection<BookDTO> = bookService.findAll()
+    fun books(@RequestParam(required = false) available: Boolean): Collection<BookDTO> = bookService.findAll(available)
 
     @PostMapping
     fun create(@RequestBody book: BookDTO): ResponseEntity<Unit> {
         val bookId = bookService.create(book)
-        
+
         val uri = URI.create("/api/library/books/${bookId}")
         return created(uri).build()
     }

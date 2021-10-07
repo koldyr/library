@@ -1,0 +1,45 @@
+### Get All Readers
+GET http://localhost:8080/api/library/readers
+
+### Get Specific Reader
+GET http://localhost:8080/api/library/readers/1
+Accept: application/json
+
+### Create Reader
+POST http://localhost:8080/api/library/readers
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "r33_first",
+  "lastName": "r33_last",
+  "mail": "r33_mail",
+  "address": "r33_address",
+  "phoneNumber": "r33-111-222-333",
+  "note": "r33_note"
+}
+
+### Update Reader
+PUT http://localhost:8080/api/library/readers/33
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "r33_first",
+  "lastName": "r33_last",
+  "mail": "r33_mail",
+  "address": "r33_address",
+  "phoneNumber": "r33-111-222-333",
+  "note": "r33_note"
+}
+
+### Delete Reader
+DELETE http://localhost:8080/api/library/readers/1
+
+### Reader Orders
+GET http://localhost:8080/api/library/readers/1/orders?returned=true
+Accept: application/json
+
+### Reader Feedbacks
+GET http://localhost:8080/api/library/readers/1/feedbacks
+Accept: application/json

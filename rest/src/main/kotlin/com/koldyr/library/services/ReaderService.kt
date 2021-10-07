@@ -1,5 +1,6 @@
 package com.koldyr.library.services
 
+import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Reader
 
@@ -14,5 +15,6 @@ interface ReaderService {
     fun update(readeId: Int, reader: Reader)
     fun delete(readerId: Int)
 
-    fun findOrders(readerId: Int): Collection<OrderDTO>
+    fun findOrders(readerId: Int, returned: Boolean): Collection<OrderDTO>
+    fun findFeedbacks(readerId: Int): Collection<FeedbackDTO>
 }

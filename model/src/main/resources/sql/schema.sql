@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS T_BOOK
     publication_date date,
     genre            VARCHAR(32),
     book_cover       VARCHAR(1024),
-    note             VARCHAR(1024)
+    note             VARCHAR(1024),
+    count            INTEGER
 );
 alter table T_BOOK
     add constraint PK_BOOK PRIMARY KEY (BOOK_ID);

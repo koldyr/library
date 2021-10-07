@@ -1,27 +1,48 @@
 package com.koldyr.library.services
 
+import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.model.Author
-import org.springframework.stereotype.Service
+import com.koldyr.library.persistence.AuthorRepository
+import ma.glasnost.orika.MapperFacade
+import org.springframework.http.HttpStatus
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
+import java.util.stream.Collectors.*
 
-@Service("authorService")
-class AuthorServiceImpl : AuthorService {
-    override fun findAll(): List<Author> {
-        TODO("Not yet implemented")
-    }
+open class AuthorServiceImpl(
+        private val authorRepository: AuthorRepository,
+        private val mapper: MapperFacade) : AuthorService {
 
-    override fun create(author: Author): Int {
-        TODO("Not yet implemented")
+    override fun findAll(): List<AuthorDTO> = authorRepository.findAll().stream()
+            .map { mapper.map(it, AuthorDTO::class.java) }
+            .collect(toList())
+
+    @Transactional
+    override fun create(author: AuthorDTO): Int {
+        author.id = null
+        val newAuthor = mapper.map(author, Author::class.java)
+        val saved = authorRepository.save(newAuthor)
+        return saved.id!!
     }
 
     override fun findById(authorId: Int): Author {
-        TODO("Not yet implemented")
+        return authorRepository.findById(authorId)
+                .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Author with id '$authorId' is not found") }
     }
 
-    override fun update(authorId: Int, author: Author) {
-        TODO("Not yet implemented")
+    @Transactional
+    override fun update(authorId: Int, author: AuthorDTO) {
+        val persisted = authorRepository.findById(authorId)
+                .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Author with id '$authorId' is not found") }
+
+        author.id = authorId
+        mapper.map(author, persisted)
+
+        authorRepository.save(persisted)
     }
 
+    @Transactional
     override fun delete(authorId: Int) {
-        TODO("Not yet implemented")
+        authorRepository.deleteById(authorId)
     }
 }

@@ -7,7 +7,7 @@ import com.koldyr.library.dto.BookDTO
  * @created: 2021-09-28
  */
 interface BookService {
-    fun findAll(): List<BookDTO>
+    fun findAll(available: Boolean): List<BookDTO>
     fun create(book: BookDTO): Int
     fun findById(bookId: Int): BookDTO
     fun update(bookId: Int, book: BookDTO)

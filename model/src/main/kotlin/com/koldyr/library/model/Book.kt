@@ -44,6 +44,8 @@ class Book() {
 
     var note: String? = null
 
+    var count: Int = 0
+
     constructor(id: Int) : this() {
         this.id = id
     }

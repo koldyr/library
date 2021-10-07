@@ -2,6 +2,8 @@ package com.koldyr.library.persistence
 
 import com.koldyr.library.model.Book
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.Query
+import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 
 /**
@@ -11,4 +13,10 @@ import org.springframework.stereotype.Repository
 @Repository("bookRepository")
 interface BookRepository : JpaRepository<Book, Int> {
     fun findBooksByAuthorId(authorId: Int): List<Book>
+
+    @Query("from Book b where b.count > 0")
+    fun findAvailable(): List<Book>
+
+    @Query("from Book b where b.count > 0 and b.author.id = :authorId")
+    fun findAvailableForAuthor(@Param("authorId") authorId: Int): List<Book>
 }
