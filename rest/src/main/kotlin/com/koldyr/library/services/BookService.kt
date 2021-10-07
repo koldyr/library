@@ -1,6 +1,7 @@
 package com.koldyr.library.services
 
 import com.koldyr.library.dto.BookDTO
+import com.koldyr.library.dto.SearchCriteria
 
 /**
  * Description of class BookService
@@ -14,4 +15,5 @@ interface BookService {
     fun delete(bookId: Int)
 
     fun findBooks(authorId: Int): List<BookDTO>
+    fun findBooks(criteria: SearchCriteria): List<BookDTO>
 }

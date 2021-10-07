@@ -1,14 +1,22 @@
 package com.koldyr.library.services
 
 import com.koldyr.library.dto.BookDTO
+import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.model.Book
 import com.koldyr.library.persistence.AuthorRepository
 import com.koldyr.library.persistence.BookRepository
+
 import ma.glasnost.orika.MapperFacade
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+
+import java.time.LocalDate
+import java.util.Objects.*
 import java.util.stream.Collectors.*
+import javax.persistence.criteria.Path
+import javax.persistence.criteria.Predicate
 
 /**
  * Description of class BookServiceImpl
@@ -58,10 +66,59 @@ open class BookServiceImpl(
         if (!authorRepository.existsById(authorId)) {
             throw ResponseStatusException(NOT_FOUND, "Author with id '$authorId' is not found")
         }
-        
         return bookRepository.findBooksByAuthorId(authorId).stream()
                 .map(this::mapBook)
                 .collect(toList())
+    }
+
+    override fun findBooks(criteria: SearchCriteria): List<BookDTO> {
+        val filter = createFilter(criteria)
+        return bookRepository.findAll(filter).stream()
+                .map(this::mapBook)
+                .collect(toList())
+    }
+
+    private fun createFilter(criteria: SearchCriteria): Specification<Book> {
+        return Specification<Book> { book, _, builder ->
+            var filter: Predicate? = null
+            if (nonNull(criteria.title)) {
+                filter = builder.like(book.get("title"), "%${criteria.title}%")
+            }
+
+            if (nonNull(criteria.genre)) {
+                val genre = book.get<String>("genre")
+                val predicate = builder.like(genre, "%${criteria.genre}%")
+                filter = if (isNull(filter)) predicate else builder.and(predicate)
+            }
+
+            if (nonNull(criteria.publisher)) {
+                val publishingHouse = book.get<String>("publishingHouse")
+                val predicate = builder.like(publishingHouse, "%${criteria.publisher}%")
+                filter = if (isNull(filter)) predicate else builder.and(predicate)
+            }
+
+            if (nonNull(criteria.note)) {
+                val note = book.get<String>("note")
+                val predicate = builder.like(note, "%${criteria.note}%")
+                filter = if (isNull(filter)) predicate else builder.and(predicate)
+            }
+
+            if (isNull(criteria.publishYear)) {
+                if (nonNull(criteria.publishYearFrom) || nonNull(criteria.publishYearTill)) {
+                    val publicationDate: Path<LocalDate> = book.get("publicationDate")
+                    val from = LocalDate.of(criteria.publishYearFrom!!, 1 ,1)
+                    val to = LocalDate.of(criteria.publishYearTill!!, 12,31)
+                    val predicate = builder.between(publicationDate, from, to)
+                    filter = if (isNull(filter)) predicate else builder.and(predicate)
+                }
+            } else {
+                val publicationDate: Path<LocalDate> = book.get("publicationDate")
+                val predicate = builder.equal(publicationDate, criteria.publishYear)
+                filter = if (isNull(filter)) predicate else builder.and(predicate)
+            }
+
+            filter
+        }
     }
 
     private fun mapBook(source: BookDTO, target: Book) {

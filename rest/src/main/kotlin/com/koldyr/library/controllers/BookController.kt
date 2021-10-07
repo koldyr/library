@@ -1,6 +1,7 @@
 package com.koldyr.library.controllers
 
 import com.koldyr.library.dto.BookDTO
+import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.services.BookService
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.*
@@ -25,6 +26,9 @@ class BookController(private val bookService: BookService) {
 
     @GetMapping
     fun books(@RequestParam(required = false) available: Boolean): Collection<BookDTO> = bookService.findAll(available)
+
+    @PostMapping("/search")
+    fun searchBooks(@RequestBody criteria: SearchCriteria): Collection<BookDTO> = bookService.findBooks(criteria)
 
     @PostMapping
     fun create(@RequestBody book: BookDTO): ResponseEntity<Unit> {

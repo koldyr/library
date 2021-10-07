@@ -46,3 +46,13 @@ GET http://localhost:8080/api/library/books/1/feedbacks
 
 ### Get all Books of Author
 GET http://localhost:8080/api/library/authors/1/books
+
+### Search Books
+POST http://localhost:8080/api/library/books/search
+Content-Type: application/json
+Accept: application/json
+
+{
+  "publishYearFrom": 2000,
+  "publishYearTill": 2030
+}
