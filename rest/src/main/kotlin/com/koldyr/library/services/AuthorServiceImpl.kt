@@ -1,10 +1,12 @@
 package com.koldyr.library.services
 
 import com.koldyr.library.dto.AuthorDTO
+import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.model.Author
+import com.koldyr.library.model.Book
 import com.koldyr.library.persistence.AuthorRepository
 import ma.glasnost.orika.MapperFacade
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import java.util.stream.Collectors.*
@@ -27,13 +29,12 @@ open class AuthorServiceImpl(
 
     override fun findById(authorId: Int): Author {
         return authorRepository.findById(authorId)
-                .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Author with id '$authorId' is not found") }
+                .orElseThrow { ResponseStatusException(NOT_FOUND, "Author with id '$authorId' is not found") }
     }
 
     @Transactional
     override fun update(authorId: Int, author: AuthorDTO) {
-        val persisted = authorRepository.findById(authorId)
-                .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Author with id '$authorId' is not found") }
+        val persisted = findById(authorId)
 
         author.id = authorId
         mapper.map(author, persisted)
@@ -44,5 +45,18 @@ open class AuthorServiceImpl(
     @Transactional
     override fun delete(authorId: Int) {
         authorRepository.deleteById(authorId)
+    }
+
+    @Transactional
+    override fun addBook(authorId: Int, book: BookDTO): Int {
+        val author = findById(authorId)
+
+        book.authorId = authorId
+        val newBook = mapper.map(book, Book::class.java)
+        author.books.add(newBook)
+        
+        authorRepository.save(author)
+        
+        return newBook.id!!
     }
 }

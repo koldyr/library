@@ -30,7 +30,7 @@ class AuthorController(
     fun authors(): List<AuthorDTO> = authorService.findAll()
 
     @PostMapping
-    fun create(@RequestBody author: AuthorDTO): ResponseEntity<String> {
+    fun create(@RequestBody author: AuthorDTO): ResponseEntity<Unit> {
         val authorId: Int = authorService.create(author)
 
         val uri = URI.create("/api/library/authors/$authorId")
@@ -52,4 +52,13 @@ class AuthorController(
 
     @GetMapping("/{authorId}/books")
     fun books(@PathVariable authorId: Int): Collection<BookDTO> = bookService.findBooks(authorId)
+
+    @PostMapping("/{authorId}/books")
+    fun addBooks(@PathVariable authorId: Int, @RequestBody book: BookDTO): ResponseEntity<Unit> {
+        val bookId: Int = authorService.addBook(authorId, book)
+
+        val uri = URI.create("/api/library/books/$bookId")
+        return ResponseEntity.created(uri).build()
+
+    }
 }

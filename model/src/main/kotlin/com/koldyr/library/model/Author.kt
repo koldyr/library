@@ -1,6 +1,7 @@
 package com.koldyr.library.model
 
 import java.time.LocalDate
+import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -31,6 +32,6 @@ class Author {
     @Column(columnDefinition = "DATE")
     var dateOfBirth: LocalDate? = null
 
-    @OneToMany(mappedBy = "author")
-    var books: Collection<Book>? = mutableSetOf()
+    @OneToMany(mappedBy = "author", cascade = [CascadeType.PERSIST])
+    var books: MutableCollection<Book> = mutableSetOf()
 }

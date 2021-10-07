@@ -2,6 +2,7 @@ package com.koldyr.library.services
 
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.model.Book
+import com.koldyr.library.persistence.AuthorRepository
 import com.koldyr.library.persistence.BookRepository
 import ma.glasnost.orika.MapperFacade
 import org.springframework.http.HttpStatus.*
@@ -15,6 +16,7 @@ import java.util.stream.Collectors.*
  */
 open class BookServiceImpl(
         private val bookRepository: BookRepository,
+        private val authorRepository: AuthorRepository,
         private val mapper: MapperFacade) : BookService {
 
     override fun findAll(available: Boolean): List<BookDTO> {
@@ -53,6 +55,10 @@ open class BookServiceImpl(
     override fun delete(bookId: Int) = bookRepository.deleteById(bookId)
 
     override fun findBooks(authorId: Int): List<BookDTO> {
+        if (!authorRepository.existsById(authorId)) {
+            throw ResponseStatusException(NOT_FOUND, "Author with id '$authorId' is not found")
+        }
+        
         return bookRepository.findBooksByAuthorId(authorId).stream()
                 .map(this::mapBook)
                 .collect(toList())

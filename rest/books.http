@@ -1,5 +1,5 @@
 ### Get Books
-GET http://localhost:8080/api/library/books?available=true
+GET http://localhost:8080/api/library/books
 Accept: application/json
 
 ### Get Book
@@ -12,13 +12,13 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "title": "b2_title",
-  "authorId": 1,
+  "title": "b3_title",
+  "authorId": 3,
   "genre": "DETECTIVE",
-  "publishingHouse": "b2_house",
+  "publishingHouse": "b3_house",
   "publicationDate": "2021-09-09",
   "bookCover": null,
-  "note": "b2_note",
+  "note": "b3_note",
   "count": 10
 }
 
@@ -28,18 +28,21 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "title": "b22_title",
+  "title": "b32_title",
   "authorId": 1,
   "genre": "CRIME",
-  "publishingHouse": "b22_house",
+  "publishingHouse": "b32_house",
   "publicationDate": "2021-09-09",
   "bookCover": null,
-  "note": "b22_note",
+  "note": "b32_note",
   "count": 20
 }
 
 ### Delete Book
-POST http://localhost:8080/api/library/books/1
+DELETE http://localhost:8080/api/library/books/1
 
-### Get all Author's Books
+### Get all Feedbacks for Book
+GET http://localhost:8080/api/library/books/1/feedbacks
+
+### Get all Books of Author
 GET http://localhost:8080/api/library/authors/1/books

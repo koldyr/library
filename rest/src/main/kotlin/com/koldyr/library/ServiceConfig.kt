@@ -48,7 +48,7 @@ open class ServiceConfig {
 
     @Bean
     open fun bookService(mapper: MapperFacade): BookService {
-        return BookServiceImpl(bookRepository, mapper)
+        return BookServiceImpl(bookRepository, authorRepository, mapper)
     }
 
     @Bean

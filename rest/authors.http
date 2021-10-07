@@ -1,0 +1,50 @@
+### Get Authors
+GET http://localhost:8080/api/library/authors
+Accept: application/json
+
+### Get Author
+GET http://localhost:8080/api/library/authors/2
+Accept: application/json
+
+### Create Author
+POST http://localhost:8080/api/library/authors
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "a2_first",
+  "lastName": "a2_last",
+  "dateOfBirth": "1992-10-10"
+}
+
+### Update Author
+PUT http://localhost:8080/api/library/authors/2
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "a22_first",
+  "lastName": "a22_last",
+  "dateOfBirth": "1992-12-12"
+}
+
+### Delete Author
+DELETE http://localhost:8080/api/library/authors/2
+
+### Get all Author's Authors
+GET http://localhost:8080/api/library/authors/2/books
+
+### Get all Author's Authors
+POST http://localhost:8080/api/library/authors/3/books
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "b4_title",
+  "genre": "DETECTIVE",
+  "publishingHouse": "b4_house",
+  "publicationDate": "2021-09-09",
+  "bookCover": null,
+  "note": "b4_note",
+  "count": 10
+}
