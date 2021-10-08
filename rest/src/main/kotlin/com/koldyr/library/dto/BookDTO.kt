@@ -7,7 +7,8 @@ import java.time.LocalDate
  * Description of class BookDTO
  * @created: 2021-09-28
  */
-class BookDTO(val id: Int) {
+class BookDTO {
+    var id: Int? = null
     var title: String? = null
     var authorId: Int? = null
     var genre: Genre? = null
@@ -15,4 +16,5 @@ class BookDTO(val id: Int) {
     var publicationDate: LocalDate? = null
     var bookCover: String? = null
     var note: String? = null
+    var count: Int? = null
 }

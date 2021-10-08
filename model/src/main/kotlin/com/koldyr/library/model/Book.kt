@@ -8,7 +8,8 @@ import javax.persistence.Enumerated
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.*
 import javax.persistence.Id
-import javax.persistence.OneToOne
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
 
@@ -30,7 +31,7 @@ class Book() {
 
     var publishingHouse: String? = null
 
-    @OneToOne
+    @ManyToOne @JoinColumn(name = "AUTHOR_ID")
     var author: Author? = null
 
     @Column(columnDefinition = "DATE")
@@ -42,6 +43,8 @@ class Book() {
     var bookCover: String? = null
 
     var note: String? = null
+
+    var count: Int = 0
 
     constructor(id: Int) : this() {
         this.id = id

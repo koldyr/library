@@ -1,6 +1,7 @@
 package com.koldyr.library.model
 
 import java.time.LocalDate
+import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -16,7 +17,7 @@ import javax.persistence.Table
  */
 @Entity
 @Table(name = "T_AUTHOR")
-@SequenceGenerator(name = "AuthorIds", sequenceName = "SEQ_READER", allocationSize = 1)
+@SequenceGenerator(name = "AuthorIds", sequenceName = "SEQ_AUTHOR", allocationSize = 1)
 class Author {
 
     @Id
@@ -31,6 +32,6 @@ class Author {
     @Column(columnDefinition = "DATE")
     var dateOfBirth: LocalDate? = null
 
-    @OneToMany(targetEntity = Book::class)
-    var books: Collection<Book>? = mutableSetOf()
+    @OneToMany(mappedBy = "author", cascade = [CascadeType.PERSIST])
+    var books: MutableCollection<Book> = mutableSetOf()
 }

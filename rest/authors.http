@@ -1,0 +1,35 @@
+### Get Authors
+GET http://localhost:8080/api/library/authors
+Accept: application/json
+
+### Get Author
+GET http://localhost:8080/api/library/authors/1
+Accept: application/json
+
+### Create Author
+POST http://localhost:8080/api/library/authors
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "a5_first",
+  "lastName": "a5_last",
+  "dateOfBirth": "1994-10-10"
+}
+
+### Update Author
+PUT http://localhost:8080/api/library/authors/3
+Content-Type: application/json
+Accept: application/json
+
+{
+  "firstName": "a3_first",
+  "lastName": "a3_last",
+  "dateOfBirth": "1993-12-12"
+}
+
+### Delete Author
+DELETE http://localhost:8080/api/library/authors/2
+
+### Get all Author's books
+GET http://localhost:8080/api/library/authors/4/books

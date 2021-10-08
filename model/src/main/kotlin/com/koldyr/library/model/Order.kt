@@ -1,12 +1,14 @@
 package com.koldyr.library.model
 
 import java.time.LocalDateTime
+import javax.persistence.Basic
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType
 import javax.persistence.Id
-import javax.persistence.OneToOne
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
 
@@ -24,14 +26,14 @@ class Order : Cloneable {
     @Column(name = "ORDER_ID")
     var id: Int? = null
 
-    @OneToOne
-    var book: Book? = null
+    @Basic(optional = false)
+    var bookId: Int? = null
 
-    @OneToOne
+    @ManyToOne(optional = false) @JoinColumn(name = "READER_ID")
     var reader: Reader? = null
 
-    @Column(columnDefinition = "TIMESTAMP")
-    var ordered: LocalDateTime? = null
+    @Column(columnDefinition = "TIMESTAMP", nullable = false)
+    var ordered: LocalDateTime = LocalDateTime.now()
 
     @Column(columnDefinition = "TIMESTAMP")
     var returned: LocalDateTime? = null

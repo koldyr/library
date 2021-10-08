@@ -1,0 +1,91 @@
+### Get Books
+GET http://localhost:8080/api/library/books
+Accept: application/json
+
+### Get Book
+GET http://localhost:8080/api/library/books/1
+Accept: application/json
+
+### Create Book
+POST http://localhost:8080/api/library/books
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "b5_title",
+  "authorId": 4,
+  "genre": "MYSTERY",
+  "publishingHouse": "b5_house",
+  "publicationDate": "2021-05-09",
+  "bookCover": null,
+  "note": "b5_note",
+  "count": 10
+}
+
+### Update Book
+PUT http://localhost:8080/api/library/books/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "b1_title",
+  "authorId": 1,
+  "genre": "CRIME",
+  "publishingHouse": "b1_house",
+  "publicationDate": "2021-09-09",
+  "bookCover": null,
+  "note": "b1_note",
+  "count": 10
+}
+
+### Delete Book
+DELETE http://localhost:8080/api/library/books/1
+
+### Get all Books of Author
+GET http://localhost:8080/api/library/authors/1/books
+
+### Search Books
+POST http://localhost:8080/api/library/books/search
+Content-Type: application/json
+Accept: application/json
+
+{
+  "publishYearFrom": 2000,
+  "publishYearTill": 2030
+}
+
+### Take Book
+POST http://localhost:8080/api/library/books/take
+Content-Type: application/json
+Accept: application/json
+
+{
+  "bookId": 5,
+  "readerId": 1,
+  "notes": "o2_note"
+}
+
+### Return Book
+POST http://localhost:8080/api/library/books/return
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": 103,
+  "notes": "o103_note_returned"
+}
+
+### Feedback on Book
+POST http://localhost:8080/api/library/books/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "readerId": 1,
+  "bookId": 3,
+  "text": "b3_feedback",
+  "rate": 9
+}
+
+### Get all Feedbacks for Book
+GET http://localhost:8080/api/library/books/5/feedbacks

@@ -7,7 +7,8 @@ CREATE TABLE IF NOT EXISTS T_BOOK
     publication_date date,
     genre            VARCHAR(32),
     book_cover       VARCHAR(1024),
-    note             VARCHAR(1024)
+    note             VARCHAR(1024),
+    count            INTEGER
 );
 alter table T_BOOK
     add constraint PK_BOOK PRIMARY KEY (BOOK_ID);
@@ -39,11 +40,6 @@ CREATE TABLE IF NOT EXISTS T_ORDER
 alter table T_ORDER
     add constraint PK_ORDER PRIMARY KEY (ORDER_ID);
 create sequence SEQ_ORDER start with 1;
-
-CREATE TABLE T_READER_ORDERS (
-    orders_order_id INTEGER   NOT NULL,
-    reader_reader_id INTEGER   NOT NULL
-);
 
 
 CREATE TABLE T_AUTHOR

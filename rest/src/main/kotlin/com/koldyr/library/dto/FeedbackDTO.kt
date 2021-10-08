@@ -1,0 +1,16 @@
+package com.koldyr.library.dto
+
+import java.time.LocalDateTime
+
+/**
+ * Description of class FeedbackDTO
+ * @created: 2021-10-07
+ */
+class FeedbackDTO {
+    var id: Int? = null
+    var readerId: Int? = null
+    var bookId: Int? = null
+    var date: LocalDateTime? = null
+    var text: String? = null
+    var rate: Int = 0
+}
