@@ -1,11 +1,14 @@
 package com.koldyr.library
 
+import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.mapper.AuthorConverter
 import com.koldyr.library.mapper.BookConverter
+import com.koldyr.library.mapper.OrderConverter
 import com.koldyr.library.mapper.ReaderConverter
+import com.koldyr.library.model.Author
 import com.koldyr.library.model.Book
 import com.koldyr.library.model.Feedback
 import com.koldyr.library.model.Order
@@ -69,26 +72,27 @@ open class ServiceConfig {
         val mapperFactory: MapperFactory = DefaultMapperFactory.Builder().build()
 
         mapperFactory.classMap(Order::class.java, OrderDTO::class.java)
-            .field("reader.id", "readerId")
-            .byDefault()
-            .register()
+                .field("reader", "readerId")
+                .byDefault()
+                .register()
         mapperFactory.classMap(Book::class.java, BookDTO::class.java)
-            .field("author.id", "authorId")
-            .byDefault()
-            .register()
+                .field("author", "authorId")
+                .byDefault()
+                .register()
         mapperFactory.classMap(Feedback::class.java, FeedbackDTO::class.java)
-            .field("reader.id", "readerId")
-            .field("book.id", "bookId")
-            .byDefault()
-            .register()
-        mapperFactory.classMap(Order::class.java, OrderDTO::class.java)
-            .byDefault()
-            .register()
+                .field("book", "bookId")
+                .field("reader", "readerId")
+                .byDefault()
+                .register()
+        mapperFactory.classMap(Author::class.java, AuthorDTO::class.java)
+                .byDefault()
+                .register()
 
         val converterFactory = mapperFactory.converterFactory
         converterFactory.registerConverter(BookConverter(bookRepository))
         converterFactory.registerConverter(AuthorConverter(authorRepository))
         converterFactory.registerConverter(ReaderConverter(readerRepository))
+        converterFactory.registerConverter(OrderConverter(orderRepository))
 
         return mapperFactory.mapperFacade
     }

@@ -5,7 +5,7 @@ import com.koldyr.library.persistence.BookRepository
 import ma.glasnost.orika.MappingContext
 import ma.glasnost.orika.converter.BidirectionalConverter
 import ma.glasnost.orika.metadata.Type
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.*
 import org.springframework.web.server.ResponseStatusException
 
 class BookConverter(private val bookRepository: BookRepository) : BidirectionalConverter<Int, Book>() {
@@ -15,7 +15,7 @@ class BookConverter(private val bookRepository: BookRepository) : BidirectionalC
             return null
         }
         return bookRepository.findById(bookId)
-                .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Book with id '$bookId' is not found") }
+                .orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '$bookId' is not found") }
     }
 
     override fun convertFrom(book: Book?, type: Type<Int>?, context: MappingContext?): Int? {

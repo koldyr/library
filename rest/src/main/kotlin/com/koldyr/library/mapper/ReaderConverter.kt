@@ -5,7 +5,7 @@ import com.koldyr.library.persistence.ReaderRepository
 import ma.glasnost.orika.MappingContext
 import ma.glasnost.orika.converter.BidirectionalConverter
 import ma.glasnost.orika.metadata.Type
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.*
 import org.springframework.web.server.ResponseStatusException
 
 /**
@@ -19,7 +19,7 @@ class ReaderConverter(private val readerRepository: ReaderRepository) : Bidirect
             return null
         }
         return readerRepository.findById(readerId)
-                .orElseThrow { ResponseStatusException(HttpStatus.NOT_FOUND, "Reader with id '$readerId' is not found") }
+                .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readerId' is not found") }
     }
 
     override fun convertFrom(reader: Reader?, type: Type<Int>?, context: MappingContext?): Int? {
