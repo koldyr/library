@@ -5,6 +5,7 @@ import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.services.BookService
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -16,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.server.ResponseStatusException
 import java.net.URI
+import java.util.*
 
 /**
  * Description of class BookController
@@ -55,19 +58,31 @@ class BookController(private val bookService: BookService) {
 
     @PostMapping("/{bookId}/take")
     fun takeBook(@PathVariable bookId: Int, @RequestBody order: OrderDTO): OrderDTO {
-        order.bookId= bookId
+        if (Objects.isNull(order.readerId)) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Reader id must be provided")
+        }
+
+        order.bookId = bookId
         return bookService.takeBook(order)
     }
 
     @PostMapping("/{bookId}/return")
     fun returnBook(@PathVariable bookId: Int, @RequestBody order: OrderDTO) {
+        if (Objects.isNull(order.id)) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Order id must be provided")
+        }
+
         order.bookId = bookId
         bookService.returnBook(order)
     }
 
     @PostMapping("/{bookId}/feedback")
     fun feedbackBook(@PathVariable bookId: Int, @RequestBody feedback: FeedbackDTO): ResponseEntity<Unit> {
-        val feedbackId: Int = bookService.feedbackBook(bookId, feedback)
+        if (Objects.isNull(feedback.readerId)) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Reader id must be provided")
+        }
+
+        bookService.feedbackBook(bookId, feedback)
 
         val uri = URI.create("/api/library/books/${bookId}/feedbacks")
         return created(uri).build()

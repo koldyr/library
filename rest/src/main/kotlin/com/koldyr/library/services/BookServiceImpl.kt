@@ -71,10 +71,6 @@ open class BookServiceImpl(
 
     @Transactional
     override fun feedbackBook(bookId: Int, feedback: FeedbackDTO): Int {
-        if (isNull(feedback.readerId)) {
-            throw ResponseStatusException(BAD_REQUEST, "Reader id must be provided")
-        }
-
         feedback.bookId = bookId
         feedback.date = LocalDateTime.now()
         val newFeedback = mapper.map(feedback, Feedback::class.java)
@@ -91,18 +87,14 @@ open class BookServiceImpl(
 
     @Transactional
     override fun takeBook(order: OrderDTO): OrderDTO {
-        if (isNull(order.readerId)) {
-            throw ResponseStatusException(BAD_REQUEST, "Reader id must be provided")
-        }
-        if (isNull(order.bookId)) {
-            throw ResponseStatusException(BAD_REQUEST, "Book id must be provided")
-        }
-
-        if (!bookRepository.existsById(order.bookId!!)) {
-            throw ResponseStatusException(NOT_FOUND, "Book with id '${order.bookId}' is not found")
-        }
         if (!readerRepository.existsById(order.readerId!!)) {
             throw ResponseStatusException(NOT_FOUND, "Reader with id '${order.readerId}' is not found")
+        }
+
+        val book = find(order.bookId!!)
+
+        if (book.count == 0) {
+            throw ResponseStatusException(BAD_REQUEST, "Book '${book.title}' is out of stock")
         }
 
         order.id = null
@@ -112,15 +104,14 @@ open class BookServiceImpl(
         orderRepository.save(newOrder)
         order.id = newOrder.id
 
+        book.count--
+        bookRepository.save(book)
+
         return order
     }
 
     @Transactional
     override fun returnBook(order: OrderDTO) {
-        if (isNull(order.id)) {
-            throw ResponseStatusException(BAD_REQUEST, "Order id must be provided")
-        }
-
         val persisted = orderRepository.findById(order.id!!)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '${order.id}' is not found") }
         
