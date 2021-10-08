@@ -10,7 +10,7 @@ import ma.glasnost.orika.MapperFacade
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.util.stream.Collectors.*
+import java.util.Objects.*
 
 /**
  * Description of class ReaderServiceImpl
@@ -35,7 +35,7 @@ open class ReaderServiceImpl(
 
     @Transactional
     override fun update(readeId: Int, reader: Reader) {
-        val persisted: Reader = readerRepository.findById(readeId)
+        val persisted = readerRepository.findById(readeId)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readeId' is not found") }
 
         reader.id = persisted.id
@@ -47,21 +47,20 @@ open class ReaderServiceImpl(
     @Transactional
     override fun delete(readerId: Int) = readerRepository.deleteById(readerId)
 
-    override fun findOrders(readerId: Int, returned: Boolean): Collection<OrderDTO> {
-        if (returned) {
-            return readerRepository.findReturnedOrders(readerId).stream()
-                    .map(this::mapOrder)
-                    .collect(toList())
+    override fun findOrders(readerId: Int, returned: Boolean?): Collection<OrderDTO> {
+        val orders = readerRepository.findOrders(readerId)
+
+        if (isNull(returned)) {
+            return orders.map(this::mapOrder)
         }
-        return readerRepository.findOrders(readerId).stream()
+
+        return orders
+                .filter { if (returned!!) nonNull(it.returned) else isNull(it.returned) }
                 .map(this::mapOrder)
-                .collect(toList())
     }
 
     override fun findFeedbacks(readerId: Int): Collection<FeedbackDTO> {
-        return readerRepository.findFeedbacks(readerId).stream()
-                .map(this::mapFeedBack)
-                .collect(toList())
+        return readerRepository.findFeedbacks(readerId).map(this::mapFeedBack)
     }
 
     private fun mapOrder(entity: Order): OrderDTO {

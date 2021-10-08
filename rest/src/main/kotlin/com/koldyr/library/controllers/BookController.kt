@@ -5,7 +5,7 @@ import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.services.BookService
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.*
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
 import java.net.URI
-import java.util.*
+import java.util.Objects.*
 
 /**
  * Description of class BookController
@@ -56,35 +56,39 @@ class BookController(private val bookService: BookService) {
         return noContent().build()
     }
 
-    @PostMapping("/{bookId}/take")
-    fun takeBook(@PathVariable bookId: Int, @RequestBody order: OrderDTO): OrderDTO {
-        if (Objects.isNull(order.readerId)) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Reader id must be provided")
+    @PostMapping("/take")
+    fun takeBook(@RequestBody order: OrderDTO): OrderDTO {
+        if (isNull(order.bookId)) {
+            throw ResponseStatusException(BAD_REQUEST, "Book id must be provided")
         }
-
-        order.bookId = bookId
+        if (isNull(order.readerId)) {
+            throw ResponseStatusException(BAD_REQUEST, "Reader id must be provided")
+        }
+        
         return bookService.takeBook(order)
     }
 
-    @PostMapping("/{bookId}/return")
-    fun returnBook(@PathVariable bookId: Int, @RequestBody order: OrderDTO) {
-        if (Objects.isNull(order.id)) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Order id must be provided")
+    @PostMapping("/return")
+    fun returnBook(@RequestBody order: OrderDTO) {
+        if (isNull(order.id)) {
+            throw ResponseStatusException(BAD_REQUEST, "Order id must be provided")
         }
 
-        order.bookId = bookId
         bookService.returnBook(order)
     }
 
-    @PostMapping("/{bookId}/feedback")
-    fun feedbackBook(@PathVariable bookId: Int, @RequestBody feedback: FeedbackDTO): ResponseEntity<Unit> {
-        if (Objects.isNull(feedback.readerId)) {
-            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "Reader id must be provided")
+    @PostMapping("/feedback")
+    fun feedbackBook(@RequestBody feedback: FeedbackDTO): ResponseEntity<Unit> {
+        if (isNull(feedback.bookId)) {
+            throw ResponseStatusException(BAD_REQUEST, "Book id must be provided")
+        }
+        if (isNull(feedback.readerId)) {
+            throw ResponseStatusException(BAD_REQUEST, "Reader id must be provided")
         }
 
-        bookService.feedbackBook(bookId, feedback)
+        bookService.feedbackBook(feedback)
 
-        val uri = URI.create("/api/library/books/${bookId}/feedbacks")
+        val uri = URI.create("/api/library/books/${feedback.bookId}/feedbacks")
         return created(uri).build()
     }
 

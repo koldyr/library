@@ -16,10 +16,7 @@ import org.springframework.stereotype.Repository
 interface ReaderRepository : JpaRepository<Reader, Int> {
     @Query("from Order where reader.id = :readerId")
     fun findOrders(@Param("readerId") readerId: Int): Collection<Order>
-
-    @Query("from Order where reader.id = :readerId and returned is not null")
-    fun findReturnedOrders(@Param("readerId") readerId: Int): Collection<Order>
-
+    
     @Query("from Feedback where reader.id = :readerId")
     fun findFeedbacks(readerId: Int): Collection<Feedback>
 }

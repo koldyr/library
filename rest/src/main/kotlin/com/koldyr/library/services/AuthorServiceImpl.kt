@@ -7,16 +7,12 @@ import ma.glasnost.orika.MapperFacade
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.util.stream.Collectors.*
 
 open class AuthorServiceImpl(
-    private val authorRepository: AuthorRepository,
-    private val mapper: MapperFacade
-) : AuthorService {
+        private val authorRepository: AuthorRepository,
+        private val mapper: MapperFacade) : AuthorService {
 
-    override fun findAll(): List<AuthorDTO> = authorRepository.findAll().stream()
-        .map { mapper.map(it, AuthorDTO::class.java) }
-        .collect(toList())
+    override fun findAll(): List<AuthorDTO> = authorRepository.findAll().map { mapper.map(it, AuthorDTO::class.java) }
 
     @Transactional
     override fun create(author: AuthorDTO): Int {
@@ -45,9 +41,9 @@ open class AuthorServiceImpl(
     override fun delete(authorId: Int) {
         authorRepository.deleteById(authorId)
     }
-    
+
     private fun find(authorId: Int): Author {
         return authorRepository.findById(authorId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Author with id '$authorId' is not found") }
+                .orElseThrow { ResponseStatusException(NOT_FOUND, "Author with id '$authorId' is not found") }
     }
 }

@@ -12,13 +12,13 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "title": "b4_title",
+  "title": "b5_title",
   "authorId": 4,
   "genre": "MYSTERY",
-  "publishingHouse": "b4_house",
-  "publicationDate": "2021-04-09",
+  "publishingHouse": "b5_house",
+  "publicationDate": "2021-05-09",
   "bookCover": null,
-  "note": "b4_note",
+  "note": "b5_note",
   "count": 10
 }
 
@@ -41,11 +41,8 @@ Accept: application/json
 ### Delete Book
 DELETE http://localhost:8080/api/library/books/1
 
-### Get all Feedbacks for Book
-GET http://localhost:8080/api/library/books/1/feedbacks
-
 ### Get all Books of Author
-GET http://localhost:8080/api/library/authors/2/books
+GET http://localhost:8080/api/library/authors/1/books
 
 ### Search Books
 POST http://localhost:8080/api/library/books/search
@@ -58,33 +55,37 @@ Accept: application/json
 }
 
 ### Take Book
-POST http://localhost:8080/api/library/books/2/take
+POST http://localhost:8080/api/library/books/take
 Content-Type: application/json
 Accept: application/json
 
 {
-  "readerId": 2,
-  "note": "o2_note"
+  "bookId": 5,
+  "readerId": 1,
+  "notes": "o2_note"
 }
 
 ### Return Book
-POST http://localhost:8080/api/library/books/3/return
+POST http://localhost:8080/api/library/books/return
 Content-Type: application/json
 Accept: application/json
 
 {
-  "id": 1,
-  "note": "o1_note_returned"
+  "id": 103,
+  "notes": "o103_note_returned"
 }
 
 ### Feedback on Book
-POST http://localhost:8080/api/library/books/1/feedback
+POST http://localhost:8080/api/library/books/feedback
 Content-Type: application/json
 Accept: application/json
 
 {
   "readerId": 1,
-  "bookId": 1,
-  "text": "f1_feedback",
-  "rate": 6
+  "bookId": 3,
+  "text": "b3_feedback",
+  "rate": 9
 }
+
+### Get all Feedbacks for Book
+GET http://localhost:8080/api/library/books/5/feedbacks

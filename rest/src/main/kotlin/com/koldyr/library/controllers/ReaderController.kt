@@ -50,7 +50,7 @@ class ReaderController(private val readerService: ReaderService) {
     }
 
     @GetMapping("/{readerId}/orders")
-    fun orders(@PathVariable readerId: Int, @RequestParam(required = false) returned: Boolean): Collection<OrderDTO> = readerService.findOrders(readerId, returned)
+    fun orders(@PathVariable readerId: Int, @RequestParam(required = false) returned: Boolean?): Collection<OrderDTO> = readerService.findOrders(readerId, returned)
 
     @GetMapping("/{readerId}/feedbacks")
     fun feedbacks(@PathVariable readerId: Int): Collection<FeedbackDTO> = readerService.findFeedbacks(readerId)

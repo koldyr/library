@@ -3,7 +3,7 @@ GET http://localhost:8080/api/library/authors
 Accept: application/json
 
 ### Get Author
-GET http://localhost:8080/api/library/authors/2
+GET http://localhost:8080/api/library/authors/1
 Accept: application/json
 
 ### Create Author
@@ -32,4 +32,4 @@ Accept: application/json
 DELETE http://localhost:8080/api/library/authors/2
 
 ### Get all Author's books
-GET http://localhost:8080/api/library/authors/2/books
+GET http://localhost:8080/api/library/authors/4/books

@@ -37,7 +37,7 @@ Accept: application/json
 DELETE http://localhost:8080/api/library/readers/1
 
 ### Reader Orders
-GET http://localhost:8080/api/library/readers/3/orders
+GET http://localhost:8080/api/library/readers/1/orders?returned=false
 Accept: application/json
 
 ### Reader Feedbacks

@@ -59,7 +59,7 @@ open class BookServiceImpl(
 
     @Transactional
     override fun update(bookId: Int, book: BookDTO) {
-        val persisted: Book = find(bookId)
+        val persisted = find(bookId)
 
         mapBook(book, persisted)
 
@@ -70,8 +70,7 @@ open class BookServiceImpl(
     override fun delete(bookId: Int) = bookRepository.deleteById(bookId)
 
     @Transactional
-    override fun feedbackBook(bookId: Int, feedback: FeedbackDTO): Int {
-        feedback.bookId = bookId
+    override fun feedbackBook(feedback: FeedbackDTO): Int {
         feedback.date = LocalDateTime.now()
         val newFeedback = mapper.map(feedback, Feedback::class.java)
         newFeedback.id = null
@@ -113,14 +112,10 @@ open class BookServiceImpl(
     @Transactional
     override fun returnBook(order: OrderDTO) {
         val persisted = orderRepository.findById(order.id!!)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '${order.id}' is not found") }
-        
+                .orElseThrow { ResponseStatusException(NOT_FOUND, "Order with id '${order.id}' is not found") }
+
         persisted.returned = LocalDateTime.now()
-        if (isNull(persisted.notes)) {
-            persisted.notes = order.notes
-        } else {
-            persisted.notes = persisted.notes + '\n' + order.notes
-        }
+        persisted.notes = if (isNull(persisted.notes)) order.notes else persisted.notes + '\n' + order.notes
 
         val book = find(persisted.bookId!!)
         book.count++
