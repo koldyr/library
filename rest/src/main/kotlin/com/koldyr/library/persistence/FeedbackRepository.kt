@@ -9,4 +9,6 @@ import org.springframework.stereotype.Repository
  * @created: 2021-10-07
  */
 @Repository("feedbackRepository")
-interface FeedbackRepository : JpaRepository<Feedback, Int>
+interface FeedbackRepository : JpaRepository<Feedback, Int>{
+    fun findAllByBookId(bookId: Int): List<Feedback>
+}

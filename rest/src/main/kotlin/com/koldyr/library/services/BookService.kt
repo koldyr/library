@@ -18,6 +18,10 @@ interface BookService {
 
     fun findBooks(authorId: Int): List<BookDTO>
     fun findBooks(criteria: SearchCriteria): List<BookDTO>
-    fun takeBook(bookId: Int, readerId: Int): OrderDTO
+
+    fun takeBook(order: OrderDTO): OrderDTO
+    fun returnBook(order: OrderDTO)
+
     fun feedbackBook(bookId: Int, feedback: FeedbackDTO): Int
+    fun bookFeedbacks(bookId: Int): List<FeedbackDTO>
 }

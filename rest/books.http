@@ -28,21 +28,21 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "title": "b22_title",
+  "title": "b1_title",
   "authorId": 1,
   "genre": "CRIME",
-  "publishingHouse": "b22_house",
+  "publishingHouse": "b1_house",
   "publicationDate": "2021-09-09",
   "bookCover": null,
-  "note": "b22_note",
-  "count": 20
+  "note": "b1_note",
+  "count": 10
 }
 
 ### Delete Book
 DELETE http://localhost:8080/api/library/books/1
 
 ### Get all Feedbacks for Book
-GET http://localhost:8080/api/library/books/2/feedbacks
+GET http://localhost:8080/api/library/books/1/feedbacks
 
 ### Get all Books of Author
 GET http://localhost:8080/api/library/authors/2/books
@@ -57,19 +57,34 @@ Accept: application/json
   "publishYearTill": 2030
 }
 
-### Order Book
-POST http://localhost:8080/api/library/books/4/reader/3
-Accept: application/json
-
-
-### Feedback on Book
-POST http://localhost:8080/api/library/books/1/feedbacks
+### Take Book
+POST http://localhost:8080/api/library/books/3/take
 Content-Type: application/json
 Accept: application/json
 
 {
-  "readerId": 2,
-  "bookId": 2,
+  "readerId": 1,
+  "note": "o1_note"
+}
+
+### Return Book
+POST http://localhost:8080/api/library/books/3/return
+Content-Type: application/json
+Accept: application/json
+
+{
+  "id": 1,
+  "note": "o1_note_returned"
+}
+
+### Feedback on Book
+POST http://localhost:8080/api/library/books/1/feedback
+Content-Type: application/json
+Accept: application/json
+
+{
+  "readerId": 1,
+  "bookId": 1,
   "text": "f1_feedback",
-  "rate": 8
+  "rate": 6
 }

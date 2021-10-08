@@ -11,12 +11,12 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "firstName": "r3_first",
-  "lastName": "r3_last",
-  "mail": "r3_mail",
-  "address": "r3_address",
-  "phoneNumber": "r3-111-222-333",
-  "note": "r3_note"
+  "firstName": "r4_first",
+  "lastName": "r4_last",
+  "mail": "r4_mail",
+  "address": "r4_address",
+  "phoneNumber": "r4-444-444-444",
+  "note": "r4_note"
 }
 
 ### Update Reader
@@ -25,12 +25,12 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "firstName": "r3_first",
-  "lastName": "r3_last",
-  "mail": "r3_mail",
-  "address": "r3_address",
-  "phoneNumber": "r3-111-222-333",
-  "note": "r3_note"
+  "firstName": "r4_first",
+  "lastName": "r4_last",
+  "mail": "r4_mail",
+  "address": "r4_address",
+  "phoneNumber": "r4-111-222-333",
+  "note": "r4_note"
 }
 
 ### Delete Reader
@@ -41,5 +41,5 @@ GET http://localhost:8080/api/library/readers/3/orders
 Accept: application/json
 
 ### Reader Feedbacks
-GET http://localhost:8080/api/library/readers/2/feedbacks
+GET http://localhost:8080/api/library/readers/1/feedbacks
 Accept: application/json
