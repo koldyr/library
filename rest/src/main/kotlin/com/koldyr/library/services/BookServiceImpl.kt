@@ -1,5 +1,10 @@
 package com.koldyr.library.services
 
+import java.time.LocalDate
+import java.time.LocalDate.of
+import java.time.LocalDateTime
+import java.util.Objects.isNull
+import java.util.Objects.nonNull
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
@@ -14,12 +19,10 @@ import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
 import ma.glasnost.orika.MapperFacade
 import org.springframework.data.jpa.domain.Specification
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.util.Objects.*
 import javax.persistence.criteria.Path
 import javax.persistence.criteria.Predicate
 
@@ -163,10 +166,10 @@ open class BookServiceImpl(
 
             if (isNull(criteria.publishYear)) {
                 if (nonNull(criteria.publishYearFrom) || nonNull(criteria.publishYearTill)) {
+                    val yearFrom: Int = if (criteria.publishYearFrom == null) 1000 else criteria.publishYearFrom!!
+                    val yearTo: Int = if (criteria.publishYearTill == null) 3000 else (criteria.publishYearTill!! + 1)
                     val publicationDate: Path<LocalDate> = book.get("publicationDate")
-                    val from = LocalDate.of(criteria.publishYearFrom!!, 1, 1)
-                    val to = LocalDate.of(criteria.publishYearTill!!, 12, 31)
-                    val predicate = builder.between(publicationDate, from, to)
+                    val predicate = builder.between(publicationDate, of(yearFrom, 1, 1), of(yearTo, 1, 1))
                     filter = if (isNull(filter)) predicate else builder.and(predicate)
                 }
             } else {
