@@ -29,13 +29,16 @@ import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpMethod
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 /**
- * Description of class ServiceConfig
+ * Description of class LibraryConfig
  * @created: 2021-09-28
  */
 @Configuration
-open class ServiceConfig {
+open class LibraryConfig {
 
     @Autowired
     lateinit var readerRepository: ReaderRepository
@@ -95,6 +98,17 @@ open class ServiceConfig {
         converterFactory.registerConverter(OrderConverter(orderRepository))
 
         return mapperFactory.mapperFacade
+    }
+
+    @Bean
+    open fun corsConfigurer(): WebMvcConfigurer {
+        return object : WebMvcConfigurer {
+            override fun addCorsMappings(registry: CorsRegistry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("*")
+                        .allowedMethods(HttpMethod.GET.name, HttpMethod.HEAD.name, HttpMethod.POST.name, HttpMethod.PUT.name, HttpMethod.DELETE.name)
+            }
+        }
     }
 }
 
