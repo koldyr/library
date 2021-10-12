@@ -15,7 +15,7 @@ class BookConverter(private val bookRepository: BookRepository) : BidirectionalC
             return null
         }
         return bookRepository.findById(bookId)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '$bookId' is not found") }
+                .orElseThrow { ResponseStatusException(BAD_REQUEST, "Book with id '$bookId' is not found") }
     }
 
     override fun convertFrom(book: Book?, type: Type<Int>?, context: MappingContext?): Int? {

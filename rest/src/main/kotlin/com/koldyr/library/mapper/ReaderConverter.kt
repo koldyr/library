@@ -19,7 +19,7 @@ class ReaderConverter(private val readerRepository: ReaderRepository) : Bidirect
             return null
         }
         return readerRepository.findById(readerId)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readerId' is not found") }
+                .orElseThrow { ResponseStatusException(BAD_REQUEST, "Reader with id '$readerId' is not found") }
     }
 
     override fun convertFrom(reader: Reader?, type: Type<Int>?, context: MappingContext?): Int? {

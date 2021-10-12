@@ -19,7 +19,7 @@ class AuthorConverter(private val authorRepository: AuthorRepository) : Bidirect
             return null
         }
         return authorRepository.findById(authorId)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Author with id '$authorId' is not found") }
+                .orElseThrow { ResponseStatusException(BAD_REQUEST, "Author with id '$authorId' is not found") }
     }
 
     override fun convertFrom(author: Author?, type: Type<Int>?, context: MappingContext?): Int? {

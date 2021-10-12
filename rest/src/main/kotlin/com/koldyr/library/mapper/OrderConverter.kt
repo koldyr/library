@@ -20,7 +20,7 @@ class OrderConverter(private val orderRepository: OrderRepository) : Bidirection
             return null
         }
         return orderRepository.findById(orderId!!)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$orderId' is not found") }
+                .orElseThrow { ResponseStatusException(BAD_REQUEST, "Reader with id '$orderId' is not found") }
     }
 
     override fun convertFrom(order: Order?, type: Type<Int>?, context: MappingContext?): Int? {
