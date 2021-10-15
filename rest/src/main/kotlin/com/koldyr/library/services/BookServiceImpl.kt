@@ -1,16 +1,12 @@
 package com.koldyr.library.services
 
-import java.time.LocalDate
-import java.time.LocalDate.of
-import java.time.LocalDateTime
-import java.util.Objects.isNull
-import java.util.Objects.nonNull
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.model.Book
 import com.koldyr.library.model.Feedback
+import com.koldyr.library.model.Genre
 import com.koldyr.library.model.Order
 import com.koldyr.library.persistence.AuthorRepository
 import com.koldyr.library.persistence.BookRepository
@@ -19,10 +15,13 @@ import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
 import ma.glasnost.orika.MapperFacade
 import org.springframework.data.jpa.domain.Specification
-import org.springframework.http.HttpStatus.BAD_REQUEST
-import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDate
+import java.time.LocalDate.*
+import java.time.LocalDateTime
+import java.util.Objects.*
 import javax.persistence.criteria.Path
 import javax.persistence.criteria.Predicate
 
@@ -147,8 +146,9 @@ open class BookServiceImpl(
             }
 
             if (nonNull(criteria.genre)) {
-                val genre = book.get<String>("genre")
-                val predicate = builder.like(genre, "%${criteria.genre}%")
+                val genre = book.get<Genre>("genre")
+                val value = Genre.valueOf(criteria.genre!!.uppercase())
+                val predicate = builder.equal(genre, value)
                 filter = if (isNull(filter)) predicate else builder.and(predicate)
             }
 

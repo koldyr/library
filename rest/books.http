@@ -1,13 +1,13 @@
 ### Get Books
-GET http://localhost:8080/api/library/books
+GET http://localhost/api/library/books
 Accept: application/json
 
 ### Get Book
-GET http://localhost:8080/api/library/books/1
+GET http://localhost/api/library/books/1
 Accept: application/json
 
 ### Create Book
-POST http://localhost:8080/api/library/books
+POST http://localhost/api/library/books
 Content-Type: application/json
 Accept: application/json
 
@@ -23,7 +23,7 @@ Accept: application/json
 }
 
 ### Update Book
-PUT http://localhost:8080/api/library/books/1
+PUT http://localhost/api/library/books/1
 Content-Type: application/json
 Accept: application/json
 
@@ -39,23 +39,22 @@ Accept: application/json
 }
 
 ### Delete Book
-DELETE http://localhost:8080/api/library/books/1
+DELETE http://localhost/api/library/books/1
 
 ### Get all Books of Author
-GET http://localhost:8080/api/library/authors/1/books
+GET http://localhost/api/library/authors/1/books
 
 ### Search Books
-POST http://localhost:8080/api/library/books/search
+POST http://localhost/api/library/books/search
 Content-Type: application/json
 Accept: application/json
 
 {
-  "publishYearFrom": 2000,
-  "publishYearTill": 2030
+  "genre": "scifi"
 }
 
 ### Take Book
-POST http://localhost:8080/api/library/books/take
+POST http://localhost/api/library/books/take
 Content-Type: application/json
 Accept: application/json
 
@@ -66,7 +65,7 @@ Accept: application/json
 }
 
 ### Return Book
-POST http://localhost:8080/api/library/books/return
+POST http://localhost/api/library/books/return
 Content-Type: application/json
 Accept: application/json
 
@@ -76,7 +75,7 @@ Accept: application/json
 }
 
 ### Feedback on Book
-POST http://localhost:8080/api/library/books/feedback
+POST http://localhost/api/library/books/feedback
 Content-Type: application/json
 Accept: application/json
 
@@ -88,4 +87,4 @@ Accept: application/json
 }
 
 ### Get all Feedbacks for Book
-GET http://localhost:8080/api/library/books/5/feedbacks
+GET http://localhost/api/library/books/5/feedbacks

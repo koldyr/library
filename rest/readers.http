@@ -1,12 +1,12 @@
 ### Get All Readers
-GET http://localhost:8080/api/library/readers
+GET http://localhost/api/library/readers
 
 ### Get Specific Reader
-GET http://localhost:8080/api/library/readers/1
+GET http://localhost/api/library/readers/1
 Accept: application/json
 
 ### Create Reader
-POST http://localhost:8080/api/library/readers
+POST http://localhost/api/library/readers
 Content-Type: application/json
 Accept: application/json
 
@@ -20,7 +20,7 @@ Accept: application/json
 }
 
 ### Update Reader
-PUT http://localhost:8080/api/library/readers/3
+PUT http://localhost/api/library/readers/3
 Content-Type: application/json
 Accept: application/json
 
@@ -34,12 +34,12 @@ Accept: application/json
 }
 
 ### Delete Reader
-DELETE http://localhost:8080/api/library/readers/1
+DELETE http://localhost/api/library/readers/1
 
 ### Reader Orders
-GET http://localhost:8080/api/library/readers/1/orders?returned=false
+GET http://localhost/api/library/readers/1/orders?returned=false
 Accept: application/json
 
 ### Reader Feedbacks
-GET http://localhost:8080/api/library/readers/1/feedbacks
+GET http://localhost/api/library/readers/1/feedbacks
 Accept: application/json
