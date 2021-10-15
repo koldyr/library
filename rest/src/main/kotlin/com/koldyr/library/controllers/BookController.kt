@@ -3,6 +3,7 @@ package com.koldyr.library.controllers
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
+import com.koldyr.library.dto.PageResultDTO
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.services.BookService
 import org.springframework.http.HttpStatus.*
@@ -34,7 +35,7 @@ class BookController(private val bookService: BookService) {
     fun books(@RequestParam(required = false) available: Boolean): Collection<BookDTO> = bookService.findAll(available)
 
     @PostMapping("/search", consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
-    fun searchBooks(@RequestBody(required = false) criteria: SearchCriteria?): Collection<BookDTO> = bookService.findBooks(criteria)
+    fun searchBooks(@RequestBody(required = false) criteria: SearchCriteria?): PageResultDTO<BookDTO> = bookService.findBooks(criteria)
 
     @PostMapping(consumes = [APPLICATION_JSON_VALUE])
     fun create(@RequestBody book: BookDTO): ResponseEntity<Unit> {

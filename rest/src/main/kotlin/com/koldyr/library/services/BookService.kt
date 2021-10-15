@@ -3,6 +3,7 @@ package com.koldyr.library.services
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
+import com.koldyr.library.dto.PageResultDTO
 import com.koldyr.library.dto.SearchCriteria
 
 /**
@@ -17,7 +18,7 @@ interface BookService {
     fun delete(bookId: Int)
 
     fun findBooks(authorId: Int): List<BookDTO>
-    fun findBooks(criteria: SearchCriteria?): List<BookDTO>
+    fun findBooks(criteria: SearchCriteria?): PageResultDTO<BookDTO>
 
     fun takeBook(order: OrderDTO): OrderDTO
     fun returnBook(order: OrderDTO)

@@ -3,6 +3,7 @@ package com.koldyr.library.services
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
+import com.koldyr.library.dto.PageResultDTO
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.model.Book
 import com.koldyr.library.model.Feedback
@@ -136,14 +137,19 @@ open class BookServiceImpl(
         return bookRepository.findBooksByAuthorId(authorId).map(this::mapBook)
     }
 
-    override fun findBooks(criteria: SearchCriteria?): List<BookDTO> {
+    override fun findBooks(criteria: SearchCriteria?): PageResultDTO<BookDTO> {
         if (criteria == null) {
-            return bookRepository.findAll().map(this::mapBook)
+            return PageResultDTO(bookRepository.findAll().map(this::mapBook))
         }
         val filter = createFilter(criteria)
         val pages: Pageable = createPageable(criteria)
-        return bookRepository.findAll(filter, pages)
-                .map(this::mapBook).content
+        val books = bookRepository.findAll(filter, pages)
+
+        val pageResult = PageResultDTO<BookDTO>(books.map(this::mapBook).content)
+        pageResult.total = books.totalElements
+        pageResult.page = books.number
+        pageResult.size = books.size
+        return pageResult
     }
 
     private fun createFilter(criteria: SearchCriteria): Specification<Book> {
