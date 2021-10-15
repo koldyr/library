@@ -4,6 +4,7 @@ import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.services.AuthorService
 import com.koldyr.library.services.BookService
+import org.springframework.http.MediaType.*
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -25,10 +26,10 @@ class AuthorController(
         private val authorService: AuthorService,
         private val bookService: BookService) {
 
-    @GetMapping
+    @GetMapping(produces = [APPLICATION_JSON_VALUE])
     fun authors(): List<AuthorDTO> = authorService.findAll()
 
-    @PostMapping
+    @PostMapping(consumes = [APPLICATION_JSON_VALUE])
     fun create(@RequestBody author: AuthorDTO): ResponseEntity<Unit> {
         val authorId: Int = authorService.create(author)
 
@@ -36,10 +37,10 @@ class AuthorController(
         return ResponseEntity.created(uri).build()
     }
 
-    @PutMapping("/{authorId}")
+    @PutMapping("/{authorId}", consumes = [APPLICATION_JSON_VALUE])
     fun update(@PathVariable authorId: Int, @RequestBody author: AuthorDTO) = authorService.update(authorId, author)
 
-    @GetMapping("/{authorId}")
+    @GetMapping("/{authorId}", produces = [APPLICATION_JSON_VALUE])
     fun authorById(@PathVariable authorId: Int): AuthorDTO = authorService.findById(authorId)
 
     @DeleteMapping("/{authorId}")
@@ -49,6 +50,6 @@ class AuthorController(
         return ResponseEntity.noContent().build()
     }
 
-    @GetMapping("/{authorId}/books")
+    @GetMapping("/{authorId}/books", produces = [APPLICATION_JSON_VALUE])
     fun books(@PathVariable authorId: Int): Collection<BookDTO> = bookService.findBooks(authorId)
 }

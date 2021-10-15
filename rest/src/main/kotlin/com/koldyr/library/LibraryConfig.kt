@@ -23,6 +23,10 @@ import com.koldyr.library.services.BookService
 import com.koldyr.library.services.BookServiceImpl
 import com.koldyr.library.services.ReaderService
 import com.koldyr.library.services.ReaderServiceImpl
+import io.swagger.v3.oas.models.Components
+import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.info.Info
+import io.swagger.v3.oas.models.info.License
 import ma.glasnost.orika.MapperFacade
 import ma.glasnost.orika.MapperFactory
 import ma.glasnost.orika.impl.DefaultMapperFactory
@@ -32,12 +36,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import springfox.documentation.builders.PathSelectors
-import springfox.documentation.builders.RequestHandlerSelectors
-import springfox.documentation.service.ApiInfo
-import springfox.documentation.service.VendorExtension
-import springfox.documentation.spi.DocumentationType
-import springfox.documentation.spring.web.plugins.Docket
 
 /**
  * Description of class LibraryConfig
@@ -118,23 +116,21 @@ open class LibraryConfig {
     }
 
     @Bean
-    open fun api(): Docket {
-        return Docket(DocumentationType.SWAGGER_2)
-                .apiInfo(apiInfo())
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.ant("/api/library/**"))
-                .build()
+    open fun api(): OpenAPI {
+        return OpenAPI()
+                .components(Components())
+                .info(apiInfo())
     }
 
-    private fun apiInfo(): ApiInfo {
-        val title = "Library"
-        val description = "RESTfull back end for Library SPA"
-        val vendorExtensions: List<VendorExtension<*>> = mutableListOf()
-        val termsOfServiceUrl = "http://koldyr.com/library/tos"
-        val licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
-        return ApiInfo(title, description, "1.0", termsOfServiceUrl, null, "Apache 2.0", licenseUrl, vendorExtensions)
+    private fun apiInfo(): Info {
+        val license = License()
+                .name("Apache 2.0")
+                .url("http://www.apache.org/licenses/LICENSE-2.0")
+        return Info()
+                .title("Library")
+                .description("RESTfull back end for Library SPA")
+                .termsOfService("http://koldyr.com/library/tos")
+                .license(license)
     }
-
 }
 

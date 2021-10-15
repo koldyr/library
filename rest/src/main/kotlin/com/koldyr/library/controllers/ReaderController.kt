@@ -4,6 +4,7 @@ import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Reader
 import com.koldyr.library.services.ReaderService
+import org.springframework.http.MediaType.*
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -25,21 +26,21 @@ import java.net.URI
 @RequestMapping("/api/library/readers")
 class ReaderController(private val readerService: ReaderService) {
 
-    @GetMapping
+    @GetMapping(produces = [APPLICATION_JSON_VALUE])
     fun readers(): Collection<Reader> = readerService.findAll()
 
-    @PostMapping
-    fun create(@RequestBody reader: Reader): ResponseEntity<String> {
+    @PostMapping(consumes = [APPLICATION_JSON_VALUE])
+    fun create(@RequestBody reader: Reader): ResponseEntity<Unit> {
         val readerId: Int = readerService.create(reader)
 
         val uri = URI.create("/api/library/readers/$readerId")
         return created(uri).build()
     }
 
-    @PutMapping("/{readerId}")
+    @PutMapping("/{readerId}", consumes = [APPLICATION_JSON_VALUE])
     fun update(@PathVariable readerId: Int, @RequestBody reader: Reader) = readerService.update(readerId, reader)
 
-    @GetMapping("/{readerId}")
+    @GetMapping("/{readerId}", produces = [APPLICATION_JSON_VALUE])
     fun readerById(@PathVariable readerId: Int): Reader = readerService.findById(readerId)
 
     @DeleteMapping("/{readerId}")
@@ -49,9 +50,9 @@ class ReaderController(private val readerService: ReaderService) {
         return noContent().build()
     }
 
-    @GetMapping("/{readerId}/orders")
+    @GetMapping("/{readerId}/orders", produces = [APPLICATION_JSON_VALUE])
     fun orders(@PathVariable readerId: Int, @RequestParam(required = false) returned: Boolean?): Collection<OrderDTO> = readerService.findOrders(readerId, returned)
 
-    @GetMapping("/{readerId}/feedbacks")
+    @GetMapping("/{readerId}/feedbacks", produces = [APPLICATION_JSON_VALUE])
     fun feedbacks(@PathVariable readerId: Int): Collection<FeedbackDTO> = readerService.findFeedbacks(readerId)
 }

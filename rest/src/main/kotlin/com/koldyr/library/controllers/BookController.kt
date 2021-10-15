@@ -6,6 +6,7 @@ import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.services.BookService
 import org.springframework.http.HttpStatus.*
+import org.springframework.http.MediaType.*
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -29,13 +30,13 @@ import java.util.Objects.*
 @RequestMapping("/api/library/books")
 class BookController(private val bookService: BookService) {
 
-    @GetMapping
+    @GetMapping(produces = [APPLICATION_JSON_VALUE])
     fun books(@RequestParam(required = false) available: Boolean): Collection<BookDTO> = bookService.findAll(available)
 
-    @PostMapping("/search")
+    @PostMapping("/search", consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
     fun searchBooks(@RequestBody criteria: SearchCriteria): Collection<BookDTO> = bookService.findBooks(criteria)
 
-    @PostMapping
+    @PostMapping(consumes = [APPLICATION_JSON_VALUE])
     fun create(@RequestBody book: BookDTO): ResponseEntity<Unit> {
         val bookId = bookService.create(book)
 
@@ -43,10 +44,10 @@ class BookController(private val bookService: BookService) {
         return created(uri).build()
     }
 
-    @GetMapping("/{bookId}")
+    @GetMapping("/{bookId}", produces = [APPLICATION_JSON_VALUE])
     fun bookById(@PathVariable bookId: Int): BookDTO = bookService.findById(bookId)
 
-    @PutMapping("/{bookId}")
+    @PutMapping("/{bookId}", consumes = [APPLICATION_JSON_VALUE])
     fun update(@PathVariable bookId: Int, @RequestBody book: BookDTO) = bookService.update(bookId, book)
 
     @DeleteMapping("/{bookId}")
@@ -56,7 +57,7 @@ class BookController(private val bookService: BookService) {
         return noContent().build()
     }
 
-    @PostMapping("/take")
+    @PostMapping("/take", consumes = [APPLICATION_JSON_VALUE])
     fun takeBook(@RequestBody order: OrderDTO): OrderDTO {
         if (isNull(order.bookId)) {
             throw ResponseStatusException(BAD_REQUEST, "Book id must be provided")
@@ -64,11 +65,11 @@ class BookController(private val bookService: BookService) {
         if (isNull(order.readerId)) {
             throw ResponseStatusException(BAD_REQUEST, "Reader id must be provided")
         }
-        
+
         return bookService.takeBook(order)
     }
 
-    @PostMapping("/return")
+    @PostMapping("/return", consumes = [APPLICATION_JSON_VALUE])
     fun returnBook(@RequestBody order: OrderDTO) {
         if (isNull(order.id)) {
             throw ResponseStatusException(BAD_REQUEST, "Order id must be provided")
@@ -77,7 +78,7 @@ class BookController(private val bookService: BookService) {
         bookService.returnBook(order)
     }
 
-    @PostMapping("/feedback")
+    @PostMapping("/feedback", consumes = [APPLICATION_JSON_VALUE])
     fun feedbackBook(@RequestBody feedback: FeedbackDTO): ResponseEntity<Unit> {
         if (isNull(feedback.bookId)) {
             throw ResponseStatusException(BAD_REQUEST, "Book id must be provided")
@@ -92,6 +93,6 @@ class BookController(private val bookService: BookService) {
         return created(uri).build()
     }
 
-    @GetMapping("/{bookId}/feedbacks")
+    @GetMapping("/{bookId}/feedbacks", produces = [APPLICATION_JSON_VALUE])
     fun bookFeedbacks(@PathVariable bookId: Int): Collection<FeedbackDTO> = bookService.bookFeedbacks(bookId)
 }
