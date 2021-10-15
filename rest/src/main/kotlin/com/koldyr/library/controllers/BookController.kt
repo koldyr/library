@@ -34,7 +34,7 @@ class BookController(private val bookService: BookService) {
     fun books(@RequestParam(required = false) available: Boolean): Collection<BookDTO> = bookService.findAll(available)
 
     @PostMapping("/search", consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
-    fun searchBooks(@RequestBody criteria: SearchCriteria): Collection<BookDTO> = bookService.findBooks(criteria)
+    fun searchBooks(@RequestBody(required = false) criteria: SearchCriteria?): Collection<BookDTO> = bookService.findBooks(criteria)
 
     @PostMapping(consumes = [APPLICATION_JSON_VALUE])
     fun create(@RequestBody book: BookDTO): ResponseEntity<Unit> {

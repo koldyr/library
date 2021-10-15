@@ -9,8 +9,10 @@ class SearchCriteria {
     var author: String? = null
     var genre: String? = null
     var publisher: String? = null
-    var publishYear: Int? = null
     var publishYearFrom: Int? = null
     var publishYearTill: Int? = null
     var note: String? = null
+
+    var page: PageDTO? = null
+    var sort: SortDTO? = null
 }

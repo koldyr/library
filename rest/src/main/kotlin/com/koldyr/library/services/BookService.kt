@@ -17,7 +17,7 @@ interface BookService {
     fun delete(bookId: Int)
 
     fun findBooks(authorId: Int): List<BookDTO>
-    fun findBooks(criteria: SearchCriteria): List<BookDTO>
+    fun findBooks(criteria: SearchCriteria?): List<BookDTO>
 
     fun takeBook(order: OrderDTO): OrderDTO
     fun returnBook(order: OrderDTO)

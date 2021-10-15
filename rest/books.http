@@ -50,7 +50,11 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "genre": "scifi"
+  "title": "b3",
+  "sort": {
+    "order": "DESC",
+    "name": "title"
+  }
 }
 
 ### Take Book
