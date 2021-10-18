@@ -15,6 +15,7 @@ import com.koldyr.library.persistence.FeedbackRepository
 import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
 import ma.glasnost.orika.MapperFacade
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
@@ -28,6 +29,7 @@ import java.time.LocalDateTime
 import java.util.Objects.*
 import javax.persistence.criteria.Path
 import javax.persistence.criteria.Predicate
+import kotlin.reflect.full.declaredMemberProperties
 
 /**
  * Description of class BookServiceImpl
@@ -139,20 +141,33 @@ open class BookServiceImpl(
 
     override fun findBooks(criteria: SearchCriteria?): PageResultDTO<BookDTO> {
         if (criteria == null) {
-            return PageResultDTO(bookRepository.findAll().map(this::mapBook))
+            val books = bookRepository.findAll()
+            
+            val pageResult = PageResultDTO(books.map(this::mapBook))
+            pageResult.total = books.size.toLong()
+            return pageResult
         }
-        val filter = createFilter(criteria)
-        val pages: Pageable = createPageable(criteria)
-        val books = bookRepository.findAll(filter, pages)
 
-        val pageResult = PageResultDTO<BookDTO>(books.map(this::mapBook).content)
-        pageResult.total = books.totalElements
-        pageResult.page = books.number
-        pageResult.size = books.size
-        return pageResult
+        val filter = createFilter(criteria)
+        val pageSelector: Pageable = createPageable(criteria)
+        val booksPage = bookRepository.findAll(filter, pageSelector)
+
+        return createPageResult(booksPage)
     }
 
-    private fun createFilter(criteria: SearchCriteria): Specification<Book> {
+    private fun hasCriteria(criteria: SearchCriteria?): Boolean {
+        if (criteria == null) {
+            return false
+        }
+        return SearchCriteria::class.declaredMemberProperties
+                .filter { it.name != "page" && it.name != "sort" }
+                .any { nonNull(it.get(criteria)) }
+    }
+
+    private fun createFilter(criteria: SearchCriteria): Specification<Book>? {
+        if (!hasCriteria(criteria)) {
+            return null
+        }
         return Specification<Book> { book, _, builder ->
             var filter: Predicate? = null
             if (nonNull(criteria.title)) {
@@ -198,6 +213,15 @@ open class BookServiceImpl(
         val property = if (criteria.sort == null) "id" else criteria.sort!!.name
 
         return PageRequest.of(page, size, direction, property)
+    }
+
+    private fun createPageResult(booksPage: Page<Book>): PageResultDTO<BookDTO> {
+        val books = booksPage.map(this::mapBook).content
+        val pageResult = PageResultDTO<BookDTO>(books)
+        pageResult.total = booksPage.totalElements
+        pageResult.page = booksPage.number
+        pageResult.size = booksPage.size
+        return pageResult
     }
 
     private fun mapBook(source: BookDTO, target: Book) {
