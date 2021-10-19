@@ -7,7 +7,7 @@ package com.koldyr.library.dto
 class SearchCriteria {
     var title: String? = null
     var author: String? = null
-    var genre: String? = null
+    var genre: Array<String>? = null
     var publisher: String? = null
     var publishYear: Int? = null
     var publishYearFrom: Int? = null

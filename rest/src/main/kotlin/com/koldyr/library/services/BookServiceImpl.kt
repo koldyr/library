@@ -69,7 +69,12 @@ open class BookServiceImpl(
     }
 
     @Transactional
-    override fun delete(bookId: Int) = bookRepository.deleteById(bookId)
+    override fun delete(bookId: Int) {
+        if (orderRepository.hasOrders(bookId)) {
+            throw ResponseStatusException(BAD_REQUEST, "Unable to delete book '${bookId}', it is already ordered")
+        }
+        bookRepository.deleteById(bookId)
+    }
 
     @Transactional
     override fun feedbackBook(feedback: FeedbackDTO): Int {
@@ -147,8 +152,8 @@ open class BookServiceImpl(
 
             if (nonNull(criteria.genre)) {
                 val genre = book.get<Genre>("genre")
-                val value = Genre.valueOf(criteria.genre!!.uppercase())
-                val predicate = builder.equal(genre, value)
+                val values = criteria.genre!!.map { Genre.valueOf(it.uppercase()) }
+                val predicate: Predicate = genre.`in`(values)
                 filter = if (isNull(filter)) predicate else builder.and(predicate)
             }
 
