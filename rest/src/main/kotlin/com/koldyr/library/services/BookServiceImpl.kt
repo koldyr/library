@@ -3,6 +3,7 @@ package com.koldyr.library.services
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
+import com.koldyr.library.dto.PageResultDTO
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.model.Book
 import com.koldyr.library.model.Feedback
@@ -15,6 +16,10 @@ import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
 import ma.glasnost.orika.MapperFacade
 import org.apache.commons.lang3.ArrayUtils.*
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
@@ -25,6 +30,7 @@ import java.time.LocalDateTime
 import java.util.Objects.*
 import javax.persistence.criteria.Path
 import javax.persistence.criteria.Predicate
+import kotlin.reflect.full.declaredMemberProperties
 
 /**
  * Description of class BookServiceImpl
@@ -139,12 +145,35 @@ open class BookServiceImpl(
         return bookRepository.findBooksByAuthorId(authorId).map(this::mapBook)
     }
 
-    override fun findBooks(criteria: SearchCriteria): List<BookDTO> {
+    override fun findBooks(criteria: SearchCriteria?): PageResultDTO<BookDTO> {
+        if (criteria == null) {
+            val books = bookRepository.findAll()
+
+            val pageResult = PageResultDTO(books.map(this::mapBook))
+            pageResult.total = books.size.toLong()
+            return pageResult
+        }
+
         val filter = createFilter(criteria)
-        return bookRepository.findAll(filter).map(this::mapBook)
+        val pageSelector: Pageable = createPageable(criteria)
+        val booksPage = bookRepository.findAll(filter, pageSelector)
+
+        return createPageResult(booksPage)
     }
 
-    private fun createFilter(criteria: SearchCriteria): Specification<Book> {
+    private fun hasCriteria(criteria: SearchCriteria?): Boolean {
+        if (criteria == null) {
+            return false
+        }
+        return SearchCriteria::class.declaredMemberProperties
+                .filter { it.name != "page" && it.name != "sort" }
+                .any { nonNull(it.get(criteria)) }
+    }
+
+    private fun createFilter(criteria: SearchCriteria): Specification<Book>? {
+        if (!hasCriteria(criteria)) {
+            return null
+        }
         return Specification<Book> { book, _, builder ->
             var filter: Predicate? = null
             if (nonNull(criteria.title)) {
@@ -172,22 +201,35 @@ open class BookServiceImpl(
                 filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
             }
 
-            if (isNull(criteria.publishYear)) {
-                if (nonNull(criteria.publishYearFrom) || nonNull(criteria.publishYearTill)) {
-                    val yearFrom: Int = if (criteria.publishYearFrom == null) 1000 else criteria.publishYearFrom!!
-                    val yearTo: Int = if (criteria.publishYearTill == null) 3000 else (criteria.publishYearTill!! + 1)
-                    val publicationDate: Path<LocalDate> = book.get("publicationDate")
-                    val predicate = builder.between(publicationDate, of(yearFrom, 1, 1), of(yearTo, 1, 1))
-                    filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
-                }
-            } else {
+            if (nonNull(criteria.publishYearFrom) || nonNull(criteria.publishYearTill)) {
+                val yearFrom: Int = if (criteria.publishYearFrom == null) 1000 else criteria.publishYearFrom!!
+                val yearTo: Int = if (criteria.publishYearTill == null) 9999 else (criteria.publishYearTill!! + 1)
                 val publicationDate: Path<LocalDate> = book.get("publicationDate")
-                val predicate = builder.equal(publicationDate, criteria.publishYear)
-                filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
+                val predicate = builder.between(publicationDate, of(yearFrom, 1, 1), of(yearTo, 1, 1))
+                filter = if (isNull(filter)) predicate else builder.and(predicate)
             }
 
             filter
         }
+    }
+
+    private fun createPageable(criteria: SearchCriteria): Pageable {
+        val page: Int = if (criteria.page == null) 0 else criteria.page!!.index
+        val size: Int = if (criteria.page == null) 100 else criteria.page!!.size
+
+        val direction = if (criteria.sort == null) Sort.Direction.ASC else Sort.Direction.fromString(criteria.sort!!.order)
+        val property = if (criteria.sort == null) "id" else criteria.sort!!.name
+
+        return PageRequest.of(page, size, direction, property)
+    }
+
+    private fun createPageResult(booksPage: Page<Book>): PageResultDTO<BookDTO> {
+        val books = booksPage.map(this::mapBook).content
+        val pageResult = PageResultDTO<BookDTO>(books)
+        pageResult.total = booksPage.totalElements
+        pageResult.page = booksPage.number
+        pageResult.size = booksPage.size
+        return pageResult
     }
 
     private fun mapBook(source: BookDTO, target: Book) {
