@@ -14,6 +14,7 @@ import com.koldyr.library.persistence.FeedbackRepository
 import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
 import ma.glasnost.orika.MapperFacade
+import org.apache.commons.lang3.ArrayUtils.*
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
@@ -106,7 +107,7 @@ open class BookServiceImpl(
         order.id = null
         order.ordered = LocalDateTime.now()
         val newOrder = mapper.map(order, Order::class.java)
-        
+
         orderRepository.save(newOrder)
         order.id = newOrder.id
 
@@ -150,23 +151,25 @@ open class BookServiceImpl(
                 filter = builder.like(book.get("title"), "%${criteria.title}%")
             }
 
-            if (nonNull(criteria.genre)) {
-                val genre = book.get<Genre>("genre")
-                val values = criteria.genre!!.map { Genre.valueOf(it.uppercase()) }
-                val predicate: Predicate = genre.`in`(values)
-                filter = if (isNull(filter)) predicate else builder.and(predicate)
+            if (isNotEmpty(criteria.genre)) {
+                val values: List<Genre> = criteria.genre!!.filter { nonNull(it) }.map { Genre.valueOf(it.uppercase()) }
+                if (values.isNotEmpty()) {
+                    val genre = book.get<Genre>("genre")
+                    val predicate: Predicate = genre.`in`(values)
+                    filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
+                }
             }
 
             if (nonNull(criteria.publisher)) {
                 val publishingHouse = book.get<String>("publishingHouse")
                 val predicate = builder.like(publishingHouse, "%${criteria.publisher}%")
-                filter = if (isNull(filter)) predicate else builder.and(predicate)
+                filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
             }
 
             if (nonNull(criteria.note)) {
                 val note = book.get<String>("note")
                 val predicate = builder.like(note, "%${criteria.note}%")
-                filter = if (isNull(filter)) predicate else builder.and(predicate)
+                filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
             }
 
             if (isNull(criteria.publishYear)) {
@@ -175,12 +178,12 @@ open class BookServiceImpl(
                     val yearTo: Int = if (criteria.publishYearTill == null) 3000 else (criteria.publishYearTill!! + 1)
                     val publicationDate: Path<LocalDate> = book.get("publicationDate")
                     val predicate = builder.between(publicationDate, of(yearFrom, 1, 1), of(yearTo, 1, 1))
-                    filter = if (isNull(filter)) predicate else builder.and(predicate)
+                    filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
                 }
             } else {
                 val publicationDate: Path<LocalDate> = book.get("publicationDate")
                 val predicate = builder.equal(publicationDate, criteria.publishYear)
-                filter = if (isNull(filter)) predicate else builder.and(predicate)
+                filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
             }
 
             filter
