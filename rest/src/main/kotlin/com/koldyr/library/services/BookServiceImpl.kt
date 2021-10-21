@@ -15,6 +15,7 @@ import com.koldyr.library.persistence.FeedbackRepository
 import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
 import ma.glasnost.orika.MapperFacade
+import org.apache.commons.lang3.ArrayUtils.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
@@ -75,7 +76,12 @@ open class BookServiceImpl(
     }
 
     @Transactional
-    override fun delete(bookId: Int) = bookRepository.deleteById(bookId)
+    override fun delete(bookId: Int) {
+        if (orderRepository.hasOrders(bookId)) {
+            throw ResponseStatusException(BAD_REQUEST, "Unable to delete book '${bookId}', it is already ordered")
+        }
+        bookRepository.deleteById(bookId)
+    }
 
     @Transactional
     override fun feedbackBook(feedback: FeedbackDTO): Int {
@@ -107,7 +113,7 @@ open class BookServiceImpl(
         order.id = null
         order.ordered = LocalDateTime.now()
         val newOrder = mapper.map(order, Order::class.java)
-        
+
         orderRepository.save(newOrder)
         order.id = newOrder.id
 
@@ -142,7 +148,7 @@ open class BookServiceImpl(
     override fun findBooks(criteria: SearchCriteria?): PageResultDTO<BookDTO> {
         if (criteria == null) {
             val books = bookRepository.findAll()
-            
+
             val pageResult = PageResultDTO(books.map(this::mapBook))
             pageResult.total = books.size.toLong()
             return pageResult
@@ -174,23 +180,25 @@ open class BookServiceImpl(
                 filter = builder.like(book.get("title"), "%${criteria.title}%")
             }
 
-            if (nonNull(criteria.genre)) {
-                val genre = book.get<Genre>("genre")
-                val value = Genre.valueOf(criteria.genre!!.uppercase())
-                val predicate = builder.equal(genre, value)
-                filter = if (isNull(filter)) predicate else builder.and(predicate)
+            if (isNotEmpty(criteria.genre)) {
+                val values: List<Genre> = criteria.genre!!.filter { nonNull(it) }.map { Genre.valueOf(it.uppercase()) }
+                if (values.isNotEmpty()) {
+                    val genre = book.get<Genre>("genre")
+                    val predicate: Predicate = genre.`in`(values)
+                    filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
+                }
             }
 
             if (nonNull(criteria.publisher)) {
                 val publishingHouse = book.get<String>("publishingHouse")
                 val predicate = builder.like(publishingHouse, "%${criteria.publisher}%")
-                filter = if (isNull(filter)) predicate else builder.and(predicate)
+                filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
             }
 
             if (nonNull(criteria.note)) {
                 val note = book.get<String>("note")
                 val predicate = builder.like(note, "%${criteria.note}%")
-                filter = if (isNull(filter)) predicate else builder.and(predicate)
+                filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
             }
 
             if (nonNull(criteria.publishYearFrom) || nonNull(criteria.publishYearTill)) {
