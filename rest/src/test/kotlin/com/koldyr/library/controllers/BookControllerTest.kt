@@ -110,11 +110,10 @@ class BookControllerTest {
 
         val searchCriteria = SearchCriteria()
         searchCriteria.title = "title"
-        
+
         val books = searchBooks(searchCriteria)
 
         assertTrue { books.isNotEmpty() }
-
     }
 
     private fun createBook(author: AuthorDTO, index: Int): BookDTO {
