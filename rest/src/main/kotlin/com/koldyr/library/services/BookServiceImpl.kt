@@ -177,7 +177,7 @@ open class BookServiceImpl(
         return Specification<Book> { book, _, builder ->
             var filter: Predicate? = null
             if (nonNull(criteria.title)) {
-                filter = builder.like(book.get("title"), "%${criteria.title}%")
+                filter = builder.like(builder.lower(book.get("title")), "%${criteria.title?.lowercase()}%")
             }
 
             if (isNotEmpty(criteria.genre)) {
@@ -191,13 +191,13 @@ open class BookServiceImpl(
 
             if (nonNull(criteria.publisher)) {
                 val publishingHouse = book.get<String>("publishingHouse")
-                val predicate = builder.like(publishingHouse, "%${criteria.publisher}%")
+                val predicate = builder.like(builder.lower(publishingHouse), "%${criteria.publisher?.lowercase()}%")
                 filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
             }
 
             if (nonNull(criteria.note)) {
                 val note = book.get<String>("note")
-                val predicate = builder.like(note, "%${criteria.note}%")
+                val predicate = builder.like(builder.lower(note), "%${criteria.note}%")
                 filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
             }
 
