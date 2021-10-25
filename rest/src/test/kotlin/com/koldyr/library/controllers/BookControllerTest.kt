@@ -3,6 +3,7 @@ package com.koldyr.library.controllers
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
+import com.koldyr.library.dto.PageResultDTO
 import com.koldyr.library.dto.SearchCriteria
 import org.junit.Test
 import org.springframework.http.MediaType.*
@@ -154,13 +155,15 @@ class BookControllerTest: LibraryControllerTest() {
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(searchCriteria)
         }
+            .andDo { print() }
             .andExpect {
                 status { isOk() }
                 content { contentType(APPLICATION_JSON) }
             }
             .andReturn().response.contentAsString
 
-        val typeRef = jacksonTypeRef<List<BookDTO>>()
-        return mapper.readValue(response, typeRef)
+        val typeRef = jacksonTypeRef<PageResultDTO<BookDTO>>()
+        val pageResult = mapper.readValue(response, typeRef)
+        return pageResult.result
     }
 }
