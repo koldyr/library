@@ -58,7 +58,7 @@ class BookController(private val bookService: BookService) {
     }
 
     @PostMapping("/take", consumes = [APPLICATION_JSON_VALUE])
-    fun takeBook(@RequestBody order: OrderDTO): OrderDTO {
+    fun takeBook(@RequestBody order: OrderDTO): ResponseEntity<OrderDTO> {
         if (isNull(order.bookId)) {
             throw ResponseStatusException(BAD_REQUEST, "Book id must be provided")
         }
@@ -66,7 +66,8 @@ class BookController(private val bookService: BookService) {
             throw ResponseStatusException(BAD_REQUEST, "Reader id must be provided")
         }
 
-        return bookService.takeBook(order)
+        val taken = bookService.takeBook(order)
+        return status(CREATED).body(taken)
     }
 
     @PostMapping("/return", consumes = [APPLICATION_JSON_VALUE])

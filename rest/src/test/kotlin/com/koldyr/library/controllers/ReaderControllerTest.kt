@@ -1,53 +1,106 @@
 package com.koldyr.library.controllers
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.koldyr.library.Library
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.koldyr.library.dto.FeedbackDTO
+import com.koldyr.library.dto.OrderDTO
+import com.koldyr.library.model.Reader
+import org.apache.commons.lang3.ArrayUtils
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.annotation.IfProfileValue
-import org.springframework.test.context.TestPropertySource
-import org.springframework.test.context.junit4.SpringRunner
-import org.springframework.test.web.servlet.MockMvc
+import org.springframework.http.MediaType
+import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.put
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 
 /**
  * Description of class ReaderControllerTest
  * @created: 2021-10-24
  */
-@RunWith(SpringRunner::class)
-@SpringBootTest(classes = [Library::class])
-@AutoConfigureMockMvc
-@TestPropertySource(properties = ["spring.config.location = classpath:application-test.yaml"])
-@IfProfileValue(name = "spring.profiles.active", values = ["int-test"])
-class ReaderControllerTest {
-    
-    @Autowired
-    lateinit var mapper: ObjectMapper
-
-    @Autowired
-    lateinit var rest: MockMvc
+class ReaderControllerTest : LibraryControllerTest() {
 
     @Test
     fun readers() {
-        rest.get("/api/library/readers")
-            .andDo { print() }
-            .andExpect { status { isOk() } }
+        val reader: Reader = createReader()
+        assertNotNull(reader.id)
+
+        var readerFromServer: Reader = getReader(reader.id!!)
+        assertEquals(reader, readerFromServer)
+
+        reader.firstName = "r1_fname_new"
+        reader.lastName = "r1_lname_new"
+        reader.mail = "r1_mail_new"
+        reader.address = "r1_address_new"
+        reader.phoneNumber = "r1_phone_new"
+        reader.note = "r1_note_new"
+
+        updateReader(reader)
+
+        readerFromServer = getReader(reader.id!!)
+        assertEquals(reader, readerFromServer)
+
+        val readers = findAllReaders()
+
+        val filtered = readers.filter { it.id == reader.id }
+        assertFalse { filtered.isEmpty() }
+        readerFromServer = filtered[0]
+        assertEquals(reader, readerFromServer)
+
+        deleteReader(reader.id!!)
+
+        rest.get("/api/library/readers/${reader.id}")
+                .andExpect { status { isNotFound() } }
     }
 
     @Test
     fun orders() {
-        rest.get("/api/library/readers/1/orders")
-            .andDo { print() }
-            .andExpect { status { isOk() } }
+        val readers = findAllReaders()
+        val books = findAllBooks()
+
+        val author = createAuthor()
+        val reader = if (readers.isEmpty()) createReader() else readers[0]
+        val book = if (books.isEmpty()) createBook(author) else books[0]
+        val order = createOrder(book.id!!, reader.id!!)
+
+        val orders: List<OrderDTO> = getOrdersForReader(reader)
+
+        val filtered = orders.filter { it.id == order.id }
+        assertFalse(filtered.isEmpty())
+        assertEquals(order, orders[0])
     }
 
     @Test
     fun feedbacks() {
-        rest.get("/api/library/readers/1/feedbacks")
-            .andDo { print() }
-            .andExpect { status { isOk() } }
+        val response = rest.get("/api/library/readers/1/feedbacks")
+                .andDo { print() }
+                .andExpect { status { isOk() } }
+                .andReturn().response.contentAsString
+
+        val typeRef = jacksonTypeRef<List<FeedbackDTO>>()
+        val feedbacks: List<FeedbackDTO> = mapper.readValue(response, typeRef)
+        print(ArrayUtils.toString(feedbacks))
+    }
+
+    private fun getReader(readerId: Int): Reader {
+        val response = rest.get("/api/library/readers/${readerId}")
+                .andDo { print() }
+                .andExpect { status { isOk() } }
+                .andReturn().response.contentAsString
+
+        return mapper.readValue(response, Reader::class.java)
+    }
+
+    private fun updateReader(reader: Reader) {
+        rest.put("/api/library/readers/${reader.id}") {
+            contentType = MediaType.APPLICATION_JSON
+            content = mapper.writeValueAsString(reader)
+        }
+                .andExpect { status { isOk() } }
+    }
+
+    private fun deleteReader(readerId: Int) {
+        rest.delete("/api/library/readers/${readerId}")
+                .andExpect { status { isNoContent() } }
     }
 }

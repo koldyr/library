@@ -1,32 +1,18 @@
 package com.koldyr.library.controllers
 
-import java.time.LocalDate
-import java.time.LocalDateTime
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
-import com.koldyr.library.Library
-import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.SearchCriteria
-import com.koldyr.library.model.Genre
-import com.koldyr.library.model.Reader
-import org.hamcrest.Matchers.matchesRegex
+import org.hamcrest.Matchers.*
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpHeaders.LOCATION
-import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.annotation.IfProfileValue
-import org.springframework.test.context.TestPropertySource
-import org.springframework.test.context.junit4.SpringRunner
-import org.springframework.test.web.servlet.MockMvc
+import org.springframework.http.HttpHeaders.*
+import org.springframework.http.MediaType.*
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
+import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -35,23 +21,12 @@ import kotlin.test.assertTrue
  * Description of class BookControllerTest
  * @created: 2021-10-23
  */
-@RunWith(SpringRunner::class)
-@SpringBootTest(classes = [Library::class])
-@AutoConfigureMockMvc
-@TestPropertySource(properties = ["spring.config.location = classpath:application-test.yaml"])
-@IfProfileValue(name = "spring.profiles.active", values = ["int-test"])
-class BookControllerTest {
-
-    @Autowired
-    lateinit var mapper: ObjectMapper
-
-    @Autowired
-    lateinit var rest: MockMvc
+class BookControllerTest: LibraryControllerTest() {
 
     @Test
     fun books() {
         val author = createAuthor()
-        val book = createBook(author, 1)
+        val book = createBook(author)
         assertNotNull(book.id)
 
         var bookFromServer = readBook(book.id!!)
@@ -78,7 +53,7 @@ class BookControllerTest {
     @Test
     fun feedbacks() {
         val author = createAuthor()
-        val book = createBook(author, 2)
+        val book = createBook(author)
 
         createFeedBack(book, "f1_feedback", 5)
         createFeedBack(book, "f2_feedback", 9)
@@ -101,12 +76,12 @@ class BookControllerTest {
     @Test
     fun searchBooks() {
         val author = createAuthor()
-        createBook(author, 3)
-        createBook(author, 4)
-        createBook(author, 5)
-        createBook(author, 6)
-        createBook(author, 7)
-        createBook(author, 8)
+        createBook(author)
+        createBook(author)
+        createBook(author)
+        createBook(author)
+        createBook(author)
+        createBook(author)
 
         val searchCriteria = SearchCriteria()
         searchCriteria.title = "title"
@@ -114,46 +89,6 @@ class BookControllerTest {
         val books = searchBooks(searchCriteria)
 
         assertTrue { books.isNotEmpty() }
-    }
-
-    private fun createBook(author: AuthorDTO, index: Int): BookDTO {
-        val book = BookDTO(null, "title $index", author.id, Genre.values()[index], "house $index", LocalDate.now(), "cover $index", "note $index", 5)
-
-        val location: String? = rest.post("/api/library/books") {
-            accept = APPLICATION_JSON
-            contentType = APPLICATION_JSON
-            content = mapper.writeValueAsString(book)
-        }
-            .andDo { print() }
-            .andExpect {
-                status { isCreated() }
-                header { string(LOCATION, matchesRegex("/api/library/books/[\\d]+")) }
-            }
-            .andReturn().response.getHeader(LOCATION)
-
-        val regex = Regex("/api/library/books/(\\d+)")
-        val matchResult = regex.find(location!!)
-        book.id = matchResult?.groups?.get(1)?.value?.toInt()
-        return book
-    }
-
-    private fun createAuthor(): AuthorDTO {
-        val author = AuthorDTO(null, "a1_name", "a1_last", LocalDate.of(1970, 10, 10))
-        val authorHeader = rest.post("/api/library/authors") {
-            accept = APPLICATION_JSON
-            contentType = APPLICATION_JSON
-            content = mapper.writeValueAsString(author)
-        }
-            .andExpect {
-                status { isCreated() }
-            }
-            .andReturn().response.getHeader(LOCATION)
-
-        val regex = Regex("/api/library/authors/(\\d+)")
-        val matchResult = regex.find(authorHeader!!)
-        author.id = matchResult?.groups?.get(1)?.value?.toInt()
-
-        return author
     }
 
     private fun createFeedBack(book: BookDTO, value: String, rate: Int) {
@@ -170,33 +105,6 @@ class BookControllerTest {
                 status { isCreated() }
                 header { string(LOCATION, matchesRegex("/api/library/books/[\\d]+/feedbacks")) }
             }
-    }
-
-    private fun createReader(): Reader {
-        val reader = Reader()
-        reader.address = "r1_address"
-        reader.firstName = "r1_fname"
-        reader.lastName = "r1_lname"
-        reader.mail = "r1_email"
-        reader.note = "r1_note"
-        reader.phoneNumber = "r1_phone"
-
-        val location: String? = rest.post("/api/library/readers") {
-            accept = APPLICATION_JSON
-            contentType = APPLICATION_JSON
-            content = mapper.writeValueAsString(reader)
-        }
-            .andDo { print() }
-            .andExpect {
-                status { isCreated() }
-                header { string(LOCATION, matchesRegex("/api/library/readers/[\\d]+")) }
-            }
-            .andReturn().response.getHeader(LOCATION)
-
-        val regex = Regex("/api/library/readers/(\\d+)")
-        val matchResult = regex.find(location!!)
-        reader.id = matchResult?.groups?.get(1)?.value?.toInt()
-        return reader
     }
 
     private fun readBook(bookId: Int): BookDTO {
@@ -223,7 +131,6 @@ class BookControllerTest {
             }
     }
 
-
     private fun deleteBook(bookId: Int) {
         rest.delete("/api/library/books/$bookId")
             .andExpect {
@@ -244,7 +151,7 @@ class BookControllerTest {
         val typeRef = jacksonTypeRef<List<BookDTO>>()
         val books = mapper.readValue(response, typeRef)
 
-        val fromServer = books.filter { dto -> dto.id == book.id }[0]
+        val fromServer = books.filter { it.id == book.id }[0]
         assertEquals(book, fromServer)
     }
 
