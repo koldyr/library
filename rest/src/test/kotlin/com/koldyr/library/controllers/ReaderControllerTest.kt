@@ -4,9 +4,8 @@ import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Reader
-import org.apache.commons.lang3.ArrayUtils
 import org.junit.Test
-import org.springframework.http.MediaType
+import org.springframework.http.MediaType.*
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
@@ -72,14 +71,39 @@ class ReaderControllerTest : LibraryControllerTest() {
 
     @Test
     fun feedbacks() {
-        val response = rest.get("/api/library/readers/1/feedbacks")
-                .andDo { print() }
-                .andExpect { status { isOk() } }
-                .andReturn().response.contentAsString
+        val reader = createReader()
 
-        val typeRef = jacksonTypeRef<List<FeedbackDTO>>()
-        val feedbacks: List<FeedbackDTO> = mapper.readValue(response, typeRef)
-        print(ArrayUtils.toString(feedbacks))
+        val books = mutableSetOf<Int>()
+
+        var author = createAuthor()
+        var book = createBook(author)
+        createFeedBack(book, reader)
+        books.add(book.id!!)
+
+        author = createAuthor()
+        book = createBook(author)
+        createFeedBack(book, reader)
+        books.add(book.id!!)
+
+        val response = rest.get("/api/library/readers/${reader.id}/feedbacks") {
+            accept = APPLICATION_JSON
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isOk() }
+                    content { contentType(APPLICATION_JSON) }
+                }.andReturn().response.contentAsString
+
+        val typeRef = jacksonTypeRef<Array<FeedbackDTO>>()
+        val feedbacks = mapper.readValue(response, typeRef)
+
+        assertEquals(2, feedbacks.size)
+
+        books.forEach { bookId ->
+            val feedback = feedbacks.first { it.bookId == bookId }
+            assertNotNull(feedback)
+            assertEquals(reader.id, feedback.readerId)
+        }
     }
 
     private fun getReader(readerId: Int): Reader {
@@ -93,7 +117,7 @@ class ReaderControllerTest : LibraryControllerTest() {
 
     private fun updateReader(reader: Reader) {
         rest.put("/api/library/readers/${reader.id}") {
-            contentType = MediaType.APPLICATION_JSON
+            contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(reader)
         }
                 .andExpect { status { isOk() } }

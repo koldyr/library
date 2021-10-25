@@ -4,15 +4,12 @@ import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.SearchCriteria
-import org.hamcrest.Matchers.*
 import org.junit.Test
-import org.springframework.http.HttpHeaders.*
 import org.springframework.http.MediaType.*
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
-import java.time.LocalDateTime
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -55,8 +52,14 @@ class BookControllerTest: LibraryControllerTest() {
         val author = createAuthor()
         val book = createBook(author)
 
-        createFeedBack(book, "f1_feedback", 5)
-        createFeedBack(book, "f2_feedback", 9)
+        val readers = mutableSetOf<Int>()
+        var reader = createReader()
+        createFeedBack(book, reader)
+        readers.add(reader.id!!)
+
+        reader = createReader()
+        createFeedBack(book, reader)
+        readers.add(reader.id!!)
 
         val response = rest.get("/api/library/books/${book.id}/feedbacks") {
             accept = APPLICATION_JSON
@@ -71,6 +74,12 @@ class BookControllerTest: LibraryControllerTest() {
         val feedbacks = mapper.readValue(response, typeRef)
 
         assertEquals(2, feedbacks.size)
+
+        readers.forEach { readerId ->
+            val feedback = feedbacks.first { it.readerId == readerId }
+            assertNotNull(feedback)
+            assertEquals(book.id, feedback.bookId)
+        }
     }
 
     @Test
@@ -89,22 +98,6 @@ class BookControllerTest: LibraryControllerTest() {
         val books = searchBooks(searchCriteria)
 
         assertTrue { books.isNotEmpty() }
-    }
-
-    private fun createFeedBack(book: BookDTO, value: String, rate: Int) {
-        val reader = createReader()
-        val feedback = FeedbackDTO(null, reader.id, book.id, LocalDateTime.now(), value, rate)
-
-        rest.post("/api/library/books/feedback") {
-            accept = APPLICATION_JSON
-            contentType = APPLICATION_JSON
-            content = mapper.writeValueAsString(feedback)
-        }
-            .andDo { print() }
-            .andExpect {
-                status { isCreated() }
-                header { string(LOCATION, matchesRegex("/api/library/books/[\\d]+/feedbacks")) }
-            }
     }
 
     private fun readBook(bookId: Int): BookDTO {

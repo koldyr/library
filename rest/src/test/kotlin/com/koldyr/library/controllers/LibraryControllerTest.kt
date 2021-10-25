@@ -5,6 +5,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.Library
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
+import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Genre
 import com.koldyr.library.model.Reader
@@ -15,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders.*
-import org.springframework.http.MediaType
+import org.springframework.http.MediaType.*
 import org.springframework.test.annotation.IfProfileValue
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit4.SpringRunner
@@ -23,6 +24,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import java.time.LocalDate
+import java.time.LocalDateTime
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [Library::class])
@@ -43,8 +45,8 @@ abstract class LibraryControllerTest {
         val author = AuthorDTO(null, "a${index}_name", "a${index}_last", LocalDate.of(year, 1, 1))
 
         val authorHeader = rest.post("/api/library/authors") {
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(author)
         }
                 .andExpect {
@@ -69,17 +71,18 @@ abstract class LibraryControllerTest {
     }
 
     protected fun createReader(): Reader {
+        val index = RandomUtils.nextInt(0, 100_000)
         val reader = Reader()
-        reader.firstName = "r1_fname"
-        reader.lastName = "r1_lname"
-        reader.mail = "r1_mail"
-        reader.address = "r1_address"
-        reader.phoneNumber = "r1_phone"
-        reader.note = "r1_note"
+        reader.firstName = "r${index}_fname"
+        reader.lastName = "r${index}_lname"
+        reader.mail = "r${index}_mail"
+        reader.address = "r${index}_address"
+        reader.phoneNumber = "r${index}_phone"
+        reader.note = "r${index}_note"
 
         val readerHeader = rest.post("/api/library/readers") {
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(reader)
         }
                 .andExpect {
@@ -114,8 +117,8 @@ abstract class LibraryControllerTest {
         val book = BookDTO(null, "title $index", author.id, Genre.values()[genre], "house $index", publicationDate, "cover $index", "note $index", count)
 
         val location: String? = rest.post("/api/library/books") {
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(book)
         }
                 .andDo { print() }
@@ -147,8 +150,8 @@ abstract class LibraryControllerTest {
         order.notes = "reader '$readerId' took '$bookId' book"
 
         val response = rest.post("/api/library/books/take") {
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(order)
         }
                 .andExpect {
@@ -172,4 +175,22 @@ abstract class LibraryControllerTest {
 
         return orders
     }
+
+    protected fun createFeedBack(book: BookDTO, reader: Reader) {
+        val rate = RandomUtils.nextInt(0, 10)
+        val feedback = FeedbackDTO(null, reader.id, book.id, LocalDateTime.now(), "feedback of reader '${reader.id}' for book '${book.id}'", rate)
+
+        rest.post("/api/library/books/feedback") {
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
+            content = mapper.writeValueAsString(feedback)
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isCreated() }
+                    header { string(LOCATION, matchesRegex("/api/library/books/[\\d]+/feedbacks")) }
+                }
+    }
+
+
 }
