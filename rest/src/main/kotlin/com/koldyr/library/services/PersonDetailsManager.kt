@@ -5,12 +5,15 @@ import com.koldyr.library.model.Reader
 import com.koldyr.library.persistence.ReaderRepository
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.provisioning.UserDetailsManager
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
 @Service
-open class PersonDetailsManager(private val readerRepository: ReaderRepository) : UserDetailsManager {
+open class PersonDetailsManager(
+        private val readerRepository: ReaderRepository,
+        private val encoder: PasswordEncoder) : UserDetailsManager {
 
     override fun loadUserByUsername(email: String): UserDetails {
         return readerRepository.findByMail(email)
@@ -49,7 +52,7 @@ open class PersonDetailsManager(private val readerRepository: ReaderRepository) 
         val reader = readerRepository.findByMail(email)
                 .orElseThrow { UsernameNotFoundException("Reader with email '${email}' is not found") }
 
-        reader.password = password
+        reader.password = encoder.encode(password)
         readerRepository.save(reader)
     }
 
@@ -65,6 +68,7 @@ open class PersonDetailsManager(private val readerRepository: ReaderRepository) 
             reader.address = user.getReader().address
             reader.phoneNumber = user.getReader().phoneNumber
             reader.note = user.getReader().note
+            reader.authorities = user.getReader().authorities
         }
     }
 }

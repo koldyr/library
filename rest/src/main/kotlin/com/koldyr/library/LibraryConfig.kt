@@ -13,6 +13,7 @@ import com.koldyr.library.model.Book
 import com.koldyr.library.model.Feedback
 import com.koldyr.library.model.Order
 import com.koldyr.library.persistence.AuthorRepository
+import com.koldyr.library.persistence.AuthorityRepository
 import com.koldyr.library.persistence.BookRepository
 import com.koldyr.library.persistence.FeedbackRepository
 import com.koldyr.library.persistence.OrderRepository
@@ -67,11 +68,14 @@ open class LibraryConfig : WebSecurityConfigurerAdapter() {
     lateinit var feedbackRepository: FeedbackRepository
 
     @Autowired
+    lateinit var authorityRepository: AuthorityRepository
+
+    @Autowired
     lateinit var userDetailsManager: UserDetailsManager
 
     @Bean
     open fun readerService(mapper: MapperFacade, encoder: PasswordEncoder): ReaderService {
-        return ReaderServiceImpl(readerRepository, mapper, encoder)
+        return ReaderServiceImpl(readerRepository, authorityRepository, mapper, encoder)
     }
 
     @Bean
@@ -130,7 +134,7 @@ open class LibraryConfig : WebSecurityConfigurerAdapter() {
                 .cors()
                 .configurationSource(corsConfigurationSource())
             .and()
-                .formLogin().defaultSuccessUrl("/swagger-ui.html",true)
+                .formLogin().defaultSuccessUrl("/swagger-ui.html", true)
             .and()
                 .httpBasic()
             .and()

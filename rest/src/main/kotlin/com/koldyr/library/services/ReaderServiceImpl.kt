@@ -5,6 +5,7 @@ import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Feedback
 import com.koldyr.library.model.Order
 import com.koldyr.library.model.Reader
+import com.koldyr.library.persistence.AuthorityRepository
 import com.koldyr.library.persistence.ReaderRepository
 import ma.glasnost.orika.MapperFacade
 import org.apache.commons.lang3.StringUtils.*
@@ -20,6 +21,7 @@ import java.util.Objects.*
  */
 open class ReaderServiceImpl(
         private val readerRepository: ReaderRepository,
+        private val authorityRepository: AuthorityRepository,
         private val mapper: MapperFacade,
         private val encoder: PasswordEncoder
 ) : ReaderService {
@@ -34,6 +36,11 @@ open class ReaderServiceImpl(
 
         if (readerRepository.findByMail(reader.mail).isPresent) {
             throw ResponseStatusException(BAD_REQUEST, "Reader with mail '${reader.mail}' already exists")
+        }
+
+        reader.id = null
+        if (reader.authorities.isEmpty()) {
+            reader.authorities.add(authorityRepository.getById(0))
         }
 
         reader.password = encoder.encode(reader.password)

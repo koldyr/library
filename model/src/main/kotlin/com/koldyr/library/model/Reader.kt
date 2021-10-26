@@ -1,8 +1,10 @@
 package com.koldyr.library.model
 
 import javax.persistence.Basic
+import javax.persistence.CascadeType.*
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.FetchType.*
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.*
 import javax.persistence.Id
@@ -29,19 +31,24 @@ class Reader : Cloneable {
 
     var lastName: String? = null
 
-    @Basic(optional = false)
+    @Column(nullable = false, unique = true)
     var mail: String = ""
 
-    var address:  String? = null
+    var address: String? = null
 
-    var phoneNumber:  String? = null
+    var phoneNumber: String? = null
 
     var note: String? = null
-    
+
     @Basic(optional = false)
     var password: String = ""
 
-    @OneToMany(mappedBy = "reader")
+    @OneToMany(targetEntity = Authority::class, cascade = [ALL], fetch = EAGER)
+//    @JoinTable(
+//            name = "T_READER_AUTHORITIES",
+//            joinColumns = [JoinColumn(name = "READER_ID", referencedColumnName = "READER_ID")],
+//            inverseJoinColumns = [JoinColumn(name = "AUTHORITY_ID", referencedColumnName = "AUTHORITY_ID")],
+//    )
     var authorities: MutableSet<Authority> = mutableSetOf()
 
     override fun equals(other: Any?): Boolean {

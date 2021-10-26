@@ -1,13 +1,16 @@
 ### Get Authors
 GET http://localhost/api/library/authors
+Authorization: Basic {{BasicHash}}
 Accept: application/json
 
 ### Get Author
 GET http://localhost/api/library/authors/1
+Authorization: Basic {{BasicHash}}
 Accept: application/json
 
 ### Create Author
 POST http://localhost/api/library/authors
+Authorization: Basic {{BasicHash}}
 Content-Type: application/json
 Accept: application/json
 
@@ -19,6 +22,7 @@ Accept: application/json
 
 ### Update Author
 PUT http://localhost/api/library/authors/3
+Authorization: Basic {{BasicHash}}
 Content-Type: application/json
 Accept: application/json
 
@@ -30,6 +34,8 @@ Accept: application/json
 
 ### Delete Author
 DELETE http://localhost/api/library/authors/2
+Authorization: Basic {{BasicHash}}
 
 ### Get all Author's books
 GET http://localhost/api/library/authors/4/books
+Authorization: Basic {{BasicHash}}
