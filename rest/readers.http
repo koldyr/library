@@ -1,14 +1,17 @@
 ### Get All Readers
 GET http://localhost/api/library/readers
+Authorization: Basic dXNlcjo5OGNlYTQ5NC1iYTIwLTQ5MjQtYThmZS1lYWFmOTM5ZjkxNjk=
 
 ### Get Specific Reader
 GET http://localhost/api/library/readers/1
 Accept: application/json
+Cookie: JSESSIONID=96C533A22C518A4CDD2B417D5E842202;
 
 ### Create Reader
 POST http://localhost/api/library/readers
 Content-Type: application/json
 Accept: application/json
+Cookie: JSESSIONID=96C533A22C518A4CDD2B417D5E842202;
 
 {
   "firstName": "r4_first",

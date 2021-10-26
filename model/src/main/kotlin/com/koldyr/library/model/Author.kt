@@ -33,5 +33,5 @@ class Author {
     var dateOfBirth: LocalDate? = null
 
     @OneToMany(mappedBy = "author", cascade = [CascadeType.PERSIST])
-    var books: MutableCollection<Book> = mutableSetOf()
+    var books: MutableSet<Book> = mutableSetOf()
 }

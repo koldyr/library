@@ -1,10 +1,12 @@
 package com.koldyr.library.model
 
+import javax.persistence.Basic
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.*
 import javax.persistence.Id
+import javax.persistence.OneToMany
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
 
@@ -27,7 +29,8 @@ class Reader : Cloneable {
 
     var lastName: String? = null
 
-    var mail:  String? = null
+    @Basic(optional = false)
+    var mail: String = ""
 
     var address:  String? = null
 
@@ -35,6 +38,12 @@ class Reader : Cloneable {
 
     var note: String? = null
     
+    @Basic(optional = false)
+    var password: String = ""
+
+    @OneToMany(mappedBy = "reader")
+    var authorities: MutableSet<Authority> = mutableSetOf()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Reader) return false

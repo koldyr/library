@@ -7,7 +7,9 @@ import com.koldyr.library.model.Order
 import com.koldyr.library.model.Reader
 import com.koldyr.library.persistence.ReaderRepository
 import ma.glasnost.orika.MapperFacade
+import org.apache.commons.lang3.StringUtils.*
 import org.springframework.http.HttpStatus.*
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import java.util.Objects.*
@@ -18,13 +20,24 @@ import java.util.Objects.*
  */
 open class ReaderServiceImpl(
         private val readerRepository: ReaderRepository,
-        private val mapper: MapperFacade) : ReaderService {
+        private val mapper: MapperFacade,
+        private val encoder: PasswordEncoder
+) : ReaderService {
 
     override fun findAll(): List<Reader> = readerRepository.findAll()
 
     @Transactional
-    override fun create(person: Reader): Int {
-        val saved = readerRepository.save(person)
+    override fun create(reader: Reader): Int {
+        if (isEmpty(reader.password)) {
+            throw ResponseStatusException(BAD_REQUEST, "Reader password must be provided")
+        }
+
+        if (readerRepository.findByMail(reader.mail).isPresent) {
+            throw ResponseStatusException(BAD_REQUEST, "Reader with mail '${reader.mail}' already exists")
+        }
+
+        reader.password = encoder.encode(reader.password)
+        val saved = readerRepository.save(reader)
         return saved.id!!
     }
 
@@ -39,6 +52,7 @@ open class ReaderServiceImpl(
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readeId' is not found") }
 
         reader.id = persisted.id
+        reader.password = persisted.password
         mapper.map(reader, persisted)
 
         readerRepository.save(persisted);

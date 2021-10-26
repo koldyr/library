@@ -34,15 +34,22 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.provisioning.UserDetailsManager
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 /**
  * Description of class LibraryConfig
  * @created: 2021-09-28
  */
 @Configuration
-open class LibraryConfig {
+open class LibraryConfig : WebSecurityConfigurerAdapter() {
 
     @Autowired
     lateinit var readerRepository: ReaderRepository
@@ -59,9 +66,12 @@ open class LibraryConfig {
     @Autowired
     lateinit var feedbackRepository: FeedbackRepository
 
+    @Autowired
+    lateinit var userDetailsManager: UserDetailsManager
+
     @Bean
-    open fun readerService(mapper: MapperFacade): ReaderService {
-        return ReaderServiceImpl(readerRepository, mapper)
+    open fun readerService(mapper: MapperFacade, encoder: PasswordEncoder): ReaderService {
+        return ReaderServiceImpl(readerRepository, mapper, encoder)
     }
 
     @Bean
@@ -104,15 +114,41 @@ open class LibraryConfig {
         return mapperFactory.mapperFacade
     }
 
+    override fun configure(auth: AuthenticationManagerBuilder) {
+        auth
+                .userDetailsService(userDetailsManager)
+                .passwordEncoder(encoder())
+    }
+
+    @Throws(Exception::class)
+    override fun configure(http: HttpSecurity) {
+        http
+            .authorizeRequests()
+                .antMatchers("/login*").permitAll()
+                .anyRequest().authenticated()
+            .and()
+                .cors()
+                .configurationSource(corsConfigurationSource())
+            .and()
+                .formLogin().defaultSuccessUrl("/swagger-ui.html",true)
+            .and()
+                .httpBasic()
+            .and()
+                .headers().disable()
+                .csrf().disable()
+    }
+
+    open fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.allowedMethods = listOf(HttpMethod.GET.name, HttpMethod.PUT.name, HttpMethod.POST.name, HttpMethod.DELETE.name)
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration.applyPermitDefaultValues())
+        return source
+    }
+
     @Bean
-    open fun corsConfigurer(): WebMvcConfigurer {
-        return object : WebMvcConfigurer {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods(HttpMethod.GET.name, HttpMethod.HEAD.name, HttpMethod.POST.name, HttpMethod.PUT.name, HttpMethod.DELETE.name)
-            }
-        }
+    open fun encoder(): PasswordEncoder {
+        return BCryptPasswordEncoder()
     }
 
     @Bean

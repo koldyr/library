@@ -26,6 +26,7 @@ Accept: application/json
 PUT http://localhost/api/library/books/1
 Content-Type: application/json
 Accept: application/json
+Cookie: JSESSIONID=4E8462E3CEB251135F5820F1217C727B
 
 {
   "title": "b1_title",
