@@ -8,9 +8,9 @@ insert into T_READER (READER_ID, FIRST_NAME, LAST_NAME, MAIL, ADDRESS, PHONE_NUM
 values (SEQ_READER.nextval, 'koldyr', 'koldyr', 'me@koldyr.com', 'Minsk', '+375297709965', '$2a$10$O.lTfOYmXq6rjeiBuTt3weq0UJJjSRKcd2aLciHvdIJNQmZa.IGHi');
 
 insert into T_ORDER (ORDER_ID, BOOK_ID, READER_ID, ORDERED, RETURNED, NOTES)
-values (SEQ_ORDER.nextval, SEQ_BOOK.currval, SEQ_READER.currval, CURRENT_TIMESTAMP() , null, 'o1_note');
+values (SEQ_ORDER.nextval, SEQ_BOOK.currval, SEQ_READER.currval, CURRENT_TIMESTAMP(), null, 'o1_note');
 
-insert into T_FEEDBACK (FEEDBACK_ID, READER_ID, BOOK_ID, "date", "text", RATE)
+insert into T_FEEDBACK (FEEDBACK_ID, READER_ID, BOOK_ID, "DATE", "TEXT", RATE)
 values (SEQ_FEEDBACK.nextval, SEQ_READER.currval, SEQ_BOOK.currval, CURRENT_TIMESTAMP(), 'f1_feedback', 8);
 
 insert into T_AUTHORITY (AUTHORITY_ID, GRANTED)
@@ -20,6 +20,9 @@ values (1, 'librarian');
 insert into T_AUTHORITY (AUTHORITY_ID, GRANTED)
 values (2, 'supervisor');
 
-insert into T_READER_AUTHORITIES (READER_READER_ID, AUTHORITIES_AUTHORITY_ID) values (1, 0);
-insert into T_READER_AUTHORITIES (READER_READER_ID, AUTHORITIES_AUTHORITY_ID) values (1, 1);
-insert into T_READER_AUTHORITIES (READER_READER_ID, AUTHORITIES_AUTHORITY_ID) values (1, 2);
+insert into T_READER_AUTHORITIES (READER_ID, AUTHORITY_ID)
+values (1, 0);
+insert into T_READER_AUTHORITIES (READER_ID, AUTHORITY_ID)
+values (1, 1);
+insert into T_READER_AUTHORITIES (READER_ID, AUTHORITY_ID)
+values (1, 2);
