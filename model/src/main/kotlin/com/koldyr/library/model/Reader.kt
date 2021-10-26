@@ -10,7 +10,7 @@ import javax.persistence.GenerationType.*
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.JoinTable
-import javax.persistence.OneToMany
+import javax.persistence.ManyToMany
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
 
@@ -45,7 +45,7 @@ class Reader : Cloneable {
     @Basic(optional = false)
     var password: String = ""
 
-    @OneToMany(targetEntity = Authority::class, cascade = [PERSIST], fetch = EAGER)
+    @ManyToMany(targetEntity = Authority::class, cascade = [PERSIST, REMOVE], fetch = EAGER)
     @JoinTable(
             name = "T_READER_AUTHORITIES",
             joinColumns = [JoinColumn(name = "reader_id", referencedColumnName = "reader_id")],
