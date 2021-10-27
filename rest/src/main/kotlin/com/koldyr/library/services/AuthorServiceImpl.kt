@@ -4,7 +4,8 @@ import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.model.Author
 import com.koldyr.library.persistence.AuthorRepository
 import ma.glasnost.orika.MapperFacade
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 
@@ -15,6 +16,7 @@ open class AuthorServiceImpl(
     override fun findAll(): List<AuthorDTO> = authorRepository.findAll().map { mapper.map(it, AuthorDTO::class.java) }
 
     @Transactional
+    @PreAuthorize("hasAnyAuthority('librarian', 'supervisor')")
     override fun create(author: AuthorDTO): Int {
         author.id = null
         val newAuthor = mapper.map(author, Author::class.java)
@@ -28,6 +30,7 @@ open class AuthorServiceImpl(
     }
 
     @Transactional
+    @PreAuthorize("hasAnyAuthority('librarian', 'supervisor')")
     override fun update(authorId: Int, author: AuthorDTO) {
         val persisted = find(authorId)
 
@@ -38,6 +41,7 @@ open class AuthorServiceImpl(
     }
 
     @Transactional
+    @PreAuthorize("hasAnyAuthority('librarian', 'supervisor')")
     override fun delete(authorId: Int) {
         authorRepository.deleteById(authorId)
     }

@@ -1,5 +1,7 @@
 package com.koldyr.library.services
 
+import java.util.Objects.isNull
+import java.util.Objects.nonNull
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Feedback
@@ -8,12 +10,13 @@ import com.koldyr.library.model.Reader
 import com.koldyr.library.persistence.AuthorityRepository
 import com.koldyr.library.persistence.ReaderRepository
 import ma.glasnost.orika.MapperFacade
-import org.apache.commons.lang3.StringUtils.*
-import org.springframework.http.HttpStatus.*
+import org.apache.commons.lang3.StringUtils.isEmpty
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.util.Objects.*
 
 /**
  * Description of class ReaderServiceImpl
@@ -66,6 +69,7 @@ open class ReaderServiceImpl(
     }
 
     @Transactional
+    @PreAuthorize("hasAnyAuthority('librarian', 'supervisor')")
     override fun delete(readerId: Int) = readerRepository.deleteById(readerId)
 
     override fun findOrders(readerId: Int, returned: Boolean?): Collection<OrderDTO> {

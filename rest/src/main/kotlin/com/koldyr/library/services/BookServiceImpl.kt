@@ -1,9 +1,15 @@
 package com.koldyr.library.services
 
+import java.time.LocalDate
+import java.time.LocalDate.of
+import java.time.LocalDateTime
+import java.util.Objects.isNull
+import java.util.Objects.nonNull
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.PageResultDTO
+import com.koldyr.library.dto.ReaderDetails
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.model.Book
 import com.koldyr.library.model.Feedback
@@ -13,21 +19,19 @@ import com.koldyr.library.persistence.AuthorRepository
 import com.koldyr.library.persistence.BookRepository
 import com.koldyr.library.persistence.FeedbackRepository
 import com.koldyr.library.persistence.OrderRepository
-import com.koldyr.library.persistence.ReaderRepository
 import ma.glasnost.orika.MapperFacade
-import org.apache.commons.lang3.ArrayUtils.*
+import org.apache.commons.lang3.ArrayUtils.isNotEmpty
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDate
-import java.time.LocalDate.*
-import java.time.LocalDateTime
-import java.util.Objects.*
 import javax.persistence.criteria.Path
 import javax.persistence.criteria.Predicate
 import kotlin.reflect.full.declaredMemberProperties
@@ -39,7 +43,6 @@ import kotlin.reflect.full.declaredMemberProperties
 open class BookServiceImpl(
         private val bookRepository: BookRepository,
         private val authorRepository: AuthorRepository,
-        private val readerRepository: ReaderRepository,
         private val orderRepository: OrderRepository,
         private val feedbackRepository: FeedbackRepository,
         private val mapper: MapperFacade
@@ -53,6 +56,7 @@ open class BookServiceImpl(
     }
 
     @Transactional
+    @PreAuthorize("hasAnyAuthority('librarian', 'supervisor')")
     override fun create(book: BookDTO): Int {
         book.id = null
         val newBook = mapper.map(book, Book::class.java)
@@ -67,6 +71,7 @@ open class BookServiceImpl(
     }
 
     @Transactional
+    @PreAuthorize("hasAnyAuthority('librarian', 'supervisor')")
     override fun update(bookId: Int, book: BookDTO) {
         val persisted = find(bookId)
 
@@ -76,6 +81,7 @@ open class BookServiceImpl(
     }
 
     @Transactional
+    @PreAuthorize("hasAnyAuthority('librarian', 'supervisor')")
     override fun delete(bookId: Int) {
         if (orderRepository.hasOrders(bookId)) {
             throw ResponseStatusException(BAD_REQUEST, "Unable to delete book '${bookId}', it is already ordered")
@@ -84,8 +90,11 @@ open class BookServiceImpl(
     }
 
     @Transactional
+    @PreAuthorize("hasAnyAuthority('reader')")
     override fun feedbackBook(feedback: FeedbackDTO): Int {
         feedback.date = LocalDateTime.now()
+        feedback.readerId = getLoggedUserId()
+
         val newFeedback = mapper.map(feedback, Feedback::class.java)
         newFeedback.id = null
 
@@ -99,11 +108,8 @@ open class BookServiceImpl(
     }
 
     @Transactional
+    @PreAuthorize("hasAnyAuthority('reader')")
     override fun takeBook(order: OrderDTO): OrderDTO {
-        if (!readerRepository.existsById(order.readerId!!)) {
-            throw ResponseStatusException(NOT_FOUND, "Reader with id '${order.readerId}' is not found")
-        }
-
         val book = find(order.bookId!!)
 
         if (book.count == 0) {
@@ -112,6 +118,8 @@ open class BookServiceImpl(
 
         order.id = null
         order.ordered = LocalDateTime.now()
+        order.readerId = getLoggedUserId()
+        
         val newOrder = mapper.map(order, Order::class.java)
 
         orderRepository.save(newOrder)
@@ -124,6 +132,7 @@ open class BookServiceImpl(
     }
 
     @Transactional
+    @PreAuthorize("hasAnyAuthority('reader')")
     override fun returnBook(order: OrderDTO) {
         val persisted = orderRepository.findById(order.id!!)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Order with id '${order.id}' is not found") }
@@ -244,6 +253,12 @@ open class BookServiceImpl(
     private fun find(bookId: Int): Book {
         return bookRepository.findById(bookId)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '$bookId' is not found") }
+    }
+
+    private fun getLoggedUserId(): Int? {
+        val securityContext = SecurityContextHolder.getContext()
+        val authentication = securityContext.authentication
+        return (authentication.principal as ReaderDetails).getReader().id
     }
 }
 

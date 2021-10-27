@@ -5,7 +5,13 @@ insert into T_BOOK (BOOK_ID, TITLE, PUBLISHING_HOUSE, AUTHOR_ID, PUBLICATION_DAT
 values (SEQ_BOOK.nextval, 'b1_title', 'b1_house', SEQ_AUTHOR.currval, '2021-09-09', 'SCIFI', null, 'b1_note', 10);
 
 insert into T_READER (READER_ID, FIRST_NAME, LAST_NAME, MAIL, ADDRESS, PHONE_NUMBER, PASSWORD)
-values (SEQ_READER.nextval, 'koldyr', 'koldyr', 'me@koldyr.com', 'Minsk', '+375297709965', '$2a$10$O.lTfOYmXq6rjeiBuTt3weq0UJJjSRKcd2aLciHvdIJNQmZa.IGHi');
+values (SEQ_READER.nextval, 'koldyr', 'koldyr', 'me@koldyr.com', 'Minsk', '+375297777777', '$2a$10$O.lTfOYmXq6rjeiBuTt3weq0UJJjSRKcd2aLciHvdIJNQmZa.IGHi');
+
+insert into T_READER (READER_ID, FIRST_NAME, LAST_NAME, MAIL, ADDRESS, PHONE_NUMBER, PASSWORD)
+values (SEQ_READER.nextval, 'lemming', 'lemming', 'lemming@koldyr.com', 'Minsk', '+375297777778', '$2a$10$6Ba2ueFmwULa4jz1hFKTyuu/BNCVa3iuLYafpCjEJn1wHxuqQPaxm');
+
+insert into T_READER (READER_ID, FIRST_NAME, LAST_NAME, MAIL, ADDRESS, PHONE_NUMBER, PASSWORD)
+values (SEQ_READER.nextval, 'shurshun', 'shurshun', 'shurshun@koldyr.com', 'Minsk', '+375297777779', '$2a$10$bCUm/mnYFuMDevURe9vcA.tqUdn3it9gdLZn7cvhpXTK3.qedwcAO');
 
 insert into T_ORDER (ORDER_ID, BOOK_ID, READER_ID, ORDERED, RETURNED, NOTES)
 values (SEQ_ORDER.nextval, SEQ_BOOK.currval, SEQ_READER.currval, CURRENT_TIMESTAMP(), null, 'o1_note');
@@ -26,3 +32,6 @@ insert into T_READER_AUTHORITIES (READER_ID, AUTHORITY_ID)
 values (1, 1);
 insert into T_READER_AUTHORITIES (READER_ID, AUTHORITY_ID)
 values (1, 2);
+
+insert into T_READER_AUTHORITIES (READER_ID, AUTHORITY_ID)
+values (3, 1);

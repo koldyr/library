@@ -80,7 +80,7 @@ open class LibraryConfig : WebSecurityConfigurerAdapter() {
 
     @Bean
     open fun bookService(mapper: MapperFacade): BookService {
-        return BookServiceImpl(bookRepository, authorRepository, readerRepository, orderRepository, feedbackRepository, mapper)
+        return BookServiceImpl(bookRepository, authorRepository, orderRepository, feedbackRepository, mapper)
     }
 
     @Bean
