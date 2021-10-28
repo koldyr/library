@@ -1,12 +1,13 @@
 package com.koldyr.library.model
 
 import javax.persistence.Basic
-import javax.persistence.CascadeType.*
+import javax.persistence.CascadeType.PERSIST
+import javax.persistence.CascadeType.REMOVE
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType.*
+import javax.persistence.FetchType.EAGER
 import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.*
+import javax.persistence.GenerationType.SEQUENCE
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.JoinTable
@@ -66,5 +67,9 @@ class Reader : Cloneable {
 
     public override fun clone(): Reader {
         return super.clone() as Reader;
+    }
+
+    override fun toString(): String {
+        return "Reader(id=$id, mail='$mail')"
     }
 }

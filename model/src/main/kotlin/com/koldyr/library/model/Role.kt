@@ -3,6 +3,7 @@ package com.koldyr.library.model
 import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.FetchType.EAGER
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.JoinTable
@@ -20,7 +21,7 @@ class Role() {
     @Column(name = "ROLE_NAME", nullable = false, unique = true)
     var name: String = "reader"
 
-    @ManyToMany
+    @ManyToMany(fetch = EAGER)
     @JoinTable(
             name = "T_ROLE_PRIVILEGES",
             joinColumns = [JoinColumn(name = "role_id", referencedColumnName = "ROLE_ID")],

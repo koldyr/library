@@ -67,7 +67,7 @@ class BookController(private val bookService: BookService) {
         if (isNull(order.bookId)) {
             throw ResponseStatusException(BAD_REQUEST, "Book id must be provided")
         }
-        
+
         val taken = bookService.takeBook(order)
         return status(CREATED).body(taken)
     }
@@ -95,4 +95,9 @@ class BookController(private val bookService: BookService) {
 
     @GetMapping("/{bookId}/feedbacks", produces = [APPLICATION_JSON_VALUE])
     fun bookFeedbacks(@PathVariable bookId: Int): Collection<FeedbackDTO> = bookService.bookFeedbacks(bookId)
+
+    @DeleteMapping("/feedbacks/{feedbackId}")
+    fun deleteFeedback(@PathVariable feedbackId: Int) {
+        bookService.deleteFeedback(feedbackId)
+    }
 }

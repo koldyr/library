@@ -1,5 +1,10 @@
 package com.koldyr.library.services
 
+import java.time.LocalDate
+import java.time.LocalDate.of
+import java.time.LocalDateTime
+import java.util.Objects.isNull
+import java.util.Objects.nonNull
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
@@ -15,21 +20,18 @@ import com.koldyr.library.persistence.BookRepository
 import com.koldyr.library.persistence.FeedbackRepository
 import com.koldyr.library.persistence.OrderRepository
 import ma.glasnost.orika.MapperFacade
-import org.apache.commons.lang3.ArrayUtils.*
+import org.apache.commons.lang3.ArrayUtils.isNotEmpty
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.data.jpa.domain.Specification
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDate
-import java.time.LocalDate.*
-import java.time.LocalDateTime
-import java.util.Objects.*
 import javax.persistence.criteria.Path
 import javax.persistence.criteria.Predicate
 import kotlin.reflect.full.declaredMemberProperties
@@ -39,11 +41,11 @@ import kotlin.reflect.full.declaredMemberProperties
  * @created: 2021-09-28
  */
 open class BookServiceImpl(
-        private val bookRepository: BookRepository,
-        private val authorRepository: AuthorRepository,
-        private val orderRepository: OrderRepository,
-        private val feedbackRepository: FeedbackRepository,
-        private val mapper: MapperFacade
+    private val bookRepository: BookRepository,
+    private val authorRepository: AuthorRepository,
+    private val orderRepository: OrderRepository,
+    private val feedbackRepository: FeedbackRepository,
+    private val mapper: MapperFacade
 ) : BookService {
 
     @PreAuthorize("hasAuthority('read_book')")
@@ -109,6 +111,16 @@ open class BookServiceImpl(
     }
 
     @Transactional
+    override fun deleteFeedback(feedbackId: Int) {
+        val feedback = feedbackRepository.findById(feedbackId)
+            .orElseThrow { throw ResponseStatusException(NOT_FOUND, "Feedback with id '${feedbackId}' is not found") }
+
+        if (feedback.reader!!.id == getLoggedUserId() || hasAuthority("modify_feedback")) {
+            feedbackRepository.delete(feedback)
+        }
+    }
+
+    @Transactional
     @PreAuthorize("hasAuthority('order_book')")
     override fun takeBook(order: OrderDTO): OrderDTO {
         val book = find(order.bookId!!)
@@ -120,7 +132,7 @@ open class BookServiceImpl(
         order.id = null
         order.ordered = LocalDateTime.now()
         order.readerId = getLoggedUserId()
-        
+
         val newOrder = mapper.map(order, Order::class.java)
 
         orderRepository.save(newOrder)
@@ -136,7 +148,7 @@ open class BookServiceImpl(
     @PreAuthorize("hasAuthority('order_book')")
     override fun returnBook(order: OrderDTO) {
         val persisted = orderRepository.findById(order.id!!)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Order with id '${order.id}' is not found") }
+            .orElseThrow { ResponseStatusException(NOT_FOUND, "Order with id '${order.id}' is not found") }
 
         persisted.returned = LocalDateTime.now()
         persisted.notes = if (isNull(persisted.notes)) order.notes else persisted.notes + '\n' + order.notes
@@ -178,8 +190,8 @@ open class BookServiceImpl(
             return false
         }
         return SearchCriteria::class.declaredMemberProperties
-                .filter { it.name != "page" && it.name != "sort" }
-                .any { nonNull(it.get(criteria)) }
+            .filter { it.name != "page" && it.name != "sort" }
+            .any { nonNull(it.get(criteria)) }
     }
 
     private fun createFilter(criteria: SearchCriteria): Specification<Book>? {
@@ -255,13 +267,21 @@ open class BookServiceImpl(
 
     private fun find(bookId: Int): Book {
         return bookRepository.findById(bookId)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '$bookId' is not found") }
+            .orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '$bookId' is not found") }
     }
 
     private fun getLoggedUserId(): Int {
         val securityContext = SecurityContextHolder.getContext()
         val authentication = securityContext.authentication
-        return (authentication.principal as ReaderDetails).getReaderId()
+        val readerDetails = authentication.principal as ReaderDetails
+        return readerDetails.getReaderId()
+    }
+
+    private fun hasAuthority(authority: String): Boolean {
+        val securityContext = SecurityContextHolder.getContext()
+        val authentication = securityContext.authentication
+        val readerDetails = authentication.principal as ReaderDetails
+        return readerDetails.hasAuthority(authority)
     }
 }
 

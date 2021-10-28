@@ -4,7 +4,7 @@ import com.koldyr.library.model.Reader
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
-class ReaderDetails(reader: Reader, private val authorities: Set<GrantedAuthority>) : UserDetails {
+class ReaderDetails(reader: Reader, private val authorities: Set<GrantedPrivilege>) : UserDetails {
 
     private var id: Int
     private var name: String
@@ -18,6 +18,10 @@ class ReaderDetails(reader: Reader, private val authorities: Set<GrantedAuthorit
 
     fun getReaderId(): Int {
         return id
+    }
+
+    fun getRoles(): Set<String> {
+        return authorities.map { it.role }.toSet()
     }
 
     override fun getAuthorities(): Collection<GrantedAuthority> {
@@ -46,5 +50,9 @@ class ReaderDetails(reader: Reader, private val authorities: Set<GrantedAuthorit
 
     override fun isEnabled(): Boolean {
         return true
+    }
+
+    fun hasAuthority(authority: String): Boolean {
+        return authorities.any { it.authority == authority }
     }
 }
