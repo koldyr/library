@@ -2,25 +2,34 @@ package com.koldyr.library.dto
 
 import com.koldyr.library.model.Reader
 import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 
-class ReaderDetails(private val reader: Reader) : UserDetails {
+class ReaderDetails(reader: Reader, private val authorities: Set<GrantedAuthority>) : UserDetails {
 
-    fun getReader(): Reader {
-        return reader
+    private var id: Int
+    private var name: String
+    private var password: String
+
+    init {
+        this.id = reader.id!!
+        this.name = reader.mail
+        this.password = reader.password
     }
 
-    override fun getAuthorities(): MutableCollection<out GrantedAuthority> {
-        return reader.authorities.map { SimpleGrantedAuthority(it.value) }.toMutableSet()
+    fun getReaderId(): Int {
+        return id
+    }
+
+    override fun getAuthorities(): Collection<GrantedAuthority> {
+        return authorities
     }
 
     override fun getPassword(): String {
-        return reader.password
+        return password
     }
 
     override fun getUsername(): String {
-        return reader.mail
+        return name
     }
 
     override fun isAccountNonExpired(): Boolean {

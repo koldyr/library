@@ -19,19 +19,100 @@ values (SEQ_ORDER.nextval, SEQ_BOOK.currval, SEQ_READER.currval, CURRENT_TIMESTA
 insert into T_FEEDBACK (FEEDBACK_ID, READER_ID, BOOK_ID, "DATE", "TEXT", RATE)
 values (SEQ_FEEDBACK.nextval, SEQ_READER.currval, SEQ_BOOK.currval, CURRENT_TIMESTAMP(), 'f1_feedback', 8);
 
-insert into T_AUTHORITY (AUTHORITY_ID, GRANTED)
+insert into T_ROLE (ROLE_ID, ROLE_NAME)
 values (0, 'reader');
-insert into T_AUTHORITY (AUTHORITY_ID, GRANTED)
+insert into T_ROLE (ROLE_ID, ROLE_NAME)
 values (1, 'librarian');
-insert into T_AUTHORITY (AUTHORITY_ID, GRANTED)
+insert into T_ROLE (ROLE_ID, ROLE_NAME)
 values (2, 'supervisor');
 
-insert into T_READER_AUTHORITIES (READER_ID, AUTHORITY_ID)
+insert into T_PRIVILEGE (PRIVILEGE_ID, PRIVILEGE_NAME)
+values (0, 'modify_reader');
+insert into T_PRIVILEGE (PRIVILEGE_ID, PRIVILEGE_NAME)
+values (1, 'read_reader');
+insert into T_PRIVILEGE (PRIVILEGE_ID, PRIVILEGE_NAME)
+values (2, 'modify_author');
+insert into T_PRIVILEGE (PRIVILEGE_ID, PRIVILEGE_NAME)
+values (3, 'read_author');
+insert into T_PRIVILEGE (PRIVILEGE_ID, PRIVILEGE_NAME)
+values (4, 'modify_book');
+insert into T_PRIVILEGE (PRIVILEGE_ID, PRIVILEGE_NAME)
+values (5, 'read_book');
+insert into T_PRIVILEGE (PRIVILEGE_ID, PRIVILEGE_NAME)
+values (6, 'order_book');
+insert into T_PRIVILEGE (PRIVILEGE_ID, PRIVILEGE_NAME)
+values (7, 'read_order');
+insert into T_PRIVILEGE (PRIVILEGE_ID, PRIVILEGE_NAME)
+values (8, 'modify_feedback');
+insert into T_PRIVILEGE (PRIVILEGE_ID, PRIVILEGE_NAME)
+values (9, 'read_feedback');
+
+--koldyr has roles: reader,librarian,supervisor
+insert into T_READER_ROLES (READER_ID, ROLE_ID)
 values (1, 0);
-insert into T_READER_AUTHORITIES (READER_ID, AUTHORITY_ID)
+insert into T_READER_ROLES (READER_ID, ROLE_ID)
 values (1, 1);
-insert into T_READER_AUTHORITIES (READER_ID, AUTHORITY_ID)
+insert into T_READER_ROLES (READER_ID, ROLE_ID)
 values (1, 2);
 
-insert into T_READER_AUTHORITIES (READER_ID, AUTHORITY_ID)
+--lemming has roles: reader
+insert into T_READER_ROLES (READER_ID, ROLE_ID)
+values (2, 0);
+
+--shurshun has roles: librarian
+insert into T_READER_ROLES (READER_ID, ROLE_ID)
 values (3, 1);
+
+--READER has PRIVILEGE:
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (0, 0);--modify_reader
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (0, 1);-- read_reader
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (0, 3);-- read_author
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (0, 5);-- read_book
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (0, 6);-- order_book
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (0, 7);-- read_order
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (0, 8);-- make_feedback
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (0, 9);-- read_feedback
+
+--LIBRARIAN has PRIVILEGE:
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (1, 0);--modify_reader
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (1, 1);-- read_reader
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (1, 3);-- read_author
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (1, 5);-- read_book
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (1, 6);-- read_order
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (1, 9);-- read_feedback
+
+--SUPERVISOR has PRIVILEGE:
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (2, 0);--modify_reader
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (2, 1);-- read_reader
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (2, 2);-- modify_author
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (2, 3);-- read_author
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (2, 4);-- modify_book
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (2, 5);-- read_book
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (2, 6);-- order_book
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (2, 7);-- read_order
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (2, 8);-- make_feedback
+insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
+values (2, 9);-- read_feedback

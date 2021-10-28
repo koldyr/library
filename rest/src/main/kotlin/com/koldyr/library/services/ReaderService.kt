@@ -2,6 +2,7 @@ package com.koldyr.library.services
 
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
+import com.koldyr.library.dto.ReaderDTO
 import com.koldyr.library.model.Reader
 
 /**
@@ -10,8 +11,8 @@ import com.koldyr.library.model.Reader
  */
 interface ReaderService {
     fun create(reader: Reader): Int
-    fun findAll(): List<Reader>
-    fun findById(readeId: Int): Reader
+    fun findAll(): List<ReaderDTO>
+    fun findById(readeId: Int): ReaderDTO
     fun update(readeId: Int, reader: Reader)
     fun delete(readerId: Int)
 

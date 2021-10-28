@@ -38,9 +38,7 @@ class AuthorControllerTest : LibraryControllerTest() {
 
         deleteAuthor(author.id!!)
 
-        rest.get("/api/library/authors/${author.id}") {
-            headers { setBasicAuth(basicHash) }
-        }
+        rest.get("/api/library/authors/${author.id}")
                 .andExpect { status { isNotFound() } }
     }
 
@@ -55,7 +53,6 @@ class AuthorControllerTest : LibraryControllerTest() {
 
         val body: String = rest.get("/api/library/authors/${author.id}/books") {
             accept = APPLICATION_JSON
-            headers { setBasicAuth(basicHash) }
         }
                 .andDo { print() }
                 .andExpect {
@@ -75,7 +72,6 @@ class AuthorControllerTest : LibraryControllerTest() {
     private fun getAuthor(authorId: Int): AuthorDTO {
         val body: String = rest.get("/api/library/authors/$authorId") {
             accept = APPLICATION_JSON
-            headers { setBasicAuth(basicHash) }
         }
                 .andDo { print() }
                 .andExpect {
@@ -91,7 +87,6 @@ class AuthorControllerTest : LibraryControllerTest() {
     private fun updateAuthor(author: AuthorDTO) {
         rest.put("/api/library/authors/${author.id}") {
             contentType = APPLICATION_JSON
-            headers { setBasicAuth(basicHash) }
             content = mapper.writeValueAsString(author)
         }
                 .andDo { print() }
@@ -101,9 +96,7 @@ class AuthorControllerTest : LibraryControllerTest() {
     }
 
     private fun deleteAuthor(authorId: Int) {
-        rest.delete("/api/library/authors/$authorId") {
-            headers { setBasicAuth(basicHash) }
-        }
+        rest.delete("/api/library/authors/$authorId")
                 .andExpect {
                     status { isNoContent() }
                 }

@@ -45,13 +45,13 @@ class Reader : Cloneable {
     @Basic(optional = false)
     var password: String = ""
 
-    @ManyToMany(targetEntity = Authority::class, cascade = [PERSIST, REMOVE], fetch = EAGER)
+    @ManyToMany(cascade = [PERSIST, REMOVE], fetch = EAGER)
     @JoinTable(
-            name = "T_READER_AUTHORITIES",
+            name = "T_READER_ROLES",
             joinColumns = [JoinColumn(name = "reader_id", referencedColumnName = "reader_id")],
-            inverseJoinColumns = [JoinColumn(name = "authority_id", referencedColumnName = "authority_id")]
+            inverseJoinColumns = [JoinColumn(name = "role_id", referencedColumnName = "role_id")]
     )
-    var authorities: MutableSet<Authority> = mutableSetOf()
+    var roles: MutableSet<Role> = mutableSetOf()
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

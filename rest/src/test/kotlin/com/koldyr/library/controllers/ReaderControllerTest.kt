@@ -48,9 +48,7 @@ class ReaderControllerTest : LibraryControllerTest() {
 
         deleteReader(reader.id!!)
 
-        rest.get("/api/library/readers/${reader.id}") {
-            headers { setBasicAuth(basicHash) }
-        }
+        rest.get("/api/library/readers/${reader.id}")
                 .andExpect { status { isNotFound() } }
     }
 
@@ -89,7 +87,6 @@ class ReaderControllerTest : LibraryControllerTest() {
 
         val response = rest.get("/api/library/readers/${reader.id}/feedbacks") {
             accept = APPLICATION_JSON
-            headers { setBasicAuth(basicHash) }
         }
                 .andDo { print() }
                 .andExpect {
@@ -110,9 +107,7 @@ class ReaderControllerTest : LibraryControllerTest() {
     }
 
     private fun getReader(readerId: Int): Reader {
-        val response = rest.get("/api/library/readers/${readerId}") {
-            headers { setBasicAuth(basicHash) }
-        }
+        val response = rest.get("/api/library/readers/${readerId}")
                 .andDo { print() }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
@@ -123,16 +118,13 @@ class ReaderControllerTest : LibraryControllerTest() {
     private fun updateReader(reader: Reader) {
         rest.put("/api/library/readers/${reader.id}") {
             contentType = APPLICATION_JSON
-            headers { setBasicAuth(basicHash) }
             content = mapper.writeValueAsString(reader)
         }
                 .andExpect { status { isOk() } }
     }
 
     private fun deleteReader(readerId: Int) {
-        rest.delete("/api/library/readers/${readerId}") {
-            headers { setBasicAuth(basicHash) }
-        }
+        rest.delete("/api/library/readers/${readerId}")
                 .andExpect { status { isNoContent() } }
     }
 }

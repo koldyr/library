@@ -44,9 +44,7 @@ class BookControllerTest: LibraryControllerTest() {
 
         deleteBook(book.id!!)
 
-        rest.get("/api/library/books/${book.id}") {
-            headers { setBasicAuth(basicHash) }
-        }
+        rest.get("/api/library/books/${book.id}")
             .andExpect { status { isNotFound() } }
     }
 
@@ -64,10 +62,7 @@ class BookControllerTest: LibraryControllerTest() {
         createFeedBack(book, reader)
         readers.add(reader.id!!)
 
-        val response = rest.get("/api/library/books/${book.id}/feedbacks") {
-            accept = APPLICATION_JSON
-            headers { setBasicAuth(basicHash) }
-        }
+        val response = rest.get("/api/library/books/${book.id}/feedbacks")
             .andDo { print() }
             .andExpect {
                 status { isOk() }
@@ -107,7 +102,6 @@ class BookControllerTest: LibraryControllerTest() {
     private fun readBook(bookId: Int): BookDTO {
         val body: String = rest.get("/api/library/books/$bookId") {
             accept = APPLICATION_JSON
-            headers { setBasicAuth(basicHash) }
         }
             .andDo { print() }
             .andExpect {
@@ -121,7 +115,6 @@ class BookControllerTest: LibraryControllerTest() {
     private fun updateBook(book: BookDTO) {
         rest.put("/api/library/books/${book.id}") {
             contentType = APPLICATION_JSON
-            headers { setBasicAuth(basicHash) }
             content = mapper.writeValueAsString(book)
         }
             .andDo { print() }
@@ -131,9 +124,7 @@ class BookControllerTest: LibraryControllerTest() {
     }
 
     private fun deleteBook(bookId: Int) {
-        rest.delete("/api/library/books/$bookId") {
-            headers { setBasicAuth(basicHash) }
-        }
+        rest.delete("/api/library/books/$bookId")
             .andExpect {
                 status { isNoContent() }
             }
@@ -142,7 +133,6 @@ class BookControllerTest: LibraryControllerTest() {
     private fun assertBooks(book: BookDTO) {
         val response = rest.get("/api/library/books") {
             accept = APPLICATION_JSON
-            headers { setBasicAuth(basicHash) }
         }
             .andExpect {
                 status { isOk() }
@@ -161,7 +151,6 @@ class BookControllerTest: LibraryControllerTest() {
         val response = rest.post("/api/library/books/search") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
-            headers { setBasicAuth(basicHash) }
             content = mapper.writeValueAsString(searchCriteria)
         }
             .andDo { print() }

@@ -6,13 +6,12 @@ import javax.persistence.Id
 import javax.persistence.Table
 
 @Entity
-@Table(name = "T_AUTHORITY")
-data class Authority(
-
+@Table(name = "T_PRIVILEGE")
+data class Privilege(
         @Id
-        @Column(name = "AUTHORITY_ID")
+        @Column(name = "PRIVILEGE_ID")
         var id: Int? = null,
 
-        @Column(name = "GRANTED", nullable = false)
-        var value: String = "reader"
+        @Column(name = "PRIVILEGE_NAME", nullable = false, unique = true)
+        var value: String = "read_book"
 )

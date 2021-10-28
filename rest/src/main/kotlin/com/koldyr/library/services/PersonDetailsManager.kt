@@ -3,6 +3,7 @@ package com.koldyr.library.services
 import com.koldyr.library.dto.ReaderDetails
 import com.koldyr.library.model.Reader
 import com.koldyr.library.persistence.ReaderRepository
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -15,10 +16,12 @@ open class PersonDetailsManager(
         private val readerRepository: ReaderRepository,
         private val encoder: PasswordEncoder) : UserDetailsManager {
 
+    @Transactional
     override fun loadUserByUsername(email: String): UserDetails {
-        return readerRepository.findByMail(email)
-                .map { ReaderDetails(it) }
+        val reader = readerRepository.findByMail(email)
                 .orElseThrow { UsernameNotFoundException("Reader with email '$email' is not found") }
+
+        return mapUserDetails(reader)
     }
 
     @Transactional
@@ -63,12 +66,21 @@ open class PersonDetailsManager(
     private fun mapUserToReader(reader: Reader, user: UserDetails) {
         reader.password = user.password
         if (user is ReaderDetails) {
-            reader.firstName = user.getReader().firstName
-            reader.lastName = user.getReader().lastName
-            reader.address = user.getReader().address
-            reader.phoneNumber = user.getReader().phoneNumber
-            reader.note = user.getReader().note
-            reader.authorities = user.getReader().authorities
+//            reader.firstName = user.getReader().firstName
+//            reader.lastName = user.getReader().lastName
+//            reader.address = user.getReader().address
+//            reader.phoneNumber = user.getReader().phoneNumber
+//            reader.note = user.getReader().note
+//            reader.roles = user.getReader().roles
         }
+    }
+
+    private fun mapUserDetails(reader: Reader): ReaderDetails {
+        val authorities = reader.roles
+                .map { it.privileges }
+                .flatten()
+                .map { SimpleGrantedAuthority(it.value) }
+                .toSet()
+        return ReaderDetails(reader, authorities)
     }
 }

@@ -13,11 +13,11 @@ import com.koldyr.library.model.Book
 import com.koldyr.library.model.Feedback
 import com.koldyr.library.model.Order
 import com.koldyr.library.persistence.AuthorRepository
-import com.koldyr.library.persistence.AuthorityRepository
 import com.koldyr.library.persistence.BookRepository
 import com.koldyr.library.persistence.FeedbackRepository
 import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
+import com.koldyr.library.persistence.RoleRepository
 import com.koldyr.library.services.AuthorService
 import com.koldyr.library.services.AuthorServiceImpl
 import com.koldyr.library.services.BookService
@@ -68,14 +68,14 @@ open class LibraryConfig : WebSecurityConfigurerAdapter() {
     lateinit var feedbackRepository: FeedbackRepository
 
     @Autowired
-    lateinit var authorityRepository: AuthorityRepository
+    lateinit var roleRepository: RoleRepository
 
     @Autowired
     lateinit var userDetailsManager: UserDetailsManager
 
     @Bean
     open fun readerService(mapper: MapperFacade, encoder: PasswordEncoder): ReaderService {
-        return ReaderServiceImpl(readerRepository, authorityRepository, mapper, encoder)
+        return ReaderServiceImpl(readerRepository, roleRepository, mapper, encoder)
     }
 
     @Bean
@@ -135,6 +135,9 @@ open class LibraryConfig : WebSecurityConfigurerAdapter() {
                 .configurationSource(corsConfigurationSource())
             .and()
                 .formLogin().defaultSuccessUrl("/swagger-ui.html", true)
+            .and()
+                .logout()
+                .deleteCookies("JSESSIONID")
             .and()
                 .httpBasic()
             .and()
