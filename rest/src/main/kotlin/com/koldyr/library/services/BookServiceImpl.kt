@@ -150,6 +150,9 @@ open class BookServiceImpl(
         val persisted = orderRepository.findById(order.id!!)
             .orElseThrow { ResponseStatusException(NOT_FOUND, "Order with id '${order.id}' is not found") }
 
+        if (persisted.reader!!.id != getLoggedUserId()) {
+            throw ResponseStatusException(BAD_REQUEST, "You can not return order with id '${order.id}', only reader ${getLoggedUserId()}")
+        }
         persisted.returned = LocalDateTime.now()
         persisted.notes = if (isNull(persisted.notes)) order.notes else persisted.notes + '\n' + order.notes
 

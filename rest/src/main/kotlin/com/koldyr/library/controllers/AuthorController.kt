@@ -1,11 +1,14 @@
 package com.koldyr.library.controllers
 
+import java.net.URI
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.services.AuthorService
 import com.koldyr.library.services.BookService
-import org.springframework.http.MediaType.*
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.created
+import org.springframework.http.ResponseEntity.noContent
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -14,7 +17,6 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.net.URI
 
 /**
  * Description of class AuthorController
@@ -34,7 +36,7 @@ class AuthorController(
         val authorId: Int = authorService.create(author)
 
         val uri = URI.create("/api/library/authors/$authorId")
-        return ResponseEntity.created(uri).build()
+        return created(uri).build()
     }
 
     @PutMapping("/{authorId}", consumes = [APPLICATION_JSON_VALUE])
@@ -47,7 +49,7 @@ class AuthorController(
     fun delete(@PathVariable authorId: Int): ResponseEntity<Unit> {
         authorService.delete(authorId)
 
-        return ResponseEntity.noContent().build()
+        return noContent().build()
     }
 
     @GetMapping("/{authorId}/books", produces = [APPLICATION_JSON_VALUE])
