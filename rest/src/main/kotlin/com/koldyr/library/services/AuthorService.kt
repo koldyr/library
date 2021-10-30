@@ -12,4 +12,5 @@ interface AuthorService {
     fun findById(authorId: Int): AuthorDTO
     fun update(authorId: Int, author: AuthorDTO)
     fun delete(authorId: Int)
+    fun search(search: String): List<AuthorDTO>
 }
