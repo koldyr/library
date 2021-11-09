@@ -3,13 +3,15 @@ package com.koldyr.library.controllers
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
+import org.apache.commons.lang3.RandomUtils
 import org.junit.Test
-import org.springframework.http.MediaType.*
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 
 /**
@@ -67,6 +69,35 @@ class AuthorControllerTest : LibraryControllerTest() {
             val dto = booksFromServer.first { it.id == book.id }
             assertEquals(book, dto)
         }
+    }
+
+    @Test
+    fun search() {
+        val authors = mutableListOf(
+            createAuthor(),
+            createAuthor(),
+            createAuthor(),
+            createAuthor(),
+            createAuthor()
+        )
+
+        val author = authors[RandomUtils.nextInt(0, authors.size - 1)]
+        val firstName = author.firstName
+
+        val body: String = rest.get("/api/library/authors") {
+            accept = APPLICATION_JSON
+            param("search", firstName!!)
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isOk() }
+                    content { contentType(APPLICATION_JSON) }
+                }.andReturn().response.contentAsString
+
+        val typeRef = jacksonTypeRef<List<AuthorDTO>>()
+        val foundAuthors = mapper.readValue(body, typeRef)
+
+        assertTrue(foundAuthors.any { it.id == author.id})
     }
 
     private fun getAuthor(authorId: Int): AuthorDTO {

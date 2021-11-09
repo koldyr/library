@@ -2,6 +2,7 @@ package com.koldyr.library.persistence
 
 import com.koldyr.library.model.Author
 import org.springframework.data.jpa.repository.JpaRepository
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.stereotype.Repository
 
 /**
@@ -9,4 +10,4 @@ import org.springframework.stereotype.Repository
  * @created: 2021-10-06
  */
 @Repository("authorRepository")
-interface AuthorRepository : JpaRepository<Author, Int>
+interface AuthorRepository : JpaRepository<Author, Int>, JpaSpecificationExecutor<Author>

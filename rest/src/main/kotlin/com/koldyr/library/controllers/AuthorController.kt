@@ -5,6 +5,7 @@ import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.services.AuthorService
 import com.koldyr.library.services.BookService
+import org.apache.commons.lang3.StringUtils.isEmpty
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.created
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 
 /**
@@ -29,7 +31,12 @@ class AuthorController(
         private val bookService: BookService) {
 
     @GetMapping(produces = [APPLICATION_JSON_VALUE])
-    fun authors(): List<AuthorDTO> = authorService.findAll()
+    fun authors(@RequestParam search: String?): List<AuthorDTO> {
+        if (isEmpty(search)) {
+            return authorService.findAll()
+        }
+        return authorService.search(search!!)
+    }
 
     @PostMapping(consumes = [APPLICATION_JSON_VALUE])
     fun create(@RequestBody author: AuthorDTO): ResponseEntity<Unit> {
