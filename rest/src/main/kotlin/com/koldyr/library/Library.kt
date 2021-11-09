@@ -4,6 +4,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication
 import org.springframework.boot.autoconfigure.domain.EntityScan
 import org.springframework.boot.runApplication
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 
 /**
  * Description of class Library
@@ -11,6 +12,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
  */
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = ["com.koldyr.library.persistence"])
+@EnableWebSecurity
 @EntityScan("com.koldyr.library.model")
 open class Library
 

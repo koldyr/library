@@ -4,11 +4,15 @@ alter table T_ORDER drop constraint FK_ORDER_READER;
 alter table T_FEEDBACK drop constraint FK_FEEDBACK_BOOK;
 alter table T_FEEDBACK drop constraint FK_FEEDBACK_READER;
 
-DROP TABLE T_BOOK;
-DROP TABLE T_READER;
-DROP TABLE T_ORDER;
-DROP TABLE T_AUTHOR;
-DROP TABLE T_FEEDBACK;
+DROP TABLE if exists T_ROLE_PRIVILEGES cascade;
+DROP TABLE if exists T_READER_ROLES cascade;
+DROP TABLE if exists T_BOOK cascade;
+DROP TABLE if exists T_READER cascade;
+DROP TABLE if exists T_ORDER cascade;
+DROP TABLE if exists T_AUTHOR cascade;
+DROP TABLE if exists T_FEEDBACK cascade;
+DROP TABLE if exists T_ROLE cascade;
+DROP TABLE if exists T_PRIVILEGE cascade;
 
 DROP SEQUENCE SEQ_BOOK;
 DROP SEQUENCE SEQ_READER;

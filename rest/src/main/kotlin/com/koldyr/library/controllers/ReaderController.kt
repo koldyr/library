@@ -2,6 +2,7 @@ package com.koldyr.library.controllers
 
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
+import com.koldyr.library.dto.ReaderDTO
 import com.koldyr.library.model.Reader
 import com.koldyr.library.services.ReaderService
 import org.springframework.http.MediaType.*
@@ -27,7 +28,7 @@ import java.net.URI
 class ReaderController(private val readerService: ReaderService) {
 
     @GetMapping(produces = [APPLICATION_JSON_VALUE])
-    fun readers(): Collection<Reader> = readerService.findAll()
+    fun readers(): Collection<ReaderDTO> = readerService.findAll()
 
     @PostMapping(consumes = [APPLICATION_JSON_VALUE])
     fun create(@RequestBody reader: Reader): ResponseEntity<Unit> {
@@ -41,7 +42,7 @@ class ReaderController(private val readerService: ReaderService) {
     fun update(@PathVariable readerId: Int, @RequestBody reader: Reader) = readerService.update(readerId, reader)
 
     @GetMapping("/{readerId}", produces = [APPLICATION_JSON_VALUE])
-    fun readerById(@PathVariable readerId: Int): Reader = readerService.findById(readerId)
+    fun readerById(@PathVariable readerId: Int): ReaderDTO = readerService.findById(readerId)
 
     @DeleteMapping("/{readerId}")
     fun delete(@PathVariable readerId: Int): ResponseEntity<Unit> {

@@ -62,9 +62,7 @@ class BookControllerTest: LibraryControllerTest() {
         createFeedBack(book, reader)
         readers.add(reader.id!!)
 
-        val response = rest.get("/api/library/books/${book.id}/feedbacks") {
-            accept = APPLICATION_JSON
-        }
+        val response = rest.get("/api/library/books/${book.id}/feedbacks")
             .andDo { print() }
             .andExpect {
                 status { isOk() }

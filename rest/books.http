@@ -1,13 +1,16 @@
 ### Get Books
 GET http://localhost/api/library/books
+Authorization: Basic {{BasicHash}}
 Accept: application/json
 
 ### Get Book
 GET http://localhost/api/library/books/1
+Authorization: Basic {{BasicHash}}
 Accept: application/json
 
 ### Create Book
 POST http://localhost/api/library/books
+Authorization: Basic {{BasicHash}}
 Content-Type: application/json
 Accept: application/json
 
@@ -24,6 +27,7 @@ Accept: application/json
 
 ### Update Book
 PUT http://localhost/api/library/books/1
+Authorization: Basic {{BasicHash}}
 Content-Type: application/json
 Accept: application/json
 
@@ -40,12 +44,15 @@ Accept: application/json
 
 ### Delete Book
 DELETE http://localhost/api/library/books/1
+Authorization: Basic {{BasicHash}}
 
 ### Get all Books of Author
 GET http://localhost/api/library/authors/1/books
+Authorization: Basic {{BasicHash}}
 
 ### Search Books
 POST http://localhost/api/library/books/search
+Authorization: Basic {{BasicHash}}
 Content-Type: application/json
 Accept: application/json
 
@@ -59,6 +66,7 @@ Accept: application/json
 
 ### Take Book
 POST http://localhost/api/library/books/take
+Authorization: Basic {{BasicHash}}
 Content-Type: application/json
 Accept: application/json
 
@@ -70,6 +78,7 @@ Accept: application/json
 
 ### Return Book
 POST http://localhost/api/library/books/return
+Authorization: Basic {{BasicHash}}
 Content-Type: application/json
 Accept: application/json
 
@@ -80,6 +89,7 @@ Accept: application/json
 
 ### Feedback on Book
 POST http://localhost/api/library/books/feedback
+Authorization: Basic {{BasicHash}}
 Content-Type: application/json
 Accept: application/json
 
@@ -92,3 +102,4 @@ Accept: application/json
 
 ### Get all Feedbacks for Book
 GET http://localhost/api/library/books/5/feedbacks
+Authorization: Basic {{BasicHash}}

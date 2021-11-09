@@ -136,7 +136,7 @@ class AuthorControllerTest : LibraryControllerTest() {
     private fun assertAuthors(author: AuthorDTO) {
         val authors = findAllAuthors()
 
-        val fromServer = authors.first{ it.id == author.id }
+        val fromServer = authors.first { it.id == author.id }
         assertNotNull(fromServer)
 
         fromServer.books = fromServer.books.toMutableSet()

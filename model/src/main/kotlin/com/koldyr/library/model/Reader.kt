@@ -1,10 +1,17 @@
 package com.koldyr.library.model
 
+import javax.persistence.Basic
+import javax.persistence.CascadeType.PERSIST
+import javax.persistence.CascadeType.REMOVE
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.FetchType.EAGER
 import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.*
+import javax.persistence.GenerationType.SEQUENCE
 import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.JoinTable
+import javax.persistence.ManyToMany
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
 
@@ -27,14 +34,26 @@ class Reader : Cloneable {
 
     var lastName: String? = null
 
-    var mail:  String? = null
+    @Column(nullable = false, unique = true)
+    var mail: String = ""
 
-    var address:  String? = null
+    var address: String? = null
 
-    var phoneNumber:  String? = null
+    var phoneNumber: String? = null
 
     var note: String? = null
-    
+
+    @Basic(optional = false)
+    var password: String = ""
+
+    @ManyToMany(cascade = [PERSIST, REMOVE], fetch = EAGER)
+    @JoinTable(
+            name = "T_READER_ROLES",
+            joinColumns = [JoinColumn(name = "reader_id", referencedColumnName = "reader_id")],
+            inverseJoinColumns = [JoinColumn(name = "role_id", referencedColumnName = "role_id")]
+    )
+    var roles: MutableSet<Role> = mutableSetOf()
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Reader) return false
@@ -48,5 +67,9 @@ class Reader : Cloneable {
 
     public override fun clone(): Reader {
         return super.clone() as Reader;
+    }
+
+    override fun toString(): String {
+        return "Reader(id=$id, mail='$mail')"
     }
 }

@@ -17,6 +17,7 @@ import com.koldyr.library.persistence.BookRepository
 import com.koldyr.library.persistence.FeedbackRepository
 import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
+import com.koldyr.library.persistence.RoleRepository
 import com.koldyr.library.services.AuthorService
 import com.koldyr.library.services.AuthorServiceImpl
 import com.koldyr.library.services.BookService
@@ -34,15 +35,22 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
+import org.springframework.security.config.annotation.web.builders.HttpSecurity
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
+import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 /**
  * Description of class LibraryConfig
  * @created: 2021-09-28
  */
 @Configuration
-open class LibraryConfig {
+open class LibraryConfig : WebSecurityConfigurerAdapter() {
 
     @Autowired
     lateinit var readerRepository: ReaderRepository
@@ -59,14 +67,20 @@ open class LibraryConfig {
     @Autowired
     lateinit var feedbackRepository: FeedbackRepository
 
+    @Autowired
+    lateinit var roleRepository: RoleRepository
+
+    @Autowired
+    lateinit var readerDetailsService: UserDetailsService
+
     @Bean
-    open fun readerService(mapper: MapperFacade): ReaderService {
-        return ReaderServiceImpl(readerRepository, mapper)
+    open fun readerService(mapper: MapperFacade, encoder: PasswordEncoder): ReaderService {
+        return ReaderServiceImpl(readerRepository, roleRepository, mapper, encoder)
     }
 
     @Bean
     open fun bookService(mapper: MapperFacade): BookService {
-        return BookServiceImpl(bookRepository, authorRepository, readerRepository, orderRepository, feedbackRepository, mapper)
+        return BookServiceImpl(bookRepository, authorRepository, orderRepository, feedbackRepository, mapper)
     }
 
     @Bean
@@ -104,15 +118,44 @@ open class LibraryConfig {
         return mapperFactory.mapperFacade
     }
 
+    override fun configure(auth: AuthenticationManagerBuilder) {
+        auth
+                .userDetailsService(readerDetailsService)
+                .passwordEncoder(encoder())
+    }
+
+    @Throws(Exception::class)
+    override fun configure(http: HttpSecurity) {
+        http
+            .authorizeRequests()
+                .antMatchers("/login*").permitAll()
+                .anyRequest().authenticated()
+            .and()
+                .cors()
+                .configurationSource(corsConfigurationSource())
+            .and()
+                .formLogin().defaultSuccessUrl("/swagger-ui.html", true)
+            .and()
+                .logout()
+                .deleteCookies("JSESSIONID")
+            .and()
+                .httpBasic()
+            .and()
+                .headers().disable()
+                .csrf().disable()
+    }
+
+    open fun corsConfigurationSource(): CorsConfigurationSource {
+        val configuration = CorsConfiguration()
+        configuration.allowedMethods = listOf(HttpMethod.GET.name, HttpMethod.PUT.name, HttpMethod.POST.name, HttpMethod.DELETE.name)
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration.applyPermitDefaultValues())
+        return source
+    }
+
     @Bean
-    open fun corsConfigurer(): WebMvcConfigurer {
-        return object : WebMvcConfigurer {
-            override fun addCorsMappings(registry: CorsRegistry) {
-                registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods(HttpMethod.GET.name, HttpMethod.HEAD.name, HttpMethod.POST.name, HttpMethod.PUT.name, HttpMethod.DELETE.name)
-            }
-        }
+    open fun encoder(): PasswordEncoder {
+        return BCryptPasswordEncoder()
     }
 
     @Bean

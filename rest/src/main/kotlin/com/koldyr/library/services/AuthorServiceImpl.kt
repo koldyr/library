@@ -6,6 +6,8 @@ import com.koldyr.library.persistence.AuthorRepository
 import ma.glasnost.orika.MapperFacade
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.*
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 
@@ -13,6 +15,7 @@ open class AuthorServiceImpl(
         private val authorRepository: AuthorRepository,
         private val mapper: MapperFacade) : AuthorService {
 
+    @PreAuthorize("hasAuthority('read_author')")
     override fun findAll(): List<AuthorDTO> = authorRepository.findAll().map { mapper.map(it, AuthorDTO::class.java) }
 
     override fun search(search: String): List<AuthorDTO> {
@@ -21,6 +24,7 @@ open class AuthorServiceImpl(
     }
 
     @Transactional
+    @PreAuthorize("hasAuthority('modify_author')")
     override fun create(author: AuthorDTO): Int {
         author.id = null
         val newAuthor = mapper.map(author, Author::class.java)
@@ -28,12 +32,14 @@ open class AuthorServiceImpl(
         return saved.id!!
     }
 
+    @PreAuthorize("hasAuthority('read_author')")
     override fun findById(authorId: Int): AuthorDTO {
         val author = find(authorId)
         return mapper.map(author, AuthorDTO::class.java)
     }
 
     @Transactional
+    @PreAuthorize("hasAuthority('modify_author')")
     override fun update(authorId: Int, author: AuthorDTO) {
         val persisted = find(authorId)
 
@@ -44,6 +50,7 @@ open class AuthorServiceImpl(
     }
 
     @Transactional
+    @PreAuthorize("hasAuthority('modify_author')")
     override fun delete(authorId: Int) {
         authorRepository.deleteById(authorId)
     }

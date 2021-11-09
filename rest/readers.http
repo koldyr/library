@@ -1,12 +1,15 @@
 ### Get All Readers
 GET http://localhost/api/library/readers
+Authorization: Basic {{BasicHash}}
 
 ### Get Specific Reader
 GET http://localhost/api/library/readers/1
+Authorization: Basic {{BasicHash}}
 Accept: application/json
 
 ### Create Reader
 POST http://localhost/api/library/readers
+Authorization: Basic {{BasicHash}}
 Content-Type: application/json
 Accept: application/json
 
@@ -21,6 +24,7 @@ Accept: application/json
 
 ### Update Reader
 PUT http://localhost/api/library/readers/3
+Authorization: Basic {{BasicHash}}
 Content-Type: application/json
 Accept: application/json
 
@@ -35,11 +39,14 @@ Accept: application/json
 
 ### Delete Reader
 DELETE http://localhost/api/library/readers/1
+Authorization: Basic {{BasicHash}}
 
 ### Reader Orders
 GET http://localhost/api/library/readers/1/orders?returned=false
+Authorization: Basic {{BasicHash}}
 Accept: application/json
 
 ### Reader Feedbacks
 GET http://localhost/api/library/readers/1/feedbacks
+Authorization: Basic {{BasicHash}}
 Accept: application/json

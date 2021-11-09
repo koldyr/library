@@ -9,6 +9,7 @@ import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Genre
 import com.koldyr.library.model.Reader
+import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.RandomUtils
 import org.hamcrest.Matchers.*
 import org.junit.runner.RunWith
@@ -17,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders.*
 import org.springframework.http.MediaType.*
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.annotation.IfProfileValue
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit4.SpringRunner
@@ -26,10 +28,14 @@ import org.springframework.test.web.servlet.post
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [Library::class])
+
 @AutoConfigureMockMvc
+@WithMockUser("me@koldyr.com", roles = ["supervisor"])
 @TestPropertySource(properties = ["spring.config.location = classpath:application-test.yaml"])
+
 @IfProfileValue(name = "spring.profiles.active", values = ["int-test"])
 abstract class LibraryControllerTest {
 
@@ -38,6 +44,19 @@ abstract class LibraryControllerTest {
 
     @Autowired
     lateinit var rest: MockMvc
+
+//    @Autowired
+//    private val context: WebApplicationContext? = null
+//
+//    var rest: MockMvc = MockMvcBuilders.standaloneSetup(ReaderController::class, BookController::class, AuthorController::class).build()
+//
+//    @Before
+//    open fun setup() {
+//        rest = MockMvcBuilders
+//                .webAppContextSetup(context)
+//                .apply { springSecurity() }
+//                .build()
+//    }
 
     protected fun createAuthor(): AuthorDTO {
         val index = RandomUtils.nextInt(0, 100_000)
@@ -79,6 +98,7 @@ abstract class LibraryControllerTest {
         reader.address = "r${index}_address"
         reader.phoneNumber = "r${index}_phone"
         reader.note = "r${index}_note"
+        reader.password = RandomStringUtils.randomAscii(10)
 
         val readerHeader = rest.post("/api/library/readers") {
             accept = APPLICATION_JSON
@@ -191,6 +211,4 @@ abstract class LibraryControllerTest {
                     header { string(LOCATION, matchesRegex("/api/library/books/[\\d]+/feedbacks")) }
                 }
     }
-
-
 }
