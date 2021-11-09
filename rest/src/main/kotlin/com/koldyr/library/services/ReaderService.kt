@@ -15,6 +15,7 @@ interface ReaderService {
     fun findById(readeId: Int): ReaderDTO
     fun update(readeId: Int, reader: Reader)
     fun delete(readerId: Int)
+    fun currentReader(): ReaderDTO
 
     fun findOrders(readerId: Int, returned: Boolean?): Collection<OrderDTO>
     fun findFeedbacks(readerId: Int): Collection<FeedbackDTO>

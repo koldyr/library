@@ -44,6 +44,9 @@ class ReaderController(private val readerService: ReaderService) {
     @GetMapping("/{readerId}", produces = [APPLICATION_JSON_VALUE])
     fun readerById(@PathVariable readerId: Int): ReaderDTO = readerService.findById(readerId)
 
+    @GetMapping("/me", produces = [APPLICATION_JSON_VALUE])
+    fun currentReader(): ReaderDTO = readerService.currentReader()
+
     @DeleteMapping("/{readerId}")
     fun delete(@PathVariable readerId: Int): ResponseEntity<Unit> {
         readerService.delete(readerId)

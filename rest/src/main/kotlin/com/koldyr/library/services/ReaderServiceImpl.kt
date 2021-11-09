@@ -3,6 +3,7 @@ package com.koldyr.library.services
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.ReaderDTO
+import com.koldyr.library.dto.ReaderDetails
 import com.koldyr.library.model.Feedback
 import com.koldyr.library.model.Order
 import com.koldyr.library.model.Reader
@@ -12,6 +13,7 @@ import ma.glasnost.orika.MapperFacade
 import org.apache.commons.lang3.StringUtils.*
 import org.springframework.http.HttpStatus.*
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
@@ -76,6 +78,10 @@ open class ReaderServiceImpl(
     @PreAuthorize("hasAuthority('modify_reader')")
     override fun delete(readerId: Int) = readerRepository.deleteById(readerId)
 
+    override fun currentReader(): ReaderDTO {
+        return findById(getLoggedUserId())
+    }
+
     @PreAuthorize("hasAuthority('read_order')")
     override fun findOrders(readerId: Int, returned: Boolean?): Collection<OrderDTO> {
         val orders = readerRepository.findOrders(readerId)
@@ -104,5 +110,12 @@ open class ReaderServiceImpl(
 
     private fun mapReader(entity: Reader): ReaderDTO {
         return mapper.map(entity, ReaderDTO::class.java)
+    }
+
+    private fun getLoggedUserId(): Int {
+        val securityContext = SecurityContextHolder.getContext()
+        val authentication = securityContext.authentication
+        val readerDetails = authentication.principal as ReaderDetails
+        return readerDetails.getReaderId()
     }
 }
