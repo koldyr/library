@@ -6,7 +6,6 @@ import com.koldyr.library.persistence.AuthorRepository
 import ma.glasnost.orika.MapperFacade
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus.NOT_FOUND
-import org.springframework.http.HttpStatus.*
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
@@ -18,6 +17,7 @@ open class AuthorServiceImpl(
     @PreAuthorize("hasAuthority('read_author')")
     override fun findAll(): List<AuthorDTO> = authorRepository.findAll().map { mapper.map(it, AuthorDTO::class.java) }
 
+    @PreAuthorize("hasAuthority('read_author')")
     override fun search(search: String): List<AuthorDTO> {
         val filter: Specification<Author> = createFilter(search)
         return authorRepository.findAll(filter).map { mapper.map(it, AuthorDTO::class.java) }
