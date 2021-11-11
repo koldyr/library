@@ -34,6 +34,7 @@ import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.http.HttpMethod
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -50,7 +51,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
  * @created: 2021-09-28
  */
 @Configuration
-open class LibraryConfig : WebSecurityConfigurerAdapter() {
+@EnableAspectJAutoProxy
+class LibraryConfig : WebSecurityConfigurerAdapter() {
 
     @Autowired
     lateinit var readerRepository: ReaderRepository
@@ -74,22 +76,22 @@ open class LibraryConfig : WebSecurityConfigurerAdapter() {
     lateinit var readerDetailsService: UserDetailsService
 
     @Bean
-    open fun readerService(mapper: MapperFacade, encoder: PasswordEncoder): ReaderService {
+    fun readerService(mapper: MapperFacade, encoder: PasswordEncoder): ReaderService {
         return ReaderServiceImpl(readerRepository, roleRepository, mapper, encoder)
     }
 
     @Bean
-    open fun bookService(mapper: MapperFacade): BookService {
+    fun bookService(mapper: MapperFacade): BookService {
         return BookServiceImpl(bookRepository, authorRepository, orderRepository, feedbackRepository, mapper)
     }
 
     @Bean
-    open fun authorService(mapper: MapperFacade): AuthorService {
+    fun authorService(mapper: MapperFacade): AuthorService {
         return AuthorServiceImpl(authorRepository, mapper)
     }
 
     @Bean
-    open fun mapper(): MapperFacade {
+    fun mapper(): MapperFacade {
         val mapperFactory: MapperFactory = DefaultMapperFactory.Builder().build()
 
         mapperFactory.classMap(Order::class.java, OrderDTO::class.java)
@@ -145,7 +147,7 @@ open class LibraryConfig : WebSecurityConfigurerAdapter() {
                 .csrf().disable()
     }
 
-    open fun corsConfigurationSource(): CorsConfigurationSource {
+    fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
         configuration.allowedMethods = listOf(HttpMethod.GET.name, HttpMethod.PUT.name, HttpMethod.POST.name, HttpMethod.DELETE.name)
         val source = UrlBasedCorsConfigurationSource()
@@ -154,12 +156,12 @@ open class LibraryConfig : WebSecurityConfigurerAdapter() {
     }
 
     @Bean
-    open fun encoder(): PasswordEncoder {
+    fun encoder(): PasswordEncoder {
         return BCryptPasswordEncoder()
     }
 
     @Bean
-    open fun api(): OpenAPI {
+    fun api(): OpenAPI {
         return OpenAPI()
                 .components(Components())
                 .info(apiInfo())
