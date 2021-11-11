@@ -1,7 +1,5 @@
 package com.koldyr.library.controllers
 
-import java.net.URI
-import java.util.Objects.isNull
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
@@ -14,6 +12,7 @@ import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.created
 import org.springframework.http.ResponseEntity.noContent
+import org.springframework.http.ResponseEntity.ok
 import org.springframework.http.ResponseEntity.status
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -25,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
+import java.net.URI
+import java.util.Objects.isNull
 
 
 /**
@@ -53,7 +54,10 @@ class BookController(private val bookService: BookService) {
     fun bookById(@PathVariable bookId: Int): BookDTO = bookService.findById(bookId)
 
     @PutMapping("/{bookId}", consumes = [APPLICATION_JSON_VALUE])
-    fun update(@PathVariable bookId: Int, @RequestBody book: BookDTO) = bookService.update(bookId, book)
+    fun update(@PathVariable bookId: Int, @RequestBody book: BookDTO): ResponseEntity<Unit> {
+        bookService.update(bookId, book)
+        return ok().build()
+    }
 
     @DeleteMapping("/{bookId}")
     fun delete(@PathVariable bookId: Int): ResponseEntity<Unit> {

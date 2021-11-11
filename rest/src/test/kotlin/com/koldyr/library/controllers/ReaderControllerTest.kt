@@ -5,7 +5,8 @@ import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Reader
 import org.junit.Test
-import org.springframework.http.MediaType.*
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
@@ -48,7 +49,9 @@ class ReaderControllerTest : LibraryControllerTest() {
 
         deleteReader(reader.id!!)
 
-        rest.get("/api/library/readers/${reader.id}")
+        rest.get("/api/library/readers/${reader.id}") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
                 .andExpect { status { isNotFound() } }
     }
 
@@ -87,6 +90,7 @@ class ReaderControllerTest : LibraryControllerTest() {
 
         val response = rest.get("/api/library/readers/${reader.id}/feedbacks") {
             accept = APPLICATION_JSON
+            header(AUTHORIZATION, "Basic $authHeader")
         }
                 .andDo { print() }
                 .andExpect {
@@ -107,7 +111,9 @@ class ReaderControllerTest : LibraryControllerTest() {
     }
 
     private fun getReader(readerId: Int): Reader {
-        val response = rest.get("/api/library/readers/${readerId}")
+        val response = rest.get("/api/library/readers/${readerId}") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
                 .andDo { print() }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
@@ -119,12 +125,15 @@ class ReaderControllerTest : LibraryControllerTest() {
         rest.put("/api/library/readers/${reader.id}") {
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(reader)
+            header(AUTHORIZATION, "Basic $authHeader")
         }
                 .andExpect { status { isOk() } }
     }
 
     private fun deleteReader(readerId: Int) {
-        rest.delete("/api/library/readers/${readerId}")
+        rest.delete("/api/library/readers/${readerId}") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
                 .andExpect { status { isNoContent() } }
     }
 }

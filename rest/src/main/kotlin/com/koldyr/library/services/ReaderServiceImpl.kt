@@ -10,14 +10,16 @@ import com.koldyr.library.model.Reader
 import com.koldyr.library.persistence.ReaderRepository
 import com.koldyr.library.persistence.RoleRepository
 import ma.glasnost.orika.MapperFacade
-import org.apache.commons.lang3.StringUtils.*
-import org.springframework.http.HttpStatus.*
+import org.apache.commons.lang3.StringUtils.isEmpty
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.util.Objects.*
+import java.util.Objects.isNull
+import java.util.Objects.nonNull
 
 /**
  * Description of class ReaderServiceImpl
@@ -46,7 +48,7 @@ open class ReaderServiceImpl(
 
         reader.id = null
         if (reader.roles.isEmpty()) {
-            reader.roles.add(roleRepository.getById(0))
+            reader.roles.add(roleRepository.findAll()[0])
         }
 
         reader.password = encoder.encode(reader.password)
