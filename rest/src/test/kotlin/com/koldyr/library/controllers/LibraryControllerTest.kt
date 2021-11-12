@@ -166,6 +166,16 @@ abstract class LibraryControllerTest {
         return mapper.readValue(response, typeRef)
     }
 
+    protected fun getCurrentUser(): Reader {
+        val response = rest.get("/api/library/readers/me") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
+                .andExpect { status { isOk() } }
+                .andReturn().response.contentAsString
+
+        return mapper.readValue(response, Reader::class.java)
+    }
+
     protected fun createBook(author: AuthorDTO): BookDTO {
         val index = RandomUtils.nextInt(0, 100_000)
         val count = RandomUtils.nextInt(1, 10)

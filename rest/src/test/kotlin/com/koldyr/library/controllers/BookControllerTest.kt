@@ -53,36 +53,26 @@ class BookControllerTest: LibraryControllerTest() {
 
     @Test
     fun feedbacks() {
-        val author = createAuthor()
-        val book = createBook(author)
+        val currentUser = getCurrentUser()
 
-        val readers = mutableSetOf<Int>()
-        var reader = createReader()
-        createFeedBack(book, reader)
-        readers.add(reader.id!!)
-
-        reader = createReader()
-        createFeedBack(book, reader)
-        readers.add(reader.id!!)
-
-        val response = rest.get("/api/library/books/${book.id}/feedbacks") {
-            header(AUTHORIZATION, "Basic $authHeader")
+        var allBooks: List<BookDTO> = findAllBooks()
+        if (allBooks.isEmpty()) {
+            allBooks = mutableListOf()
+            val author = createAuthor()
+            for (i in 0 until 10) {
+                allBooks.add(createBook(author))
+            }
         }
-            .andDo { print() }
-            .andExpect {
-                status { isOk() }
-                content { contentType(APPLICATION_JSON) }
-            }.andReturn().response.contentAsString
 
-        val typeRef = jacksonTypeRef<Array<FeedbackDTO>>()
-        val feedbacks = mapper.readValue(response, typeRef)
+        for (book in allBooks) {
+            createFeedBack(book, currentUser)
+        }
 
-        assertEquals(2, feedbacks.size)
+        for (book in allBooks) {
+            val feedbacks = getBookFeedbacks(book.id!!)
 
-        readers.forEach { readerId ->
-            val feedback = feedbacks.first { it.readerId == readerId }
-            assertNotNull(feedback)
-            assertEquals(book.id, feedback.bookId)
+            val readerFeedbacks = feedbacks.filter { feedback -> feedback.readerId == currentUser.id && feedback.bookId == book.id }
+            assertTrue(readerFeedbacks.size > 0)
         }
     }
 
@@ -174,5 +164,19 @@ class BookControllerTest: LibraryControllerTest() {
         val typeRef = jacksonTypeRef<PageResultDTO<BookDTO>>()
         val pageResult = mapper.readValue(response, typeRef)
         return pageResult.result
+    }
+
+    private fun getBookFeedbacks(bookId: Int): Array<FeedbackDTO> {
+        val response = rest.get("/api/library/books/$bookId/feedbacks") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isOk() }
+                    content { contentType(APPLICATION_JSON) }
+                }.andReturn().response.contentAsString
+
+        val typeRef = jacksonTypeRef<Array<FeedbackDTO>>()
+        return mapper.readValue(response, typeRef)
     }
 }

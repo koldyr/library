@@ -1,6 +1,7 @@
 package com.koldyr.library.controllers
 
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Reader
@@ -13,6 +14,7 @@ import org.springframework.test.web.servlet.put
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 
 /**
  * Description of class ReaderControllerTest
@@ -74,39 +76,26 @@ class ReaderControllerTest : LibraryControllerTest() {
 
     @Test
     fun feedbacks() {
-        val reader = createReader()
+        val currentUser = getCurrentUser()
 
-        val books = mutableSetOf<Int>()
-
-        var author = createAuthor()
-        var book = createBook(author)
-        createFeedBack(book, reader)
-        books.add(book.id!!)
-
-        author = createAuthor()
-        book = createBook(author)
-        createFeedBack(book, reader)
-        books.add(book.id!!)
-
-        val response = rest.get("/api/library/readers/${reader.id}/feedbacks") {
-            accept = APPLICATION_JSON
-            header(AUTHORIZATION, "Basic $authHeader")
+        var allBooks: List<BookDTO> = findAllBooks()
+        if (allBooks.isEmpty()) {
+            allBooks = mutableListOf()
+            val author = createAuthor()
+            for (i in 0 until 10) {
+                allBooks.add(createBook(author))
+            }
         }
-                .andDo { print() }
-                .andExpect {
-                    status { isOk() }
-                    content { contentType(APPLICATION_JSON) }
-                }.andReturn().response.contentAsString
 
-        val typeRef = jacksonTypeRef<Array<FeedbackDTO>>()
-        val feedbacks = mapper.readValue(response, typeRef)
+        for (book in allBooks) {
+            createFeedBack(book, currentUser)
+        }
 
-        assertEquals(2, feedbacks.size)
+        val feedbacks = getReadersFeedbacks(currentUser)
 
-        books.forEach { bookId ->
-            val feedback = feedbacks.first { it.bookId == bookId }
-            assertNotNull(feedback)
-            assertEquals(reader.id, feedback.readerId)
+        for (book in allBooks) {
+            val readerFeedbacks = feedbacks.filter { feedback -> feedback.readerId == currentUser.id && feedback.bookId == book.id }
+            assertTrue(readerFeedbacks.size > 0)
         }
     }
 
@@ -135,5 +124,20 @@ class ReaderControllerTest : LibraryControllerTest() {
             header(AUTHORIZATION, "Basic $authHeader")
         }
                 .andExpect { status { isNoContent() } }
+    }
+
+    private fun getReadersFeedbacks(currentUser: Reader): Array<FeedbackDTO> {
+        val response = rest.get("/api/library/readers/${currentUser.id}/feedbacks") {
+            accept = APPLICATION_JSON
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isOk() }
+                    content { contentType(APPLICATION_JSON) }
+                }.andReturn().response.contentAsString
+
+        val typeRef = jacksonTypeRef<Array<FeedbackDTO>>()
+        return mapper.readValue(response, typeRef)
     }
 }
