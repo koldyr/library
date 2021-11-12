@@ -5,6 +5,7 @@ import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import org.apache.commons.lang3.RandomUtils
 import org.junit.Test
+import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
@@ -40,7 +41,9 @@ class AuthorControllerTest : LibraryControllerTest() {
 
         deleteAuthor(author.id!!)
 
-        rest.get("/api/library/authors/${author.id}")
+        rest.get("/api/library/authors/${author.id}") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
                 .andExpect { status { isNotFound() } }
     }
 
@@ -55,6 +58,7 @@ class AuthorControllerTest : LibraryControllerTest() {
 
         val body: String = rest.get("/api/library/authors/${author.id}/books") {
             accept = APPLICATION_JSON
+            header(AUTHORIZATION, "Basic $authHeader")
         }
                 .andDo { print() }
                 .andExpect {
@@ -87,6 +91,7 @@ class AuthorControllerTest : LibraryControllerTest() {
         val body: String = rest.get("/api/library/authors") {
             accept = APPLICATION_JSON
             param("search", firstName!!)
+            header(AUTHORIZATION, "Basic $authHeader")
         }
                 .andDo { print() }
                 .andExpect {
@@ -103,6 +108,7 @@ class AuthorControllerTest : LibraryControllerTest() {
     private fun getAuthor(authorId: Int): AuthorDTO {
         val body: String = rest.get("/api/library/authors/$authorId") {
             accept = APPLICATION_JSON
+            header(AUTHORIZATION, "Basic $authHeader")
         }
                 .andDo { print() }
                 .andExpect {
@@ -119,6 +125,7 @@ class AuthorControllerTest : LibraryControllerTest() {
         rest.put("/api/library/authors/${author.id}") {
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(author)
+            header(AUTHORIZATION, "Basic $authHeader")
         }
                 .andDo { print() }
                 .andExpect {
@@ -127,7 +134,9 @@ class AuthorControllerTest : LibraryControllerTest() {
     }
 
     private fun deleteAuthor(authorId: Int) {
-        rest.delete("/api/library/authors/$authorId")
+        rest.delete("/api/library/authors/$authorId") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
                 .andExpect {
                     status { isNoContent() }
                 }

@@ -5,9 +5,11 @@ import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.ReaderDTO
 import com.koldyr.library.model.Reader
 import com.koldyr.library.services.ReaderService
-import org.springframework.http.MediaType.*
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.*
+import org.springframework.http.ResponseEntity.created
+import org.springframework.http.ResponseEntity.noContent
+import org.springframework.http.ResponseEntity.ok
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -39,7 +41,10 @@ class ReaderController(private val readerService: ReaderService) {
     }
 
     @PutMapping("/{readerId}", consumes = [APPLICATION_JSON_VALUE])
-    fun update(@PathVariable readerId: Int, @RequestBody reader: Reader) = readerService.update(readerId, reader)
+    fun update(@PathVariable readerId: Int, @RequestBody reader: Reader): ResponseEntity<Unit> {
+        readerService.update(readerId, reader)
+        return ok().build()
+    }
 
     @GetMapping("/{readerId}", produces = [APPLICATION_JSON_VALUE])
     fun readerById(@PathVariable readerId: Int): ReaderDTO = readerService.findById(readerId)

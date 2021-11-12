@@ -6,7 +6,8 @@ import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.PageResultDTO
 import com.koldyr.library.dto.SearchCriteria
 import org.junit.Test
-import org.springframework.http.MediaType.*
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
@@ -44,40 +45,34 @@ class BookControllerTest: LibraryControllerTest() {
 
         deleteBook(book.id!!)
 
-        rest.get("/api/library/books/${book.id}")
+        rest.get("/api/library/books/${book.id}") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
             .andExpect { status { isNotFound() } }
     }
 
     @Test
     fun feedbacks() {
-        val author = createAuthor()
-        val book = createBook(author)
+        val currentUser = getCurrentUser()
 
-        val readers = mutableSetOf<Int>()
-        var reader = createReader()
-        createFeedBack(book, reader)
-        readers.add(reader.id!!)
+        var allBooks: List<BookDTO> = findAllBooks()
+        if (allBooks.isEmpty()) {
+            allBooks = mutableListOf()
+            val author = createAuthor()
+            for (i in 0 until 10) {
+                allBooks.add(createBook(author))
+            }
+        }
 
-        reader = createReader()
-        createFeedBack(book, reader)
-        readers.add(reader.id!!)
+        for (book in allBooks) {
+            createFeedBack(book, currentUser)
+        }
 
-        val response = rest.get("/api/library/books/${book.id}/feedbacks")
-            .andDo { print() }
-            .andExpect {
-                status { isOk() }
-                content { contentType(APPLICATION_JSON) }
-            }.andReturn().response.contentAsString
+        for (book in allBooks) {
+            val feedbacks = getBookFeedbacks(book.id!!)
 
-        val typeRef = jacksonTypeRef<Array<FeedbackDTO>>()
-        val feedbacks = mapper.readValue(response, typeRef)
-
-        assertEquals(2, feedbacks.size)
-
-        readers.forEach { readerId ->
-            val feedback = feedbacks.first { it.readerId == readerId }
-            assertNotNull(feedback)
-            assertEquals(book.id, feedback.bookId)
+            val readerFeedbacks = feedbacks.filter { feedback -> feedback.readerId == currentUser.id && feedback.bookId == book.id }
+            assertTrue(readerFeedbacks.size > 0)
         }
     }
 
@@ -102,6 +97,7 @@ class BookControllerTest: LibraryControllerTest() {
     private fun readBook(bookId: Int): BookDTO {
         val body: String = rest.get("/api/library/books/$bookId") {
             accept = APPLICATION_JSON
+            header(AUTHORIZATION, "Basic $authHeader")
         }
             .andDo { print() }
             .andExpect {
@@ -116,6 +112,7 @@ class BookControllerTest: LibraryControllerTest() {
         rest.put("/api/library/books/${book.id}") {
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(book)
+            header(AUTHORIZATION, "Basic $authHeader")
         }
             .andDo { print() }
             .andExpect {
@@ -124,7 +121,9 @@ class BookControllerTest: LibraryControllerTest() {
     }
 
     private fun deleteBook(bookId: Int) {
-        rest.delete("/api/library/books/$bookId")
+        rest.delete("/api/library/books/$bookId") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
             .andExpect {
                 status { isNoContent() }
             }
@@ -133,6 +132,7 @@ class BookControllerTest: LibraryControllerTest() {
     private fun assertBooks(book: BookDTO) {
         val response = rest.get("/api/library/books") {
             accept = APPLICATION_JSON
+            header(AUTHORIZATION, "Basic $authHeader")
         }
             .andExpect {
                 status { isOk() }
@@ -152,6 +152,7 @@ class BookControllerTest: LibraryControllerTest() {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(searchCriteria)
+            header(AUTHORIZATION, "Basic $authHeader")
         }
             .andDo { print() }
             .andExpect {
@@ -163,5 +164,19 @@ class BookControllerTest: LibraryControllerTest() {
         val typeRef = jacksonTypeRef<PageResultDTO<BookDTO>>()
         val pageResult = mapper.readValue(response, typeRef)
         return pageResult.result
+    }
+
+    private fun getBookFeedbacks(bookId: Int): Array<FeedbackDTO> {
+        val response = rest.get("/api/library/books/$bookId/feedbacks") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isOk() }
+                    content { contentType(APPLICATION_JSON) }
+                }.andReturn().response.contentAsString
+
+        val typeRef = jacksonTypeRef<Array<FeedbackDTO>>()
+        return mapper.readValue(response, typeRef)
     }
 }

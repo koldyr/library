@@ -1,6 +1,5 @@
 package com.koldyr.library.controllers
 
-import java.net.URI
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.services.AuthorService
@@ -10,6 +9,7 @@ import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.created
 import org.springframework.http.ResponseEntity.noContent
+import org.springframework.http.ResponseEntity.ok
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import java.net.URI
 
 /**
  * Description of class AuthorController
@@ -47,7 +48,10 @@ class AuthorController(
     }
 
     @PutMapping("/{authorId}", consumes = [APPLICATION_JSON_VALUE])
-    fun update(@PathVariable authorId: Int, @RequestBody author: AuthorDTO) = authorService.update(authorId, author)
+    fun update(@PathVariable authorId: Int, @RequestBody author: AuthorDTO): ResponseEntity<Unit> {
+        authorService.update(authorId, author)
+        return ok().build()
+    }
 
     @GetMapping("/{authorId}", produces = [APPLICATION_JSON_VALUE])
     fun authorById(@PathVariable authorId: Int): AuthorDTO = authorService.findById(authorId)

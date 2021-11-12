@@ -11,52 +11,85 @@ import com.koldyr.library.model.Genre
 import com.koldyr.library.model.Reader
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.RandomUtils
-import org.hamcrest.Matchers.*
+import org.hamcrest.Matchers.matchesRegex
+import org.junit.Before
 import org.junit.runner.RunWith
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpHeaders.*
-import org.springframework.http.MediaType.*
-import org.springframework.security.test.context.support.WithMockUser
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.HttpHeaders.LOCATION
+import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.test.annotation.IfProfileValue
-import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import java.time.LocalDate
 import java.time.LocalDateTime
+import javax.sql.DataSource
 
+object TestKotlinConstantObject {
+    @JvmStatic
+    var authHeader: String? = null
+}
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [Library::class])
-
 @AutoConfigureMockMvc
-@WithMockUser("me@koldyr.com", roles = ["supervisor"])
-@TestPropertySource(properties = ["spring.config.location = classpath:application-test.yaml"])
 
 @IfProfileValue(name = "spring.profiles.active", values = ["int-test"])
 abstract class LibraryControllerTest {
+
+    protected val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     @Autowired
     lateinit var mapper: ObjectMapper
 
     @Autowired
+    lateinit var dataSource: DataSource
+
+    @Autowired
     lateinit var rest: MockMvc
 
-//    @Autowired
-//    private val context: WebApplicationContext? = null
-//
-//    var rest: MockMvc = MockMvcBuilders.standaloneSetup(ReaderController::class, BookController::class, AuthorController::class).build()
-//
-//    @Before
-//    open fun setup() {
-//        rest = MockMvcBuilders
-//                .webAppContextSetup(context)
-//                .apply { springSecurity() }
-//                .build()
-//    }
+    protected var authHeader: String? = null
+    
+    @Before
+    fun login() {
+        if (TestKotlinConstantObject.authHeader == null) {
+            insertSupervisor()
+            TestKotlinConstantObject.authHeader = "bWVAa29sZHlyLmNvbTprb2xkeXI="
+        }
+        authHeader = TestKotlinConstantObject.authHeader
+    }
+
+    private fun insertSupervisor() {
+        val template = JdbcTemplate(dataSource)
+
+        ClassLoader.getSystemResourceAsStream("initial-data.sql").use {
+            val sqlCommand = StringBuilder()
+            val reader = BufferedReader(InputStreamReader(it!!))
+            reader.lines().forEach { line ->
+                if (line == null || line.startsWith("--")) {
+                    //do nothing
+                } else {
+                    sqlCommand.append(line).append(' ')
+
+                    if (line.endsWith(";")) {
+                        template.execute(sqlCommand.toString())
+                        logger.info(sqlCommand.toString())
+
+                        sqlCommand.clear()
+                    }
+                }
+            }
+        }
+    }
 
     protected fun createAuthor(): AuthorDTO {
         val index = RandomUtils.nextInt(0, 100_000)
@@ -67,6 +100,7 @@ abstract class LibraryControllerTest {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(author)
+            header(AUTHORIZATION, "Basic $authHeader")
         }
                 .andExpect {
                     status { isCreated() }
@@ -81,7 +115,9 @@ abstract class LibraryControllerTest {
     }
 
     protected fun findAllAuthors(): List<AuthorDTO> {
-        val response = rest.get("/api/library/authors")
+        val response = rest.get("/api/library/authors") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
 
@@ -104,6 +140,7 @@ abstract class LibraryControllerTest {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(reader)
+            header(AUTHORIZATION, "Basic $authHeader")
         }
                 .andExpect {
                     status { isCreated() }
@@ -119,12 +156,24 @@ abstract class LibraryControllerTest {
     }
 
     protected fun findAllReaders(): List<Reader> {
-        val response = rest.get("/api/library/readers")
+        val response = rest.get("/api/library/readers") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
 
         val typeRef = jacksonTypeRef<List<Reader>>()
         return mapper.readValue(response, typeRef)
+    }
+
+    protected fun getCurrentUser(): Reader {
+        val response = rest.get("/api/library/readers/me") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
+                .andExpect { status { isOk() } }
+                .andReturn().response.contentAsString
+
+        return mapper.readValue(response, Reader::class.java)
     }
 
     protected fun createBook(author: AuthorDTO): BookDTO {
@@ -140,6 +189,7 @@ abstract class LibraryControllerTest {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(book)
+            header(AUTHORIZATION, "Basic $authHeader")
         }
                 .andDo { print() }
                 .andExpect {
@@ -155,7 +205,9 @@ abstract class LibraryControllerTest {
     }
 
     protected fun findAllBooks(): List<BookDTO> {
-        val response = rest.get("/api/library/books")
+        val response = rest.get("/api/library/books") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
 
@@ -173,6 +225,7 @@ abstract class LibraryControllerTest {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(order)
+            header(AUTHORIZATION, "Basic $authHeader")
         }
                 .andExpect {
                     status { isCreated() }
@@ -185,7 +238,9 @@ abstract class LibraryControllerTest {
     }
 
     protected fun getOrdersForReader(reader: Reader): List<OrderDTO> {
-        val response = rest.get("/api/library/readers/${reader.id}/orders")
+        val response = rest.get("/api/library/readers/${reader.id}/orders") {
+            header(AUTHORIZATION, "Basic $authHeader")
+        }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
 
@@ -204,6 +259,7 @@ abstract class LibraryControllerTest {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(feedback)
+            header(AUTHORIZATION, "Basic $authHeader")
         }
                 .andDo { print() }
                 .andExpect {
