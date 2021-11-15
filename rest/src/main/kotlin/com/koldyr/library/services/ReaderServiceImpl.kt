@@ -36,7 +36,7 @@ open class ReaderServiceImpl(
     override fun findAll(): List<ReaderDTO> = readerRepository.findAll().map(this::mapReader)
 
     @Transactional
-    @PreAuthorize("hasAuthority('modify_reader')")
+    @PreAuthorize("permitAll()")
     override fun create(reader: Reader): Int {
         if (isEmpty(reader.password)) {
             throw ResponseStatusException(BAD_REQUEST, "Reader password must be provided")
@@ -47,9 +47,8 @@ open class ReaderServiceImpl(
         }
 
         reader.id = null
-        if (reader.roles.isEmpty()) {
-            reader.roles.add(roleRepository.findAll()[0])
-        }
+        reader.roles.clear()
+        reader.roles.add(roleRepository.findAll()[0])
 
         reader.password = encoder.encode(reader.password)
         val saved = readerRepository.save(reader)

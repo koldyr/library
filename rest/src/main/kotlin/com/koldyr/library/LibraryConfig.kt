@@ -35,7 +35,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
-import org.springframework.http.HttpMethod
+import org.springframework.http.HttpMethod.DELETE
+import org.springframework.http.HttpMethod.GET
+import org.springframework.http.HttpMethod.POST
+import org.springframework.http.HttpMethod.PUT
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
@@ -131,12 +134,14 @@ class LibraryConfig : WebSecurityConfigurerAdapter() {
         http
             .authorizeRequests()
                 .antMatchers("/login*").permitAll()
+                .antMatchers(POST, "/api/library/readers").permitAll()
                 .anyRequest().authenticated()
             .and()
                 .cors()
                 .configurationSource(corsConfigurationSource())
             .and()
-                .formLogin().defaultSuccessUrl("/swagger-ui.html", true)
+                .formLogin()
+                .successHandler { request, response, authentication -> }
             .and()
                 .logout()
                 .deleteCookies("JSESSIONID")
@@ -149,7 +154,7 @@ class LibraryConfig : WebSecurityConfigurerAdapter() {
 
     fun corsConfigurationSource(): CorsConfigurationSource {
         val configuration = CorsConfiguration()
-        configuration.allowedMethods = listOf(HttpMethod.GET.name, HttpMethod.PUT.name, HttpMethod.POST.name, HttpMethod.DELETE.name)
+        configuration.allowedMethods = listOf(GET.name, PUT.name, POST.name, DELETE.name)
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration.applyPermitDefaultValues())
         return source
