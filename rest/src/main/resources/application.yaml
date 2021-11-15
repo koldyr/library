@@ -9,7 +9,7 @@ spring:
     username: sa
     password: sa
   jpa:
-    show-sql: true
+    show-sql: false
 #    schema: classpath:sql/schema.sql
 #    initialization-mode: always
 
@@ -39,3 +39,8 @@ logging:
   level:
     org.springframework.test: ERROR
     org.springframework.boot.test: ERROR
+
+library:
+  test:
+    user: me@koldyr.com
+    password: koldyr

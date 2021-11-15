@@ -6,8 +6,8 @@ import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.PageResultDTO
 import com.koldyr.library.dto.SearchCriteria
 import org.junit.Test
-import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
@@ -46,7 +46,7 @@ class BookControllerTest: LibraryControllerTest() {
         deleteBook(book.id!!)
 
         rest.get("/api/library/books/${book.id}") {
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
             .andExpect { status { isNotFound() } }
     }
@@ -97,7 +97,7 @@ class BookControllerTest: LibraryControllerTest() {
     private fun readBook(bookId: Int): BookDTO {
         val body: String = rest.get("/api/library/books/$bookId") {
             accept = APPLICATION_JSON
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
             .andDo { print() }
             .andExpect {
@@ -112,7 +112,7 @@ class BookControllerTest: LibraryControllerTest() {
         rest.put("/api/library/books/${book.id}") {
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(book)
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
             .andDo { print() }
             .andExpect {
@@ -122,7 +122,7 @@ class BookControllerTest: LibraryControllerTest() {
 
     private fun deleteBook(bookId: Int) {
         rest.delete("/api/library/books/$bookId") {
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
             .andExpect {
                 status { isNoContent() }
@@ -132,7 +132,7 @@ class BookControllerTest: LibraryControllerTest() {
     private fun assertBooks(book: BookDTO) {
         val response = rest.get("/api/library/books") {
             accept = APPLICATION_JSON
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
             .andExpect {
                 status { isOk() }
@@ -152,7 +152,7 @@ class BookControllerTest: LibraryControllerTest() {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(searchCriteria)
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
             .andDo { print() }
             .andExpect {
@@ -168,7 +168,7 @@ class BookControllerTest: LibraryControllerTest() {
 
     private fun getBookFeedbacks(bookId: Int): Array<FeedbackDTO> {
         val response = rest.get("/api/library/books/$bookId/feedbacks") {
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
                 .andDo { print() }
                 .andExpect {

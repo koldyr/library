@@ -3,6 +3,7 @@ package com.koldyr.library.controllers
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.Library
+import com.koldyr.library.controllers.TestDbInitializer.dbInitialized
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
@@ -17,12 +18,13 @@ import org.junit.runner.RunWith
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.LOCATION
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import org.springframework.test.annotation.IfProfileValue
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
@@ -34,9 +36,9 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.sql.DataSource
 
-object TestKotlinConstantObject {
+object TestDbInitializer {
     @JvmStatic
-    var authHeader: String? = null
+    var dbInitialized: Boolean = false
 }
 
 @RunWith(SpringRunner::class)
@@ -57,15 +59,18 @@ abstract class LibraryControllerTest {
     @Autowired
     lateinit var rest: MockMvc
 
-    protected var authHeader: String? = null
-    
+    @Value("\${library.test.user}")
+    protected val userName: String = ""
+
+    @Value("\${library.test.password}")
+    protected val password: String = ""
+
     @Before
     fun login() {
-        if (TestKotlinConstantObject.authHeader == null) {
+        if (!dbInitialized) {
             insertSupervisor()
-            TestKotlinConstantObject.authHeader = "bWVAa29sZHlyLmNvbTprb2xkeXI="
+            dbInitialized = true
         }
-        authHeader = TestKotlinConstantObject.authHeader
     }
 
     private fun insertSupervisor() {
@@ -100,7 +105,7 @@ abstract class LibraryControllerTest {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(author)
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
                 .andExpect {
                     status { isCreated() }
@@ -116,7 +121,7 @@ abstract class LibraryControllerTest {
 
     protected fun findAllAuthors(): List<AuthorDTO> {
         val response = rest.get("/api/library/authors") {
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
@@ -140,7 +145,7 @@ abstract class LibraryControllerTest {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(reader)
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
                 .andExpect {
                     status { isCreated() }
@@ -157,7 +162,7 @@ abstract class LibraryControllerTest {
 
     protected fun findAllReaders(): List<Reader> {
         val response = rest.get("/api/library/readers") {
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
@@ -168,7 +173,7 @@ abstract class LibraryControllerTest {
 
     protected fun getCurrentUser(): Reader {
         val response = rest.get("/api/library/readers/me") {
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
@@ -189,7 +194,7 @@ abstract class LibraryControllerTest {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(book)
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
                 .andDo { print() }
                 .andExpect {
@@ -206,7 +211,7 @@ abstract class LibraryControllerTest {
 
     protected fun findAllBooks(): List<BookDTO> {
         val response = rest.get("/api/library/books") {
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
@@ -225,7 +230,7 @@ abstract class LibraryControllerTest {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(order)
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
                 .andExpect {
                     status { isCreated() }
@@ -239,7 +244,7 @@ abstract class LibraryControllerTest {
 
     protected fun getOrdersForReader(reader: Reader): List<OrderDTO> {
         val response = rest.get("/api/library/readers/${reader.id}/orders") {
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
@@ -259,7 +264,7 @@ abstract class LibraryControllerTest {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(feedback)
-            header(AUTHORIZATION, "Basic $authHeader")
+            with(httpBasic(userName, password))
         }
                 .andDo { print() }
                 .andExpect {
