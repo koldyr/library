@@ -10,7 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 
 @Service
-open class ReaderDetailsService(private val readerRepository: ReaderRepository) : UserDetailsService {
+class ReaderDetailsService(private val readerRepository: ReaderRepository) : UserDetailsService {
 
     override fun loadUserByUsername(email: String): UserDetails {
         val reader = readerRepository.findByMail(email)
