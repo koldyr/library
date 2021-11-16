@@ -3,8 +3,10 @@ package com.koldyr.library.controllers
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
+import com.koldyr.library.dto.PageDTO
 import com.koldyr.library.dto.PageResultDTO
 import com.koldyr.library.dto.SearchCriteria
+import com.koldyr.library.dto.SortDTO
 import org.junit.Test
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
@@ -87,6 +89,8 @@ class BookControllerTest: LibraryControllerTest() {
         createBook(author)
 
         val searchCriteria = SearchCriteria()
+        searchCriteria.sort = SortDTO("title", "DESC")
+        searchCriteria.page = PageDTO(5)
         searchCriteria.title = "title"
 
         val books = searchBooks(searchCriteria)
