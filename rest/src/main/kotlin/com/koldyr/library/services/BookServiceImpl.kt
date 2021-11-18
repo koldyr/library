@@ -1,10 +1,5 @@
 package com.koldyr.library.services
 
-import java.time.LocalDate
-import java.time.LocalDate.of
-import java.time.LocalDateTime
-import java.util.Objects.isNull
-import java.util.Objects.nonNull
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
@@ -32,6 +27,11 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+import java.time.LocalDate
+import java.time.LocalDate.of
+import java.time.LocalDateTime
+import java.util.Objects.isNull
+import java.util.Objects.nonNull
 import javax.persistence.criteria.Path
 import javax.persistence.criteria.Predicate
 import kotlin.reflect.full.declaredMemberProperties
@@ -153,6 +153,10 @@ open class BookServiceImpl(
         if (persisted.reader!!.id != getLoggedUserId()) {
             throw ResponseStatusException(BAD_REQUEST, "You can not return order with id '${order.id}', only reader ${getLoggedUserId()}")
         }
+        if (nonNull(persisted.returned)) {
+            throw ResponseStatusException(BAD_REQUEST, "You can not return already returned order '${order.id}'")
+        }
+
         persisted.returned = LocalDateTime.now()
         persisted.notes = if (isNull(persisted.notes)) order.notes else persisted.notes + '\n' + order.notes
 

@@ -3,17 +3,22 @@ package com.koldyr.library.controllers
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
+import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.PageDTO
 import com.koldyr.library.dto.PageResultDTO
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.dto.SortDTO
+import com.koldyr.library.model.Order
+import com.koldyr.library.persistence.OrderRepository
 import org.junit.Test
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
+import java.util.Objects.nonNull
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
@@ -23,6 +28,9 @@ import kotlin.test.assertTrue
  * @created: 2021-10-23
  */
 class BookControllerTest: LibraryControllerTest() {
+
+    @Autowired
+    lateinit var orderRepository: OrderRepository
 
     @Test
     fun books() {
@@ -51,6 +59,42 @@ class BookControllerTest: LibraryControllerTest() {
             with(httpBasic(userName, password))
         }
             .andExpect { status { isNotFound() } }
+    }
+
+    @Test
+    fun orderBooks() {
+        val currentUser = getCurrentUser()
+
+        var allBooks: List<BookDTO> = findAllBooks()
+        if (allBooks.isEmpty()) {
+            allBooks = mutableListOf()
+            val author = createAuthor()
+            for (i in 0 until 10) {
+                allBooks.add(createBook(author))
+            }
+        }
+
+        val orders: MutableList<OrderDTO> = mutableListOf()
+        for (book in allBooks) {
+            val order = takeBook(book)
+            orders.add(order)
+        }
+
+        for (order in orders) {
+            returnBook(order)
+        }
+
+        for (book in allBooks) {
+            val completed: Collection<Order> = getBookOrders(book.id!!)
+
+            val bookOrders = completed.filter { order ->
+                order.reader!!.id == currentUser.id &&
+                order.bookId == book.id &&
+                nonNull(order.ordered)  &&
+                nonNull(order.returned)
+            }
+            assertTrue(bookOrders.size > 0)
+        }
     }
 
     @Test
@@ -182,5 +226,42 @@ class BookControllerTest: LibraryControllerTest() {
 
         val typeRef = jacksonTypeRef<Array<FeedbackDTO>>()
         return mapper.readValue(response, typeRef)
+    }
+
+    private fun takeBook(book: BookDTO): OrderDTO {
+        val order = OrderDTO()
+        order.bookId = book.id
+        order.notes = "taken"
+
+        val response = rest.post("/api/library/books/take") {
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
+            content = mapper.writeValueAsString(order)
+            with(httpBasic(userName, password))
+        }
+            .andDo { print() }
+            .andExpect {
+                status { isCreated() }
+                content { contentType(APPLICATION_JSON) }
+            }.andReturn().response.contentAsString
+
+        return mapper.readValue(response, OrderDTO::class.java)
+    }
+
+    private fun returnBook(order: OrderDTO) {
+        rest.post("/api/library/books/return") {
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
+            content = mapper.writeValueAsString(order)
+            with(httpBasic(userName, password))
+        }
+            .andDo { print() }
+            .andExpect {
+                status { isOk() }
+            }
+    }
+
+    private fun getBookOrders(bookId: Int): Collection<Order> {
+        return orderRepository.findOrdersByBookId(bookId)
     }
 }

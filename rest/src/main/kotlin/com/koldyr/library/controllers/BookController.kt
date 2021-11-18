@@ -62,7 +62,6 @@ class BookController(private val bookService: BookService) {
     @DeleteMapping("/{bookId}")
     fun delete(@PathVariable bookId: Int): ResponseEntity<Unit> {
         bookService.delete(bookId)
-
         return noContent().build()
     }
 
@@ -77,12 +76,13 @@ class BookController(private val bookService: BookService) {
     }
 
     @PostMapping("/return", consumes = [APPLICATION_JSON_VALUE])
-    fun returnBook(@RequestBody order: OrderDTO) {
+    fun returnBook(@RequestBody order: OrderDTO): ResponseEntity<Unit> {
         if (isNull(order.id)) {
             throw ResponseStatusException(BAD_REQUEST, "Order id must be provided")
         }
 
         bookService.returnBook(order)
+        return ok().build()
     }
 
     @PostMapping("/feedback", consumes = [APPLICATION_JSON_VALUE])
@@ -101,7 +101,8 @@ class BookController(private val bookService: BookService) {
     fun bookFeedbacks(@PathVariable bookId: Int): Collection<FeedbackDTO> = bookService.bookFeedbacks(bookId)
 
     @DeleteMapping("/feedbacks/{feedbackId}")
-    fun deleteFeedback(@PathVariable feedbackId: Int) {
+    fun deleteFeedback(@PathVariable feedbackId: Int): ResponseEntity<Unit> {
         bookService.deleteFeedback(feedbackId)
+        return noContent().build()
     }
 }
