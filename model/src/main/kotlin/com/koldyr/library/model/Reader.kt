@@ -2,7 +2,6 @@ package com.koldyr.library.model
 
 import javax.persistence.Basic
 import javax.persistence.CascadeType.PERSIST
-import javax.persistence.CascadeType.REMOVE
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType.EAGER
@@ -46,7 +45,7 @@ class Reader : Cloneable {
     @Basic(optional = false)
     var password: String = ""
 
-    @ManyToMany(cascade = [PERSIST, REMOVE], fetch = EAGER)
+    @ManyToMany(cascade = [PERSIST], fetch = EAGER)
     @JoinTable(
             name = "T_READER_ROLES",
             joinColumns = [JoinColumn(name = "reader_id", referencedColumnName = "reader_id")],

@@ -70,6 +70,7 @@ open class ReaderServiceImpl(
 
         reader.id = persisted.id
         reader.password = persisted.password
+        reader.roles = persisted.roles
         mapper.map(reader, persisted)
 
         readerRepository.save(persisted);
