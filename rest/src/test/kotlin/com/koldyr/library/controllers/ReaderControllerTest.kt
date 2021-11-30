@@ -71,6 +71,9 @@ class ReaderControllerTest : LibraryControllerTest() {
 
         val filtered = orders.filter { it.id == order.id }
         assertFalse(filtered.isEmpty())
+
+        book.count = book.count?.minus(1)
+        order.book = book
         assertEquals(order, orders[0])
     }
 
