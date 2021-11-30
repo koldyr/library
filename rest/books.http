@@ -103,3 +103,7 @@ Accept: application/json
 ### Get all Feedbacks for Book
 GET http://localhost/api/library/books/5/feedbacks
 Authorization: Basic {{BasicHash}}
+
+### Get all Feedbacks for Book
+GET http://localhost/api/library/books/3/orders
+Authorization: Basic {{BasicHash}}

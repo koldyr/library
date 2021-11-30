@@ -105,4 +105,7 @@ class BookController(private val bookService: BookService) {
         bookService.deleteFeedback(feedbackId)
         return noContent().build()
     }
+
+    @GetMapping("/{bookId}/orders", produces = [APPLICATION_JSON_VALUE])
+    fun bookOrders(@PathVariable bookId: Int): Collection<OrderDTO> = bookService.bookOrders(bookId)
 }

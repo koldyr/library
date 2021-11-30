@@ -3,10 +3,9 @@ package com.koldyr.library.services
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.ReaderDTO
-import com.koldyr.library.dto.ReaderDetails
 import com.koldyr.library.model.Feedback
-import com.koldyr.library.model.Order
 import com.koldyr.library.model.Reader
+import com.koldyr.library.persistence.BookRepository
 import com.koldyr.library.persistence.ReaderRepository
 import com.koldyr.library.persistence.RoleRepository
 import ma.glasnost.orika.MapperFacade
@@ -14,7 +13,6 @@ import org.apache.commons.lang3.StringUtils.isEmpty
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
@@ -26,11 +24,12 @@ import java.util.Objects.nonNull
  * @created: 2021-09-28
  */
 open class ReaderServiceImpl(
-        private val readerRepository: ReaderRepository,
-        private val roleRepository: RoleRepository,
-        private val mapper: MapperFacade,
-        private val encoder: PasswordEncoder
-) : ReaderService {
+    bookRepository: BookRepository,
+    mapper: MapperFacade,
+    private val readerRepository: ReaderRepository,
+    private val roleRepository: RoleRepository,
+    private val encoder: PasswordEncoder
+) : ReaderService, BaseLibraryService(bookRepository, mapper) {
 
     @PreAuthorize("hasAuthority('read_reader')")
     override fun findAll(): List<ReaderDTO> = readerRepository.findAll().map(this::mapReader)
@@ -102,22 +101,11 @@ open class ReaderServiceImpl(
         return readerRepository.findFeedbacks(readerId).map(this::mapFeedBack)
     }
 
-    private fun mapOrder(entity: Order): OrderDTO {
-        return mapper.map(entity, OrderDTO::class.java)
-    }
-
     private fun mapFeedBack(entity: Feedback): FeedbackDTO {
         return mapper.map(entity, FeedbackDTO::class.java)
     }
 
     private fun mapReader(entity: Reader): ReaderDTO {
         return mapper.map(entity, ReaderDTO::class.java)
-    }
-
-    private fun getLoggedUserId(): Int {
-        val securityContext = SecurityContextHolder.getContext()
-        val authentication = securityContext.authentication
-        val readerDetails = authentication.principal as ReaderDetails
-        return readerDetails.getReaderId()
     }
 }

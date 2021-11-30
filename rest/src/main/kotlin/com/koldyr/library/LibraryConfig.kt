@@ -80,17 +80,17 @@ class LibraryConfig : WebSecurityConfigurerAdapter() {
 
     @Bean
     fun readerService(mapper: MapperFacade, encoder: PasswordEncoder): ReaderService {
-        return ReaderServiceImpl(readerRepository, roleRepository, mapper, encoder)
+        return ReaderServiceImpl(bookRepository, mapper, readerRepository, roleRepository, encoder)
     }
 
     @Bean
     fun bookService(mapper: MapperFacade): BookService {
-        return BookServiceImpl(bookRepository, authorRepository, orderRepository, feedbackRepository, mapper)
+        return BookServiceImpl(bookRepository, mapper, authorRepository, orderRepository, feedbackRepository)
     }
 
     @Bean
     fun authorService(mapper: MapperFacade): AuthorService {
-        return AuthorServiceImpl(authorRepository, mapper)
+        return AuthorServiceImpl(bookRepository, mapper, authorRepository)
     }
 
     @Bean
@@ -132,22 +132,22 @@ class LibraryConfig : WebSecurityConfigurerAdapter() {
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         http
-            .authorizeRequests()
+                .authorizeRequests()
                 .antMatchers("/login*").permitAll()
                 .antMatchers(POST, "/api/library/readers").permitAll()
                 .anyRequest().authenticated()
-            .and()
+                .and()
                 .cors()
                 .configurationSource(corsConfigurationSource())
-            .and()
+                .and()
                 .formLogin()
                 .successHandler { request, response, authentication -> }
-            .and()
+                .and()
                 .logout()
                 .deleteCookies("JSESSIONID")
-            .and()
+                .and()
                 .httpBasic()
-            .and()
+                .and()
                 .headers().disable()
                 .csrf().disable()
     }

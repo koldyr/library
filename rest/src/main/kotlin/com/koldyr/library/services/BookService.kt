@@ -26,4 +26,6 @@ interface BookService {
     fun feedbackBook(feedback: FeedbackDTO): Int
     fun bookFeedbacks(bookId: Int): List<FeedbackDTO>
     fun deleteFeedback(feedbackId: Int)
+
+    fun bookOrders(bookId: Int): Collection<OrderDTO>
 }

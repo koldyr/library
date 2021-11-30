@@ -4,7 +4,6 @@ import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.PageResultDTO
-import com.koldyr.library.dto.ReaderDetails
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.model.Book
 import com.koldyr.library.model.Feedback
@@ -24,7 +23,6 @@ import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDate
@@ -41,12 +39,12 @@ import kotlin.reflect.full.declaredMemberProperties
  * @created: 2021-09-28
  */
 open class BookServiceImpl(
-    private val bookRepository: BookRepository,
+    bookRepository: BookRepository,
+    mapper: MapperFacade,
     private val authorRepository: AuthorRepository,
     private val orderRepository: OrderRepository,
     private val feedbackRepository: FeedbackRepository,
-    private val mapper: MapperFacade
-) : BookService {
+) : BookService, BaseLibraryService(bookRepository, mapper) {
 
     @PreAuthorize("hasAuthority('read_book')")
     override fun findAll(available: Boolean): List<BookDTO> {
@@ -113,7 +111,7 @@ open class BookServiceImpl(
     @Transactional
     override fun deleteFeedback(feedbackId: Int) {
         val feedback = feedbackRepository.findById(feedbackId)
-            .orElseThrow { throw ResponseStatusException(NOT_FOUND, "Feedback with id '${feedbackId}' is not found") }
+                .orElseThrow { throw ResponseStatusException(NOT_FOUND, "Feedback with id '${feedbackId}' is not found") }
 
         if (feedback.reader!!.id == getLoggedUserId() || hasAuthority("modify_feedback")) {
             feedbackRepository.delete(feedback)
@@ -148,7 +146,7 @@ open class BookServiceImpl(
     @PreAuthorize("hasAuthority('order_book')")
     override fun returnBook(order: OrderDTO) {
         val persisted = orderRepository.findById(order.id!!)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Order with id '${order.id}' is not found") }
+                .orElseThrow { ResponseStatusException(NOT_FOUND, "Order with id '${order.id}' is not found") }
 
         if (persisted.reader!!.id != getLoggedUserId()) {
             throw ResponseStatusException(BAD_REQUEST, "You can not return order with id '${order.id}', only reader ${getLoggedUserId()}")
@@ -192,13 +190,19 @@ open class BookServiceImpl(
         return createPageResult(booksPage)
     }
 
+    override fun bookOrders(bookId: Int): Collection<OrderDTO> {
+        return orderRepository
+                .findOrdersByBookId(bookId)
+                .map(this::mapOrder)
+    }
+
     private fun hasCriteria(criteria: SearchCriteria?): Boolean {
         if (criteria == null) {
             return false
         }
         return SearchCriteria::class.declaredMemberProperties
-            .filter { it.name != "page" && it.name != "sort" }
-            .any { nonNull(it.get(criteria)) }
+                .filter { it.name != "page" && it.name != "sort" }
+                .any { nonNull(it.get(criteria)) }
     }
 
     private fun createFilter(criteria: SearchCriteria): Specification<Book>? {
@@ -274,21 +278,7 @@ open class BookServiceImpl(
 
     private fun find(bookId: Int): Book {
         return bookRepository.findById(bookId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '$bookId' is not found") }
-    }
-
-    private fun getLoggedUserId(): Int {
-        val securityContext = SecurityContextHolder.getContext()
-        val authentication = securityContext.authentication
-        val readerDetails = authentication.principal as ReaderDetails
-        return readerDetails.getReaderId()
-    }
-
-    private fun hasAuthority(authority: String): Boolean {
-        val securityContext = SecurityContextHolder.getContext()
-        val authentication = securityContext.authentication
-        val readerDetails = authentication.principal as ReaderDetails
-        return readerDetails.hasAuthority(authority)
+                .orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '$bookId' is not found") }
     }
 }
 
