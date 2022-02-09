@@ -15,11 +15,11 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <kotlin.version>1.6.0</kotlin.version>
+        <kotlin.version>1.6.10</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
         <jackson.version>2.13.1</jackson.version>
-        <spring-boot.version>2.6.2</spring-boot.version>
-        <springdoc-openapi.version>1.5.11</springdoc-openapi.version>
+        <spring-boot.version>2.6.3</spring-boot.version>
+        <springdoc-openapi.version>1.6.5</springdoc-openapi.version>
     </properties>
 
     <modules>

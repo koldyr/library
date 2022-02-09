@@ -4,6 +4,7 @@ import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
+import com.koldyr.library.dto.ReaderDTO
 import com.koldyr.library.mapper.AuthorConverter
 import com.koldyr.library.mapper.BookConverter
 import com.koldyr.library.mapper.OrderConverter
@@ -12,6 +13,7 @@ import com.koldyr.library.model.Author
 import com.koldyr.library.model.Book
 import com.koldyr.library.model.Feedback
 import com.koldyr.library.model.Order
+import com.koldyr.library.model.Reader
 import com.koldyr.library.persistence.AuthorRepository
 import com.koldyr.library.persistence.BookRepository
 import com.koldyr.library.persistence.FeedbackRepository
@@ -35,19 +37,16 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
+import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpMethod.DELETE
 import org.springframework.http.HttpMethod.GET
+import org.springframework.http.HttpMethod.HEAD
+import org.springframework.http.HttpMethod.PATCH
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpMethod.PUT
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
-import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.web.cors.CorsConfiguration
-import org.springframework.web.cors.CorsConfigurationSource
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 /**
  * Description of class LibraryConfig
@@ -55,7 +54,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
  */
 @Configuration
 @EnableAspectJAutoProxy
-class LibraryConfig : WebSecurityConfigurerAdapter() {
+class LibraryConfig {
 
     @Autowired
     lateinit var readerRepository: ReaderRepository
@@ -74,9 +73,6 @@ class LibraryConfig : WebSecurityConfigurerAdapter() {
 
     @Autowired
     lateinit var roleRepository: RoleRepository
-
-    @Autowired
-    lateinit var readerDetailsService: UserDetailsService
 
     @Bean
     fun readerService(mapper: MapperFacade, encoder: PasswordEncoder): ReaderService {
@@ -110,6 +106,9 @@ class LibraryConfig : WebSecurityConfigurerAdapter() {
                 .field("reader", "readerId")
                 .byDefault()
                 .register()
+        mapperFactory.classMap(Reader::class.java, ReaderDTO::class.java)
+                .byDefault()
+                .register()
         mapperFactory.classMap(Author::class.java, AuthorDTO::class.java)
                 .byDefault()
                 .register()
@@ -123,53 +122,23 @@ class LibraryConfig : WebSecurityConfigurerAdapter() {
         return mapperFactory.mapperFacade
     }
 
-    override fun configure(auth: AuthenticationManagerBuilder) {
-        auth
-                .userDetailsService(readerDetailsService)
-                .passwordEncoder(encoder())
-    }
-
-    @Throws(Exception::class)
-    override fun configure(http: HttpSecurity) {
-        http
-                .authorizeRequests()
-                .antMatchers("/login*").permitAll()
-                .antMatchers(POST, "/api/library/readers").permitAll()
-                .anyRequest().authenticated()
-                .and()
-                .cors()
-                .configurationSource(corsConfigurationSource())
-                .and()
-                .formLogin()
-                .successHandler { request, response, authentication -> }
-                .and()
-                .logout()
-                .deleteCookies("JSESSIONID")
-                .and()
-                .httpBasic()
-                .and()
-                .headers().disable()
-                .csrf().disable()
-    }
-
-    fun corsConfigurationSource(): CorsConfigurationSource {
-        val configuration = CorsConfiguration()
-        configuration.allowedMethods = listOf(GET.name, PUT.name, POST.name, DELETE.name)
-        val source = UrlBasedCorsConfigurationSource()
-        source.registerCorsConfiguration("/**", configuration.applyPermitDefaultValues())
-        return source
-    }
-
-    @Bean
-    fun encoder(): PasswordEncoder {
-        return BCryptPasswordEncoder()
-    }
-
     @Bean
     fun api(): OpenAPI {
         return OpenAPI()
                 .components(Components())
                 .info(apiInfo())
+    }
+    
+    @Bean
+    fun corsConfigurer(): WebMvcConfigurer {
+        return object : WebMvcConfigurer {
+            override fun addCorsMappings(registry: CorsRegistry) {
+                registry.addMapping("/**")
+                    .allowedOrigins("*")
+                    .allowedMethods(GET.name, HEAD.name, POST.name, PUT.name, DELETE.name, PATCH.name)
+                    .exposedHeaders(AUTHORIZATION)
+            }
+        }
     }
 
     private fun apiInfo(): Info {

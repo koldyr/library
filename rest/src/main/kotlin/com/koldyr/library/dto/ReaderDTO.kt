@@ -7,6 +7,7 @@ data class ReaderDTO(
         var firstName: String? = null,
         var lastName: String? = null,
         var mail: String?,
+        var password: String?,
         var address: String? = null,
         var phoneNumber: String? = null,
         var note: String? = null,

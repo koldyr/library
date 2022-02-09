@@ -36,21 +36,26 @@ open class ReaderServiceImpl(
 
     @Transactional
     @PreAuthorize("permitAll()")
-    override fun create(reader: Reader): Int {
+    override fun create(reader: ReaderDTO): Int {
         if (isEmpty(reader.password)) {
             throw ResponseStatusException(BAD_REQUEST, "Reader password must be provided")
         }
-
-        if (readerRepository.findByMail(reader.mail).isPresent) {
-            throw ResponseStatusException(BAD_REQUEST, "Reader with mail '${reader.mail}' already exists")
+        if (isEmpty(reader.mail)) {
+            throw ResponseStatusException(BAD_REQUEST, "Reader email must be provided")
         }
 
+        if (readerRepository.findByMail(reader.mail!!).isPresent) {
+            throw ResponseStatusException(BAD_REQUEST, "Reader with mail '${reader.mail}' already exists")
+        }
+        
         reader.id = null
-        reader.roles.clear()
-        reader.roles.add(roleRepository.findAll()[0])
+        val entity = mapper.map(reader, Reader::class.java)
+        
+        entity.roles.clear()
+        entity.roles.add(roleRepository.findAll()[0])
+        entity.password = encoder.encode(reader.password)
 
-        reader.password = encoder.encode(reader.password)
-        val saved = readerRepository.save(reader)
+        val saved = readerRepository.save(entity)
         return saved.id!!
     }
 

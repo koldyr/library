@@ -1,6 +1,7 @@
 package com.koldyr.library.controllers
 
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.koldyr.library.controllers.TestDbInitializer.token
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
@@ -12,8 +13,8 @@ import com.koldyr.library.model.Order
 import com.koldyr.library.persistence.OrderRepository
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
@@ -56,7 +57,7 @@ class BookControllerTest: LibraryControllerTest() {
         deleteBook(book.id!!)
 
         rest.get("/api/library/books/${book.id}") {
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
             .andExpect { status { isNotFound() } }
     }
@@ -145,7 +146,7 @@ class BookControllerTest: LibraryControllerTest() {
     private fun readBook(bookId: Int): BookDTO {
         val body: String = rest.get("/api/library/books/$bookId") {
             accept = APPLICATION_JSON
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
             .andDo { print() }
             .andExpect {
@@ -159,8 +160,8 @@ class BookControllerTest: LibraryControllerTest() {
     private fun updateBook(book: BookDTO) {
         rest.put("/api/library/books/${book.id}") {
             contentType = APPLICATION_JSON
+            header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(book)
-            with(httpBasic(userName, password))
         }
             .andDo { print() }
             .andExpect {
@@ -170,7 +171,7 @@ class BookControllerTest: LibraryControllerTest() {
 
     private fun deleteBook(bookId: Int) {
         rest.delete("/api/library/books/$bookId") {
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
             .andExpect {
                 status { isNoContent() }
@@ -180,7 +181,7 @@ class BookControllerTest: LibraryControllerTest() {
     private fun assertBooks(book: BookDTO) {
         val response = rest.get("/api/library/books") {
             accept = APPLICATION_JSON
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
             .andExpect {
                 status { isOk() }
@@ -199,8 +200,8 @@ class BookControllerTest: LibraryControllerTest() {
         val response = rest.post("/api/library/books/search") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
+            header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(searchCriteria)
-            with(httpBasic(userName, password))
         }
             .andDo { print() }
             .andExpect {
@@ -216,7 +217,7 @@ class BookControllerTest: LibraryControllerTest() {
 
     private fun getBookFeedbacks(bookId: Int): Array<FeedbackDTO> {
         val response = rest.get("/api/library/books/$bookId/feedbacks") {
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
                 .andDo { print() }
                 .andExpect {
@@ -236,8 +237,8 @@ class BookControllerTest: LibraryControllerTest() {
         val response = rest.post("/api/library/books/take") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
+            header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(order)
-            with(httpBasic(userName, password))
         }
             .andDo { print() }
             .andExpect {
@@ -252,8 +253,8 @@ class BookControllerTest: LibraryControllerTest() {
         rest.post("/api/library/books/return") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
+            header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(order)
-            with(httpBasic(userName, password))
         }
             .andDo { print() }
             .andExpect {
