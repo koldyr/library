@@ -14,6 +14,7 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import java.util.Objects.isNull
@@ -23,6 +24,7 @@ import java.util.Objects.nonNull
  * Description of class ReaderServiceImpl
  * @created: 2021-09-28
  */
+@Service
 open class ReaderServiceImpl(
     bookRepository: BookRepository,
     mapper: MapperFacade,

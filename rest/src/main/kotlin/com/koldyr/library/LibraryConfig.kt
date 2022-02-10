@@ -16,16 +16,8 @@ import com.koldyr.library.model.Order
 import com.koldyr.library.model.Reader
 import com.koldyr.library.persistence.AuthorRepository
 import com.koldyr.library.persistence.BookRepository
-import com.koldyr.library.persistence.FeedbackRepository
 import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
-import com.koldyr.library.persistence.RoleRepository
-import com.koldyr.library.services.AuthorService
-import com.koldyr.library.services.AuthorServiceImpl
-import com.koldyr.library.services.BookService
-import com.koldyr.library.services.BookServiceImpl
-import com.koldyr.library.services.ReaderService
-import com.koldyr.library.services.ReaderServiceImpl
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
@@ -44,7 +36,6 @@ import org.springframework.http.HttpMethod.HEAD
 import org.springframework.http.HttpMethod.PATCH
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpMethod.PUT
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
@@ -67,28 +58,7 @@ class LibraryConfig {
 
     @Autowired
     lateinit var orderRepository: OrderRepository
-
-    @Autowired
-    lateinit var feedbackRepository: FeedbackRepository
-
-    @Autowired
-    lateinit var roleRepository: RoleRepository
-
-    @Bean
-    fun readerService(mapper: MapperFacade, encoder: PasswordEncoder): ReaderService {
-        return ReaderServiceImpl(bookRepository, mapper, readerRepository, roleRepository, encoder)
-    }
-
-    @Bean
-    fun bookService(mapper: MapperFacade): BookService {
-        return BookServiceImpl(bookRepository, mapper, authorRepository, orderRepository, feedbackRepository)
-    }
-
-    @Bean
-    fun authorService(mapper: MapperFacade): AuthorService {
-        return AuthorServiceImpl(bookRepository, mapper, authorRepository)
-    }
-
+    
     @Bean
     fun mapper(): MapperFacade {
         val mapperFactory: MapperFactory = DefaultMapperFactory.Builder().build()
