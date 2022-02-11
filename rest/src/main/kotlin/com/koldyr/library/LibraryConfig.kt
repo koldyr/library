@@ -58,30 +58,30 @@ class LibraryConfig {
 
     @Autowired
     lateinit var orderRepository: OrderRepository
-    
+
     @Bean
     fun mapper(): MapperFacade {
         val mapperFactory: MapperFactory = DefaultMapperFactory.Builder().build()
 
         mapperFactory.classMap(Order::class.java, OrderDTO::class.java)
-                .field("reader", "readerId")
-                .byDefault()
-                .register()
+            .field("reader", "readerId")
+            .byDefault()
+            .register()
         mapperFactory.classMap(Book::class.java, BookDTO::class.java)
-                .field("author", "authorId")
-                .byDefault()
-                .register()
+            .field("author", "authorId")
+            .byDefault()
+            .register()
         mapperFactory.classMap(Feedback::class.java, FeedbackDTO::class.java)
-                .field("book", "bookId")
-                .field("reader", "readerId")
-                .byDefault()
-                .register()
+            .field("book", "bookId")
+            .field("reader", "readerId")
+            .byDefault()
+            .register()
         mapperFactory.classMap(Reader::class.java, ReaderDTO::class.java)
-                .byDefault()
-                .register()
+            .byDefault()
+            .register()
         mapperFactory.classMap(Author::class.java, AuthorDTO::class.java)
-                .byDefault()
-                .register()
+            .byDefault()
+            .register()
 
         val converterFactory = mapperFactory.converterFactory
         converterFactory.registerConverter(BookConverter(bookRepository))
@@ -95,10 +95,10 @@ class LibraryConfig {
     @Bean
     fun api(): OpenAPI {
         return OpenAPI()
-                .components(Components())
-                .info(apiInfo())
+            .components(Components())
+            .info(apiInfo())
     }
-    
+
     @Bean
     fun corsConfigurer(): WebMvcConfigurer {
         return object : WebMvcConfigurer {
@@ -113,13 +113,13 @@ class LibraryConfig {
 
     private fun apiInfo(): Info {
         val license = License()
-                .name("Apache 2.0")
-                .url("http://www.apache.org/licenses/LICENSE-2.0")
+            .name("Apache 2.0")
+            .url("http://www.apache.org/licenses/LICENSE-2.0")
         return Info()
-                .title("Library")
-                .description("RESTfull back end for Library SPA")
-                .termsOfService("http://koldyr.com/library/tos")
-                .license(license)
+            .title("Library")
+            .description("RESTfull back end for Library SPA")
+            .termsOfService("http://koldyr.com/library/tos")
+            .license(license)
     }
 }
 

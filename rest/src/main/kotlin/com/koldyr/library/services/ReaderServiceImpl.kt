@@ -25,6 +25,7 @@ import java.util.Objects.nonNull
  * @created: 2021-09-28
  */
 @Service
+@Transactional
 open class ReaderServiceImpl(
     bookRepository: BookRepository,
     mapper: MapperFacade,
@@ -36,8 +37,6 @@ open class ReaderServiceImpl(
     @PreAuthorize("hasAuthority('read_reader')")
     override fun findAll(): List<ReaderDTO> = readerRepository.findAll().map(this::mapReader)
 
-    @Transactional
-    @PreAuthorize("permitAll()")
     override fun create(reader: ReaderDTO): Int {
         if (isEmpty(reader.password)) {
             throw ResponseStatusException(BAD_REQUEST, "Reader password must be provided")
@@ -68,7 +67,6 @@ open class ReaderServiceImpl(
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readeId' is not found") }
     }
 
-    @Transactional
     @PreAuthorize("hasAuthority('modify_reader')")
     override fun update(readeId: Int, reader: Reader) {
         val persisted = readerRepository.findById(readeId)
@@ -82,7 +80,6 @@ open class ReaderServiceImpl(
         readerRepository.save(persisted);
     }
 
-    @Transactional
     @PreAuthorize("hasAuthority('modify_reader')")
     override fun delete(readerId: Int) = readerRepository.deleteById(readerId)
 

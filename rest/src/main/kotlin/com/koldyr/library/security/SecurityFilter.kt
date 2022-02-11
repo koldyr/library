@@ -7,8 +7,10 @@ import com.auth0.jwt.exceptions.JWTVerificationException
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import java.io.IOException
 import javax.servlet.FilterChain
@@ -17,12 +19,13 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 /**
- * Description of class AuthenticationFilter
+ * Description of class SecurityFilter
  * @created: 2022-02-09
  */
-open class AuthenticationFilter(
+open class SecurityFilter(
     secret: String,
-    authenticationManager: AuthenticationManager
+    authenticationManager: AuthenticationManager,
+    private val readerDetailsService: UserDetailsService
 ) : BasicAuthenticationFilter(authenticationManager) {
 
     private val jwtVerifier: JWTVerifier
@@ -49,10 +52,11 @@ open class AuthenticationFilter(
         }
     }
 
-    private fun getAuthentication(token: String): UsernamePasswordAuthenticationToken {
-        val user = jwtVerifier
-            .verify(token.replace("Bearer ", ""))
-            .subject
-        return UsernamePasswordAuthenticationToken(user, null, listOf())
+    private fun getAuthentication(token: String): Authentication {
+        val jwt = jwtVerifier.verify(token.replace("Bearer ", ""))
+        val username = jwt.subject
+
+        val userDetails = readerDetailsService.loadUserByUsername(username)
+        return PreAuthenticatedAuthenticationToken(userDetails, userDetails.password, userDetails.authorities)
     }
 }

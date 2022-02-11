@@ -1,6 +1,6 @@
 package com.koldyr.library
 
-import com.koldyr.library.security.AuthenticationFilter
+import com.koldyr.library.security.SecurityFilter
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -52,7 +52,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
             .antMatchers(POST, "/api/library/login", "/api/library/registration").permitAll()
             .anyRequest().authenticated()
             .and()
-            .addFilter(authorizationFilter())
+            .addFilter(securityFilter())
             .sessionManagement().sessionCreationPolicy(STATELESS)
     }
 
@@ -63,8 +63,8 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     }
 
     @Bean
-    fun authorizationFilter(): AuthenticationFilter {
-        return AuthenticationFilter(secret, authenticationManagerBean())
+    fun securityFilter(): SecurityFilter {
+        return SecurityFilter(secret, authenticationManagerBean(), readerDetailsService)
     }
 
     @Bean
