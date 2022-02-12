@@ -1,13 +1,14 @@
 package com.koldyr.library.controllers
 
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.koldyr.library.controllers.TestDbInitializer.token
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Reader
 import org.junit.Test
+import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
@@ -52,7 +53,7 @@ class ReaderControllerTest : LibraryControllerTest() {
         deleteReader(reader.id!!)
 
         rest.get("/api/library/readers/${reader.id}") {
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isNotFound() } }
     }
@@ -104,7 +105,7 @@ class ReaderControllerTest : LibraryControllerTest() {
 
     private fun getReader(readerId: Int): Reader {
         val response = rest.get("/api/library/readers/${readerId}") {
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
                 .andDo { print() }
                 .andExpect { status { isOk() } }
@@ -116,15 +117,15 @@ class ReaderControllerTest : LibraryControllerTest() {
     private fun updateReader(reader: Reader) {
         rest.put("/api/library/readers/${reader.id}") {
             contentType = APPLICATION_JSON
+            header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(reader)
-            with(httpBasic(userName, password))
         }
                 .andExpect { status { isOk() } }
     }
 
     private fun deleteReader(readerId: Int) {
         rest.delete("/api/library/readers/${readerId}") {
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isNoContent() } }
     }
@@ -132,7 +133,7 @@ class ReaderControllerTest : LibraryControllerTest() {
     private fun getReadersFeedbacks(currentUser: Reader): Array<FeedbackDTO> {
         val response = rest.get("/api/library/readers/${currentUser.id}/feedbacks") {
             accept = APPLICATION_JSON
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
                 .andDo { print() }
                 .andExpect {

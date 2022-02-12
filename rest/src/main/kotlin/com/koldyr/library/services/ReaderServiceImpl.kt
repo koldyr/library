@@ -1,5 +1,7 @@
 package com.koldyr.library.services
 
+import java.util.Objects.isNull
+import java.util.Objects.nonNull
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.ReaderDTO
@@ -14,15 +16,16 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.util.Objects.isNull
-import java.util.Objects.nonNull
 
 /**
  * Description of class ReaderServiceImpl
  * @created: 2021-09-28
  */
+@Service
+@Transactional
 open class ReaderServiceImpl(
     bookRepository: BookRepository,
     mapper: MapperFacade,
@@ -34,23 +37,26 @@ open class ReaderServiceImpl(
     @PreAuthorize("hasAuthority('read_reader')")
     override fun findAll(): List<ReaderDTO> = readerRepository.findAll().map(this::mapReader)
 
-    @Transactional
-    @PreAuthorize("permitAll()")
-    override fun create(reader: Reader): Int {
+    override fun create(reader: ReaderDTO): Int {
         if (isEmpty(reader.password)) {
             throw ResponseStatusException(BAD_REQUEST, "Reader password must be provided")
         }
-
-        if (readerRepository.findByMail(reader.mail).isPresent) {
-            throw ResponseStatusException(BAD_REQUEST, "Reader with mail '${reader.mail}' already exists")
+        if (isEmpty(reader.mail)) {
+            throw ResponseStatusException(BAD_REQUEST, "Reader email must be provided")
         }
 
+        if (readerRepository.findByMail(reader.mail!!).isPresent) {
+            throw ResponseStatusException(BAD_REQUEST, "Reader with mail '${reader.mail}' already exists")
+        }
+        
         reader.id = null
-        reader.roles.clear()
-        reader.roles.add(roleRepository.findAll()[0])
+        val entity = mapper.map(reader, Reader::class.java)
+        
+        entity.roles.clear()
+        entity.roles.add(roleRepository.findAll().sortedBy { it.id }.first() )
+        entity.password = encoder.encode(reader.password)
 
-        reader.password = encoder.encode(reader.password)
-        val saved = readerRepository.save(reader)
+        val saved = readerRepository.save(entity)
         return saved.id!!
     }
 
@@ -61,7 +67,6 @@ open class ReaderServiceImpl(
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readeId' is not found") }
     }
 
-    @Transactional
     @PreAuthorize("hasAuthority('modify_reader')")
     override fun update(readeId: Int, reader: Reader) {
         val persisted = readerRepository.findById(readeId)
@@ -75,7 +80,6 @@ open class ReaderServiceImpl(
         readerRepository.save(persisted);
     }
 
-    @Transactional
     @PreAuthorize("hasAuthority('modify_reader')")
     override fun delete(readerId: Int) = readerRepository.deleteById(readerId)
 

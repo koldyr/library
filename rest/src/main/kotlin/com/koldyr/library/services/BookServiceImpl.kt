@@ -7,43 +7,38 @@ import com.koldyr.library.dto.PageResultDTO
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.model.Book
 import com.koldyr.library.model.Feedback
-import com.koldyr.library.model.Genre
 import com.koldyr.library.model.Order
 import com.koldyr.library.persistence.AuthorRepository
 import com.koldyr.library.persistence.BookRepository
 import com.koldyr.library.persistence.FeedbackRepository
 import com.koldyr.library.persistence.OrderRepository
 import ma.glasnost.orika.MapperFacade
-import org.apache.commons.lang3.ArrayUtils.isNotEmpty
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
-import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDate
-import java.time.LocalDate.of
 import java.time.LocalDateTime
 import java.util.Objects.isNull
 import java.util.Objects.nonNull
-import javax.persistence.criteria.Path
-import javax.persistence.criteria.Predicate
-import kotlin.reflect.full.declaredMemberProperties
 
 /**
  * Description of class BookServiceImpl
  * @created: 2021-09-28
  */
+@Service
 open class BookServiceImpl(
     bookRepository: BookRepository,
     mapper: MapperFacade,
     private val authorRepository: AuthorRepository,
     private val orderRepository: OrderRepository,
     private val feedbackRepository: FeedbackRepository,
+    private val predicateBuilder: PredicateBuilder,
 ) : BookService, BaseLibraryService(bookRepository, mapper) {
 
     @PreAuthorize("hasAuthority('read_book')")
@@ -183,7 +178,7 @@ open class BookServiceImpl(
             return pageResult
         }
 
-        val filter = createFilter(criteria)
+        val filter = predicateBuilder.booksFilter(criteria)
         val pageSelector: Pageable = createPageable(criteria)
         val booksPage = bookRepository.findAll(filter, pageSelector)
 
@@ -194,58 +189,6 @@ open class BookServiceImpl(
         return orderRepository
                 .findOrdersByBookId(bookId)
                 .map(this::mapOrder)
-    }
-
-    private fun hasCriteria(criteria: SearchCriteria?): Boolean {
-        if (criteria == null) {
-            return false
-        }
-        return SearchCriteria::class.declaredMemberProperties
-                .filter { it.name != "page" && it.name != "sort" }
-                .any { nonNull(it.get(criteria)) }
-    }
-
-    private fun createFilter(criteria: SearchCriteria): Specification<Book>? {
-        if (!hasCriteria(criteria)) {
-            return null
-        }
-        return Specification<Book> { book, _, builder ->
-            var filter: Predicate? = null
-            if (nonNull(criteria.title)) {
-                filter = builder.like(builder.lower(book.get("title")), "%${criteria.title?.lowercase()}%")
-            }
-
-            if (isNotEmpty(criteria.genre)) {
-                val values: List<Genre> = criteria.genre!!.filter { nonNull(it) }.map { Genre.valueOf(it.uppercase()) }
-                if (values.isNotEmpty()) {
-                    val genre = book.get<Genre>("genre")
-                    val predicate: Predicate = genre.`in`(values)
-                    filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
-                }
-            }
-
-            if (nonNull(criteria.publisher)) {
-                val publishingHouse = book.get<String>("publishingHouse")
-                val predicate = builder.like(builder.lower(publishingHouse), "%${criteria.publisher?.lowercase()}%")
-                filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
-            }
-
-            if (nonNull(criteria.note)) {
-                val note = book.get<String>("note")
-                val predicate = builder.like(builder.lower(note), "%${criteria.note?.lowercase()}%")
-                filter = if (isNull(filter)) predicate else builder.and(filter, predicate)
-            }
-
-            if (nonNull(criteria.publishYearFrom) || nonNull(criteria.publishYearTill)) {
-                val yearFrom: Int = if (criteria.publishYearFrom == null) 1000 else criteria.publishYearFrom!!
-                val yearTo: Int = if (criteria.publishYearTill == null) 9999 else (criteria.publishYearTill!! + 1)
-                val publicationDate: Path<LocalDate> = book.get("publicationDate")
-                val predicate = builder.between(publicationDate, of(yearFrom, 1, 1), of(yearTo, 1, 1))
-                filter = if (isNull(filter)) predicate else builder.and(predicate)
-            }
-
-            filter
-        }
     }
 
     private fun createPageable(criteria: SearchCriteria): Pageable {

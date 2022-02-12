@@ -1,30 +1,38 @@
-### Get All Readers
-GET http://localhost/api/library/readers
-Authorization: Basic {{BasicHash}}
-
-### Get Specific Reader
-GET http://localhost/api/library/readers/1
-Authorization: Basic {{BasicHash}}
-Accept: application/json
-
-### Create Reader
-POST http://localhost/api/library/readers
-Authorization: Basic {{BasicHash}}
+### Register User
+POST http://localhost/api/library/registration
 Content-Type: application/json
-Accept: application/json
 
 {
   "firstName": "r4_first",
   "lastName": "r4_last",
-  "mail": "r4_mail",
+  "mail": "r4_mail@server.com",
+  "password": "r4_first",
   "address": "r4_address",
   "phoneNumber": "r4-444-444-444",
   "note": "r4_note"
 }
 
+### User Login
+POST http://localhost/api/library/login
+Content-Type: application/json
+
+{
+  "username": "me@koldyr.com",
+  "password": "koldyr"
+}
+
+### Get All Readers
+GET http://localhost/api/library/readers
+Authorization: Bearer {{token}}
+
+### Get Specific Reader
+GET http://localhost/api/library/readers/1
+Authorization: Bearer {{token}}
+Accept: application/json
+
 ### Update Reader
 PUT http://localhost/api/library/readers/3
-Authorization: Basic {{BasicHash}}
+Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
 
@@ -39,14 +47,14 @@ Accept: application/json
 
 ### Delete Reader
 DELETE http://localhost/api/library/readers/1
-Authorization: Basic {{BasicHash}}
+Authorization: Bearer {{token}}
 
 ### Reader Orders
 GET http://localhost/api/library/readers/1/orders?returned=false
-Authorization: Basic {{BasicHash}}
+Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Reader Feedbacks
 GET http://localhost/api/library/readers/1/feedbacks
-Authorization: Basic {{BasicHash}}
+Authorization: Bearer {{token}}
 Accept: application/json

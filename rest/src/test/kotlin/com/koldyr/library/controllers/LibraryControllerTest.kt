@@ -4,34 +4,36 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.Library
 import com.koldyr.library.controllers.TestDbInitializer.dbInitialized
+import com.koldyr.library.controllers.TestDbInitializer.token
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
+import com.koldyr.library.dto.CredentialsDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Genre
 import com.koldyr.library.model.Reader
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.RandomUtils
+import org.h2.tools.RunScript
 import org.hamcrest.Matchers.matchesRegex
 import org.junit.Before
-import org.junit.runner.RunWith
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.LOCATION
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic
 import org.springframework.test.annotation.IfProfileValue
-import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import java.io.BufferedReader
+import java.io.InputStream
 import java.io.InputStreamReader
+import java.lang.ClassLoader.getSystemResourceAsStream
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.sql.DataSource
@@ -39,12 +41,13 @@ import javax.sql.DataSource
 object TestDbInitializer {
     @JvmStatic
     var dbInitialized: Boolean = false
+
+    @JvmStatic
+    var token: String? = null
 }
 
-@RunWith(SpringRunner::class)
 @SpringBootTest(classes = [Library::class])
 @AutoConfigureMockMvc
-
 @IfProfileValue(name = "spring.profiles.active", values = ["int-test"])
 abstract class LibraryControllerTest {
 
@@ -66,34 +69,33 @@ abstract class LibraryControllerTest {
     protected val password: String = ""
 
     @Before
-    fun login() {
+    fun setUp() {
         if (!dbInitialized) {
             insertSupervisor()
             dbInitialized = true
         }
+
+        if (token == null) {
+            token = login(CredentialsDTO(userName, password))
+        }
     }
 
     private fun insertSupervisor() {
-        val template = JdbcTemplate(dataSource)
-
-        ClassLoader.getSystemResourceAsStream("initial-data.sql").use {
-            val sqlCommand = StringBuilder()
-            val reader = BufferedReader(InputStreamReader(it!!))
-            reader.lines().forEach { line ->
-                if (line == null || line.startsWith("--")) {
-                    //do nothing
-                } else {
-                    sqlCommand.append(line).append(' ')
-
-                    if (line.endsWith(";")) {
-                        template.execute(sqlCommand.toString())
-                        logger.info(sqlCommand.toString())
-
-                        sqlCommand.clear()
-                    }
-                }
+        getSystemResourceAsStream("initial-data.sql").use { stream: InputStream? ->
+            BufferedReader(InputStreamReader(stream!!)).use { reader: BufferedReader ->
+                RunScript.execute(dataSource.connection, reader)
+                logger.info("DB initialized")
             }
         }
+    }
+
+    protected fun login(credentials: CredentialsDTO): String {
+        return rest.post("/api/library/login") {
+            contentType = APPLICATION_JSON
+            content = mapper.writeValueAsString(credentials)
+        }
+            .andExpect { status { isOk() } }
+            .andReturn().response.getHeader(AUTHORIZATION)!!
     }
 
     protected fun createAuthor(): AuthorDTO {
@@ -104,8 +106,8 @@ abstract class LibraryControllerTest {
         val authorHeader = rest.post("/api/library/authors") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
+            header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(author)
-            with(httpBasic(userName, password))
         }
                 .andExpect {
                     status { isCreated() }
@@ -121,7 +123,7 @@ abstract class LibraryControllerTest {
 
     protected fun findAllAuthors(): List<AuthorDTO> {
         val response = rest.get("/api/library/authors") {
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
@@ -144,8 +146,8 @@ abstract class LibraryControllerTest {
         val readerHeader = rest.post("/api/library/readers") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
+            header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(reader)
-            with(httpBasic(userName, password))
         }
                 .andExpect {
                     status { isCreated() }
@@ -162,7 +164,7 @@ abstract class LibraryControllerTest {
 
     protected fun findAllReaders(): List<Reader> {
         val response = rest.get("/api/library/readers") {
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
@@ -173,7 +175,7 @@ abstract class LibraryControllerTest {
 
     protected fun getCurrentUser(): Reader {
         val response = rest.get("/api/library/readers/me") {
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
@@ -193,8 +195,8 @@ abstract class LibraryControllerTest {
         val location: String? = rest.post("/api/library/books") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
+            header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(book)
-            with(httpBasic(userName, password))
         }
                 .andDo { print() }
                 .andExpect {
@@ -211,7 +213,7 @@ abstract class LibraryControllerTest {
 
     protected fun findAllBooks(): List<BookDTO> {
         val response = rest.get("/api/library/books") {
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
@@ -229,8 +231,8 @@ abstract class LibraryControllerTest {
         val response = rest.post("/api/library/books/take") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
+            header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(order)
-            with(httpBasic(userName, password))
         }
                 .andExpect {
                     status { isCreated() }
@@ -244,7 +246,7 @@ abstract class LibraryControllerTest {
 
     protected fun getOrdersForReader(reader: Reader): List<OrderDTO> {
         val response = rest.get("/api/library/readers/${reader.id}/orders") {
-            with(httpBasic(userName, password))
+            header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
@@ -263,8 +265,8 @@ abstract class LibraryControllerTest {
         rest.post("/api/library/books/feedback") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
+            header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(feedback)
-            with(httpBasic(userName, password))
         }
                 .andDo { print() }
                 .andExpect {

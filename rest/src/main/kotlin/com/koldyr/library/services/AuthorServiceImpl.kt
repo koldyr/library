@@ -8,9 +8,11 @@ import ma.glasnost.orika.MapperFacade
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 
+@Service
 open class AuthorServiceImpl(
     bookRepository: BookRepository,
     mapper: MapperFacade,

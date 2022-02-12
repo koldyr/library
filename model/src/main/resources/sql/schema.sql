@@ -59,12 +59,12 @@ create sequence SEQ_ORDER start with 1;
 --
 CREATE TABLE T_FEEDBACK
 (
-    feedback_id INTEGER    NOT NULL,
-    reader_id   INTEGER    NOT NULL,
-    book_id     INTEGER    NOT NULL,
-    "DATE"      TIMESTAMP  NOT NULL,
+    feedback_id INTEGER   NOT NULL,
+    reader_id   INTEGER   NOT NULL,
+    book_id     INTEGER   NOT NULL,
+    "DATE"      TIMESTAMP NOT NULL,
     "TEXT"      VARCHAR(255),
-    rate        INTEGER(1) NOT NULL,
+    rate        NUMBER(1) NOT NULL,
     CONSTRAINT PK_FEEDBACK PRIMARY KEY (feedback_id),
     CONSTRAINT FK_FEEDBACK_BOOK FOREIGN KEY (book_id) REFERENCES T_BOOK (book_id),
     CONSTRAINT FK_FEEDBACK_READER FOREIGN KEY (reader_id) REFERENCES T_READER (reader_id)
@@ -74,7 +74,7 @@ create sequence SEQ_FEEDBACK start with 1;
 --
 CREATE TABLE T_ROLE
 (
-    role_id   INT         NOT NULL,
+    role_id   INTEGER     NOT NULL,
     role_name VARCHAR(32) NOT NULL UNIQUE,
     CONSTRAINT PK_ROLE PRIMARY KEY (role_id)
 );
@@ -92,7 +92,7 @@ CREATE TABLE T_READER_ROLES
 --
 CREATE TABLE T_PRIVILEGE
 (
-    privilege_id   INT         NOT NULL,
+    privilege_id   INTEGER     NOT NULL,
     privilege_name VARCHAR(32) NOT NULL UNIQUE,
     CONSTRAINT PK_PRIVILEGE PRIMARY KEY (privilege_id)
 );

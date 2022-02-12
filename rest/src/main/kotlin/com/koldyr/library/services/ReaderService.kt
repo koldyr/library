@@ -10,7 +10,7 @@ import com.koldyr.library.model.Reader
  * @created: 2021-09-28
  */
 interface ReaderService {
-    fun create(reader: Reader): Int
+    fun create(reader: ReaderDTO): Int
     fun findAll(): List<ReaderDTO>
     fun findById(readeId: Int): ReaderDTO
     fun update(readeId: Int, reader: Reader)
