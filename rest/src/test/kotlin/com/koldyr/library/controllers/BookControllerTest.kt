@@ -1,5 +1,9 @@
 package com.koldyr.library.controllers
 
+import java.util.Objects.nonNull
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.controllers.TestDbInitializer.token
 import com.koldyr.library.dto.BookDTO
@@ -11,7 +15,7 @@ import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.dto.SortDTO
 import com.koldyr.library.model.Order
 import com.koldyr.library.persistence.OrderRepository
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -19,10 +23,6 @@ import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
-import java.util.Objects.nonNull
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 /**
  * Description of class BookControllerTest

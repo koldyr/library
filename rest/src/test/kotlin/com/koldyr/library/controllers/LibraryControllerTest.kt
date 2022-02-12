@@ -1,8 +1,14 @@
 package com.koldyr.library.controllers
 
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.lang.ClassLoader.getSystemResourceAsStream
+import java.time.LocalDate
+import java.time.LocalDateTime
+import javax.sql.DataSource
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
-import com.koldyr.library.Library
 import com.koldyr.library.controllers.TestDbInitializer.dbInitialized
 import com.koldyr.library.controllers.TestDbInitializer.token
 import com.koldyr.library.dto.AuthorDTO
@@ -10,13 +16,13 @@ import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.CredentialsDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
+import com.koldyr.library.dto.ReaderDTO
 import com.koldyr.library.model.Genre
-import com.koldyr.library.model.Reader
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.RandomUtils
 import org.h2.tools.RunScript
 import org.hamcrest.Matchers.matchesRegex
-import org.junit.Before
+import org.junit.jupiter.api.BeforeEach
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -30,13 +36,6 @@ import org.springframework.test.annotation.IfProfileValue
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.lang.ClassLoader.getSystemResourceAsStream
-import java.time.LocalDate
-import java.time.LocalDateTime
-import javax.sql.DataSource
 
 object TestDbInitializer {
     @JvmStatic
@@ -46,7 +45,7 @@ object TestDbInitializer {
     var token: String? = null
 }
 
-@SpringBootTest(classes = [Library::class])
+@SpringBootTest
 @AutoConfigureMockMvc
 @IfProfileValue(name = "spring.profiles.active", values = ["int-test"])
 abstract class LibraryControllerTest {
@@ -68,7 +67,7 @@ abstract class LibraryControllerTest {
     @Value("\${library.test.password}")
     protected val password: String = ""
 
-    @Before
+    @BeforeEach
     fun setUp() {
         if (!dbInitialized) {
             insertSupervisor()
@@ -132,9 +131,9 @@ abstract class LibraryControllerTest {
         return mapper.readValue(response, typeRef)
     }
 
-    protected fun createReader(): Reader {
+    protected fun createReader(): ReaderDTO {
         val index = RandomUtils.nextInt(0, 100_000)
-        val reader = Reader()
+        val reader = ReaderDTO()
         reader.firstName = "r${index}_fname"
         reader.lastName = "r${index}_lname"
         reader.mail = "r${index}_mail"
@@ -143,7 +142,7 @@ abstract class LibraryControllerTest {
         reader.note = "r${index}_note"
         reader.password = RandomStringUtils.randomAscii(10)
 
-        val readerHeader = rest.post("/api/library/readers") {
+        val readerHeader = rest.post("/api/library/registration") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
@@ -162,25 +161,25 @@ abstract class LibraryControllerTest {
         return reader
     }
 
-    protected fun findAllReaders(): List<Reader> {
+    protected fun findAllReaders(): List<ReaderDTO> {
         val response = rest.get("/api/library/readers") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
 
-        val typeRef = jacksonTypeRef<List<Reader>>()
+        val typeRef = jacksonTypeRef<List<ReaderDTO>>()
         return mapper.readValue(response, typeRef)
     }
 
-    protected fun getCurrentUser(): Reader {
+    protected fun getCurrentUser(): ReaderDTO {
         val response = rest.get("/api/library/readers/me") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
 
-        return mapper.readValue(response, Reader::class.java)
+        return mapper.readValue(response, ReaderDTO::class.java)
     }
 
     protected fun createBook(author: AuthorDTO): BookDTO {
@@ -244,7 +243,7 @@ abstract class LibraryControllerTest {
         return dto
     }
 
-    protected fun getOrdersForReader(reader: Reader): List<OrderDTO> {
+    protected fun getOrdersForReader(reader: ReaderDTO): List<OrderDTO> {
         val response = rest.get("/api/library/readers/${reader.id}/orders") {
             header(AUTHORIZATION, token!!)
         }
@@ -258,7 +257,7 @@ abstract class LibraryControllerTest {
         return orders
     }
 
-    protected fun createFeedBack(book: BookDTO, reader: Reader) {
+    protected fun createFeedBack(book: BookDTO, reader: ReaderDTO) {
         val rate = RandomUtils.nextInt(0, 10)
         val feedback = FeedbackDTO(null, reader.id, book.id, LocalDateTime.now(), "feedback of reader '${reader.id}' for book '${book.id}'", rate)
 

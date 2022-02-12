@@ -1,19 +1,19 @@
 package com.koldyr.library.controllers
 
+import kotlin.test.assertEquals
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.controllers.TestDbInitializer.token
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import org.apache.commons.lang3.RandomUtils
-import org.junit.Test
+import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 
 /**

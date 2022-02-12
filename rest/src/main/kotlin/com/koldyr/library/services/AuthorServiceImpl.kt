@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 
 @Service
+@Transactional
 open class AuthorServiceImpl(
     bookRepository: BookRepository,
     mapper: MapperFacade,
@@ -28,7 +29,6 @@ open class AuthorServiceImpl(
         return authorRepository.findAll(filter).map { mapper.map(it, AuthorDTO::class.java) }
     }
 
-    @Transactional
     @PreAuthorize("hasAuthority('modify_author')")
     override fun create(author: AuthorDTO): Int {
         author.id = null
@@ -43,7 +43,6 @@ open class AuthorServiceImpl(
         return mapper.map(author, AuthorDTO::class.java)
     }
 
-    @Transactional
     @PreAuthorize("hasAuthority('modify_author')")
     override fun update(authorId: Int, author: AuthorDTO) {
         val persisted = find(authorId)
@@ -54,7 +53,6 @@ open class AuthorServiceImpl(
         authorRepository.save(persisted)
     }
 
-    @Transactional
     @PreAuthorize("hasAuthority('modify_author')")
     override fun delete(authorId: Int) {
         authorRepository.deleteById(authorId)

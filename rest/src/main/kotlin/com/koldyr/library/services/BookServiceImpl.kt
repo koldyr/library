@@ -1,5 +1,8 @@
 package com.koldyr.library.services
 
+import java.time.LocalDateTime
+import java.util.Objects.isNull
+import java.util.Objects.nonNull
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
@@ -23,15 +26,13 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDateTime
-import java.util.Objects.isNull
-import java.util.Objects.nonNull
 
 /**
  * Description of class BookServiceImpl
  * @created: 2021-09-28
  */
 @Service
+@Transactional
 open class BookServiceImpl(
     bookRepository: BookRepository,
     mapper: MapperFacade,
@@ -49,7 +50,6 @@ open class BookServiceImpl(
         return bookRepository.findAll().map(this::mapBook)
     }
 
-    @Transactional
     @PreAuthorize("hasAuthority('modify_book')")
     override fun create(book: BookDTO): Int {
         book.id = null
@@ -65,7 +65,6 @@ open class BookServiceImpl(
         return mapBook(book)
     }
 
-    @Transactional
     @PreAuthorize("hasAuthority('modify_book')")
     override fun update(bookId: Int, book: BookDTO) {
         val persisted = find(bookId)
@@ -75,7 +74,6 @@ open class BookServiceImpl(
         bookRepository.save(persisted)
     }
 
-    @Transactional
     @PreAuthorize("hasAuthority('modify_book')")
     override fun delete(bookId: Int) {
         if (orderRepository.hasOrders(bookId)) {
@@ -84,7 +82,6 @@ open class BookServiceImpl(
         bookRepository.deleteById(bookId)
     }
 
-    @Transactional
     @PreAuthorize("hasAuthority('modify_feedback')")
     override fun feedbackBook(feedback: FeedbackDTO): Int {
         feedback.date = LocalDateTime.now()
@@ -103,7 +100,6 @@ open class BookServiceImpl(
         return feedbackRepository.findAllByBookId(bookId).map { mapper.map(it, FeedbackDTO::class.java) }
     }
 
-    @Transactional
     override fun deleteFeedback(feedbackId: Int) {
         val feedback = feedbackRepository.findById(feedbackId)
                 .orElseThrow { throw ResponseStatusException(NOT_FOUND, "Feedback with id '${feedbackId}' is not found") }
@@ -113,7 +109,6 @@ open class BookServiceImpl(
         }
     }
 
-    @Transactional
     @PreAuthorize("hasAuthority('order_book')")
     override fun takeBook(order: OrderDTO): OrderDTO {
         val book = find(order.bookId!!)
@@ -137,7 +132,6 @@ open class BookServiceImpl(
         return order
     }
 
-    @Transactional
     @PreAuthorize("hasAuthority('order_book')")
     override fun returnBook(order: OrderDTO) {
         val persisted = orderRepository.findById(order.id!!)

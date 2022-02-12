@@ -1,21 +1,21 @@
 package com.koldyr.library.controllers
 
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.controllers.TestDbInitializer.token
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
-import com.koldyr.library.model.Reader
-import org.junit.Test
+import com.koldyr.library.dto.ReaderDTO
+import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 /**
  * Description of class ReaderControllerTest
@@ -25,10 +25,10 @@ class ReaderControllerTest : LibraryControllerTest() {
 
     @Test
     fun readers() {
-        val reader: Reader = createReader()
+        val reader: ReaderDTO = createReader()
         assertNotNull(reader.id)
 
-        var readerFromServer: Reader = getReader(reader.id!!)
+        var readerFromServer: ReaderDTO = getReader(reader.id!!)
         assertEquals(reader, readerFromServer)
 
         reader.firstName = "r1_fname_new"
@@ -103,7 +103,7 @@ class ReaderControllerTest : LibraryControllerTest() {
         }
     }
 
-    private fun getReader(readerId: Int): Reader {
+    private fun getReader(readerId: Int): ReaderDTO {
         val response = rest.get("/api/library/readers/${readerId}") {
             header(AUTHORIZATION, token!!)
         }
@@ -111,10 +111,10 @@ class ReaderControllerTest : LibraryControllerTest() {
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
 
-        return mapper.readValue(response, Reader::class.java)
+        return mapper.readValue(response, ReaderDTO::class.java)
     }
 
-    private fun updateReader(reader: Reader) {
+    private fun updateReader(reader: ReaderDTO) {
         rest.put("/api/library/readers/${reader.id}") {
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
@@ -130,7 +130,7 @@ class ReaderControllerTest : LibraryControllerTest() {
                 .andExpect { status { isNoContent() } }
     }
 
-    private fun getReadersFeedbacks(currentUser: Reader): Array<FeedbackDTO> {
+    private fun getReadersFeedbacks(currentUser: ReaderDTO): Array<FeedbackDTO> {
         val response = rest.get("/api/library/readers/${currentUser.id}/feedbacks") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
