@@ -77,6 +77,7 @@ class LibraryConfig {
             .byDefault()
             .register()
         mapperFactory.classMap(Reader::class.java, ReaderDTO::class.java)
+            .fieldBToA("password", "password")
             .byDefault()
             .register()
         mapperFactory.classMap(Author::class.java, AuthorDTO::class.java)

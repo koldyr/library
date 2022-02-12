@@ -1,5 +1,7 @@
 package com.koldyr.library.services
 
+import java.util.Objects.isNull
+import java.util.Objects.nonNull
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.ReaderDTO
@@ -17,8 +19,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.util.Objects.isNull
-import java.util.Objects.nonNull
 
 /**
  * Description of class ReaderServiceImpl
@@ -53,7 +53,7 @@ open class ReaderServiceImpl(
         val entity = mapper.map(reader, Reader::class.java)
         
         entity.roles.clear()
-        entity.roles.add(roleRepository.findAll()[0])
+        entity.roles.add(roleRepository.findAll().sortedBy { it.id }.first() )
         entity.password = encoder.encode(reader.password)
 
         val saved = readerRepository.save(entity)

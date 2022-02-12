@@ -1,22 +1,23 @@
 package com.koldyr.library.security
 
+import java.io.IOException
+import javax.servlet.FilterChain
+import javax.servlet.ServletException
+import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpServletResponse
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import com.auth0.jwt.exceptions.JWTVerificationException
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
-import java.io.IOException
-import javax.servlet.FilterChain
-import javax.servlet.ServletException
-import javax.servlet.http.HttpServletRequest
-import javax.servlet.http.HttpServletResponse
+import org.springframework.web.server.ResponseStatusException
 
 /**
  * Description of class SecurityFilter
@@ -27,6 +28,8 @@ open class SecurityFilter(
     authenticationManager: AuthenticationManager,
     private val readerDetailsService: UserDetailsService
 ) : BasicAuthenticationFilter(authenticationManager) {
+
+    private val logger: Logger = LoggerFactory.getLogger(javaClass)
 
     private val jwtVerifier: JWTVerifier
 
@@ -47,8 +50,14 @@ open class SecurityFilter(
             val authentication = getAuthentication(header)
             SecurityContextHolder.getContext().authentication = authentication
             chain.doFilter(request, response)
-        } catch (ex: JWTVerificationException) {
-            response.sendError(UNAUTHORIZED.value(), "invalid token")
+        } catch (ex: ResponseStatusException) {
+            throw ex
+        } catch (ex: Exception) {
+            if (ex.cause is ResponseStatusException) {
+                throw ex.cause as ResponseStatusException
+            }
+            logger.error(ex.message, ex)
+            response.sendError(UNAUTHORIZED.value(), ex.toString())
         }
     }
 
@@ -57,6 +66,6 @@ open class SecurityFilter(
         val username = jwt.subject
 
         val userDetails = readerDetailsService.loadUserByUsername(username)
-        return PreAuthenticatedAuthenticationToken(userDetails, userDetails.password, userDetails.authorities)
+        return LibraryAuthentication(userDetails)
     }
 }

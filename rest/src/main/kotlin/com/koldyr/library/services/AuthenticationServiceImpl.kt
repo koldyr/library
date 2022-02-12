@@ -1,5 +1,9 @@
 package com.koldyr.library.services
 
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.Date
+import javax.persistence.EntityNotFoundException
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.koldyr.library.dto.CredentialsDTO
@@ -7,7 +11,7 @@ import com.koldyr.library.dto.ReaderDTO
 import com.koldyr.library.persistence.ReaderRepository
 import ma.glasnost.orika.MapperFacade
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException
@@ -15,10 +19,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.util.Date
-import javax.persistence.EntityNotFoundException
 
 @Service("authenticationService")
 class AuthenticationServiceImpl(
@@ -46,9 +46,9 @@ class AuthenticationServiceImpl(
 
             return "Bearer " + generateToken(login.username!!)
         } catch (e: DisabledException) {
-            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "user is disabled")
+            throw ResponseStatusException(UNAUTHORIZED, "user is disabled")
         } catch (e: BadCredentialsException) {
-            throw ResponseStatusException(HttpStatus.UNAUTHORIZED, "username or password invalid")
+            throw ResponseStatusException(UNAUTHORIZED, "username or password invalid")
         }
     }
 
