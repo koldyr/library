@@ -13,4 +13,6 @@ data class ReaderDTO(
     var phoneNumber: String? = null
     var note: String? = null
     var roles: MutableSet<Role> = mutableSetOf()
+
+    constructor() : this(null, null, null, null)
 }
