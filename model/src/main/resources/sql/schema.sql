@@ -27,17 +27,37 @@ CREATE TABLE IF NOT EXISTS T_BOOK
 create sequence SEQ_BOOK start with 1;
 
 --
+CREATE TABLE IF NOT EXISTS T_GENRE
+(
+    genre_id   INTEGER      NOT NULL,
+    genre_name VARCHAR(255) NOT NULL,
+    CONSTRAINT PK_GENRE PRIMARY KEY (genre_id),
+    CONSTRAINT UC_GENRE_NAME UNIQUE (genre_name)
+);
+
+--
+CREATE TABLE IF NOT EXISTS T_BOOK_GENRE
+(
+    book_id  INTEGER NOT NULL,
+    genre_id INTEGER NOT NULL,
+    CONSTRAINT PK_BOOK_GENRE PRIMARY KEY (genre_id, book_id),
+    CONSTRAINT FK_BOOK_GENRE FOREIGN KEY (book_id) REFERENCES T_BOOK (book_id),
+    CONSTRAINT FK_GENRE FOREIGN KEY (genre_id) REFERENCES T_GENRE (genre_id)
+);
+
+--
 CREATE TABLE T_READER
 (
     reader_id    INTEGER      NOT NULL,
     first_name   VARCHAR(255) NOT NULL,
     last_name    VARCHAR(255),
-    mail         VARCHAR(255) NOT NULL UNIQUE,
+    mail         VARCHAR(255) NOT NULL,
     address      VARCHAR(255),
     phone_number VARCHAR(255),
     note         VARCHAR(255),
     password     VARCHAR(255) NOT NULL,
-    CONSTRAINT PK_READER PRIMARY KEY (reader_id)
+    CONSTRAINT PK_READER PRIMARY KEY (reader_id),
+    CONSTRAINT UC_READER_MAIL UNIQUE (mail)
 );
 create sequence SEQ_READER start with 1;
 
@@ -63,7 +83,7 @@ CREATE TABLE T_FEEDBACK
     reader_id   INTEGER   NOT NULL,
     book_id     INTEGER   NOT NULL,
     "DATE"      TIMESTAMP NOT NULL,
-    "TEXT"      VARCHAR(255),
+    "TEXT"      VARCHAR(4000),
     rate        NUMBER(1) NOT NULL,
     CONSTRAINT PK_FEEDBACK PRIMARY KEY (feedback_id),
     CONSTRAINT FK_FEEDBACK_BOOK FOREIGN KEY (book_id) REFERENCES T_BOOK (book_id),

@@ -3,7 +3,8 @@ package com.koldyr.library.services
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.model.Book
 import com.koldyr.library.model.Genre
-import org.apache.commons.lang3.ArrayUtils.isNotEmpty
+import com.koldyr.library.model.GenreNames
+import org.apache.commons.lang3.ObjectUtils.isNotEmpty
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Component
 import java.time.LocalDate
@@ -32,11 +33,12 @@ class PredicateBuilder {
                 filters.add(predicate)
             }
 
-            if (isNotEmpty(criteria.genre)) {
-                val values: List<Genre> = criteria.genre!!.filter { nonNull(it) }.map { Genre.valueOf(it.uppercase()) }
+            if (isNotEmpty(criteria.genres)) {
+                val values: List<GenreNames> = criteria.genres!!.filter { nonNull(it) }.map { GenreNames.valueOf(it.uppercase()) }
                 if (values.isNotEmpty()) {
-                    val genre = book.get<Genre>("genre")
-                    val predicate = genre.`in`(values)
+                    val genres = book.join<Book, Genre>("genres")
+                    val name = genres.get<String>("name")
+                    val predicate = name.`in`(values)
                     filters.add(predicate)
                 }
             }

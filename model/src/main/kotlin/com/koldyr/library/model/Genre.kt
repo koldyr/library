@@ -1,28 +1,17 @@
 package com.koldyr.library.model
 
-enum class Genre {
-    FANTASY,
-    SCIFI,
-    HISTORY,
-    ACTION,
-    CLASSICS,
-    COMICS,
-    DETECTIVE,
-    MYSTERY,
-    HORROR,
-    BIOGRAPHY,
-    AUTOBIOGRAPHY,
-    ECONOMICS,
-    COOKBOOK,
-    DIARY,
-    DICTIONARY,
-    CRIME,
-    DRAMA,
-    HUMOR,
-    PHILOSOPHY,
-    POETRY,
-    ROMANCE,
-    THRILLER,
-    WESTERN,
-    SCIENCE
-}
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.Id
+import javax.persistence.Table
+
+@Entity
+@Table(name = "T_GENRE")
+data class Genre (
+    @Id
+    @Column(name = "GENRE_ID")
+    var id: Int? = null,
+
+    @Column(name = "GENRE_NAME", nullable = false, unique = true)
+    var name: String? = null
+)

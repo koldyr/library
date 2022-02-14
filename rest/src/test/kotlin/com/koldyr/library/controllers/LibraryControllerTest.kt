@@ -1,12 +1,5 @@
 package com.koldyr.library.controllers
 
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.lang.ClassLoader.getSystemResourceAsStream
-import java.time.LocalDate
-import java.time.LocalDateTime
-import javax.sql.DataSource
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.controllers.TestDbInitializer.dbInitialized
@@ -17,7 +10,7 @@ import com.koldyr.library.dto.CredentialsDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.ReaderDTO
-import com.koldyr.library.model.Genre
+import com.koldyr.library.model.GenreNames
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.RandomUtils
 import org.h2.tools.RunScript
@@ -36,6 +29,13 @@ import org.springframework.test.annotation.IfProfileValue
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.lang.ClassLoader.getSystemResourceAsStream
+import java.time.LocalDate
+import java.time.LocalDateTime
+import javax.sql.DataSource
 
 object TestDbInitializer {
     @JvmStatic
@@ -185,11 +185,11 @@ abstract class LibraryControllerTest {
     protected fun createBook(author: AuthorDTO): BookDTO {
         val index = RandomUtils.nextInt(0, 100_000)
         val count = RandomUtils.nextInt(1, 10)
-        val genre = RandomUtils.nextInt(0, Genre.values().size - 1)
+        val genres = getGenres()
         val year = RandomUtils.nextInt(1900, 2021)
 
         val publicationDate = LocalDate.of(year, 1, 1)
-        val book = BookDTO(null, "title $index", author.id, Genre.values()[genre], "house $index", publicationDate, "cover $index", "note $index", count)
+        val book = BookDTO(null, "title $index", author.id, genres, "house $index", publicationDate, "cover $index", "note $index", count)
 
         val location: String? = rest.post("/api/library/books") {
             accept = APPLICATION_JSON
@@ -272,5 +272,18 @@ abstract class LibraryControllerTest {
                     status { isCreated() }
                     header { string(LOCATION, matchesRegex("/api/library/books/[\\d]+/feedbacks")) }
                 }
+    }
+
+    private fun getGenres(): Set<String> {
+        val genres = mutableSetOf<String>()
+
+        val count = (2..5).random()
+        var i = 0
+        while (i < count) {
+            val index = (1 until GenreNames.values().size).random()
+            genres.add(GenreNames.values()[index].name)
+            i++
+        }
+        return genres
     }
 }

@@ -48,3 +48,52 @@ values (2, 9);
 
 insert into T_READER_ROLES (READER_ID, ROLE_ID)
 values (1, 2);
+
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (0, 'FANTASY');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (1, 'SCIFI');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (2, 'HISTORY');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (3, 'ACTION');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (4, 'CLASSICS');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (5, 'COMICS');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (6, 'DETECTIVE');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (7, 'MYSTERY');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (8, 'HORROR');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (9, 'BIOGRAPHY');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (10, 'AUTOBIOGRAPHY');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (11, 'ECONOMICS');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (12, 'COOKBOOK');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (13, 'DIARY');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (14, 'DICTIONARY');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (15, 'CRIME');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (16, 'DRAMA');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (17, 'HUMOR');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (18, 'PHILOSOPHY');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (19, 'POETRY');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (20, 'ROMANCE');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (21, 'THRILLER');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (22, 'WESTERN');
+insert into T_GENRE (GENRE_ID, GENRE_NAME)
+values (23, 'SCIENCE');

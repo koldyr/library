@@ -1,14 +1,16 @@
 package com.koldyr.library.model
 
 import java.time.LocalDate
+import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.EnumType
-import javax.persistence.Enumerated
+import javax.persistence.FetchType.EAGER
 import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.*
+import javax.persistence.GenerationType.SEQUENCE
 import javax.persistence.Id
 import javax.persistence.JoinColumn
+import javax.persistence.JoinTable
+import javax.persistence.ManyToMany
 import javax.persistence.ManyToOne
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
@@ -37,8 +39,13 @@ class Book() {
     @Column(columnDefinition = "DATE")
     var publicationDate: LocalDate? = null
 
-    @Enumerated(EnumType.STRING)
-    var genre: Genre? = null
+    @ManyToMany(cascade = [CascadeType.PERSIST], fetch = EAGER)
+    @JoinTable(
+        name = "T_BOOK_GENRE",
+        joinColumns = [JoinColumn(name = "book_id", referencedColumnName = "book_id")],
+        inverseJoinColumns = [JoinColumn(name = "genre_id", referencedColumnName = "genre_id")]
+    )
+    var genres: MutableSet<Genre> = mutableSetOf()
 
     var bookCover: String? = null
 
