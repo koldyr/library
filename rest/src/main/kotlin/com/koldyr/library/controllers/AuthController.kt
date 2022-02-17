@@ -1,5 +1,6 @@
 package com.koldyr.library.controllers
 
+import java.net.URI
 import com.koldyr.library.dto.CredentialsDTO
 import com.koldyr.library.dto.ReaderDTO
 import com.koldyr.library.services.AuthenticationService
@@ -15,7 +16,6 @@ import org.springframework.http.ResponseEntity.ok
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
-import java.net.URI
 
 /**
  * Description of class AuthController
@@ -34,13 +34,13 @@ class AuthController(
             ApiResponse(responseCode = "201", description = "User created"),
             ApiResponse(responseCode = "400", description = "Wrong data for user")]
     )
-    @PostMapping(path = ["/api/library/registration"], consumes = [APPLICATION_JSON_VALUE])
+    @PostMapping(path = ["/library/registration"], consumes = [APPLICATION_JSON_VALUE])
     fun create(@RequestBody reader: ReaderDTO): ResponseEntity<Void> {
         val readerId = readerService.create(reader)
-        return created(URI.create("/api/library/readers/$readerId")).build()
+        return created(URI.create("/library/readers/$readerId")).build()
     }
 
-    @PostMapping(path = ["/api/library/login"], consumes = [APPLICATION_JSON_VALUE])
+    @PostMapping(path = ["/library/login"], consumes = [APPLICATION_JSON_VALUE])
     fun login(@RequestBody credentials: CredentialsDTO): ResponseEntity<Unit> {
         val token = authenticationService.login(credentials)
         return ok().header(AUTHORIZATION, token).build()

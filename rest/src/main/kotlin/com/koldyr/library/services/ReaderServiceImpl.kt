@@ -68,7 +68,7 @@ open class ReaderServiceImpl(
     }
 
     @PreAuthorize("hasAuthority('modify_reader')")
-    override fun update(readeId: Int, reader: Reader) {
+    override fun update(readeId: Int, reader: ReaderDTO) {
         val persisted = readerRepository.findById(readeId)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readeId' is not found") }
 

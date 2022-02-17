@@ -42,7 +42,7 @@ class AuthorControllerTest : LibraryControllerTest() {
 
         deleteAuthor(author.id!!)
 
-        rest.get("/api/library/authors/${author.id}") {
+        rest.get("/library/authors/${author.id}") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isNotFound() } }
@@ -57,7 +57,7 @@ class AuthorControllerTest : LibraryControllerTest() {
         books.add(createBook(author))
         books.add(createBook(author))
 
-        val body: String = rest.get("/api/library/authors/${author.id}/books") {
+        val body: String = rest.get("/library/authors/${author.id}/books") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
         }
@@ -89,7 +89,7 @@ class AuthorControllerTest : LibraryControllerTest() {
         val author = authors[RandomUtils.nextInt(0, authors.size - 1)]
         val firstName = author.firstName
 
-        val body: String = rest.get("/api/library/authors") {
+        val body: String = rest.get("/library/authors") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
             param("search", firstName!!)
@@ -107,7 +107,7 @@ class AuthorControllerTest : LibraryControllerTest() {
     }
 
     private fun getAuthor(authorId: Int): AuthorDTO {
-        val body: String = rest.get("/api/library/authors/$authorId") {
+        val body: String = rest.get("/library/authors/$authorId") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
         }
@@ -123,7 +123,7 @@ class AuthorControllerTest : LibraryControllerTest() {
     }
 
     private fun updateAuthor(author: AuthorDTO) {
-        rest.put("/api/library/authors/${author.id}") {
+        rest.put("/library/authors/${author.id}") {
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(author)
@@ -135,7 +135,7 @@ class AuthorControllerTest : LibraryControllerTest() {
     }
 
     private fun deleteAuthor(authorId: Int) {
-        rest.delete("/api/library/authors/$authorId") {
+        rest.delete("/library/authors/$authorId") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect {

@@ -1,5 +1,6 @@
 package com.koldyr.library.controllers
 
+import java.net.URI
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.services.AuthorService
@@ -19,14 +20,13 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import java.net.URI
 
 /**
  * Description of class AuthorController
  * @created: 2021-10-06
  */
 @RestController
-@RequestMapping("/api/library/authors")
+@RequestMapping("/library/authors")
 class AuthorController(
         private val authorService: AuthorService,
         private val bookService: BookService) {
@@ -43,7 +43,7 @@ class AuthorController(
     fun create(@RequestBody author: AuthorDTO): ResponseEntity<Unit> {
         val authorId: Int = authorService.create(author)
 
-        val uri = URI.create("/api/library/authors/$authorId")
+        val uri = URI.create("/library/authors/$authorId")
         return created(uri).build()
     }
 

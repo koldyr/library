@@ -32,7 +32,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     lateinit var readerDetailsService: UserDetailsService
 
     override fun configure(web: WebSecurity) {
-        web.ignoring().antMatchers("/api/library/login", "/api/library/registration")
+        web.ignoring().antMatchers("/library/login", "/library/registration")
     }
 
     override fun configure(auth: AuthenticationManagerBuilder) {
@@ -49,7 +49,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
             .cors()
             .and()
             .authorizeRequests()
-            .antMatchers(POST, "/api/library/login", "/api/library/registration").permitAll()
+            .antMatchers(POST, "/library/login", "/library/registration").permitAll()
             .anyRequest().authenticated()
             .and()
             .addFilter(securityFilter())

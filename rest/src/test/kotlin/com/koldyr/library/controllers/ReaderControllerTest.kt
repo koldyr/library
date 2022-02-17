@@ -52,7 +52,7 @@ class ReaderControllerTest : LibraryControllerTest() {
 
         deleteReader(reader.id!!)
 
-        rest.get("/api/library/readers/${reader.id}") {
+        rest.get("/library/readers/${reader.id}") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isNotFound() } }
@@ -104,7 +104,7 @@ class ReaderControllerTest : LibraryControllerTest() {
     }
 
     private fun getReader(readerId: Int): ReaderDTO {
-        val response = rest.get("/api/library/readers/${readerId}") {
+        val response = rest.get("/library/readers/${readerId}") {
             header(AUTHORIZATION, token!!)
         }
                 .andDo { print() }
@@ -115,7 +115,7 @@ class ReaderControllerTest : LibraryControllerTest() {
     }
 
     private fun updateReader(reader: ReaderDTO) {
-        rest.put("/api/library/readers/${reader.id}") {
+        rest.put("/library/readers/${reader.id}") {
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(reader)
@@ -124,14 +124,14 @@ class ReaderControllerTest : LibraryControllerTest() {
     }
 
     private fun deleteReader(readerId: Int) {
-        rest.delete("/api/library/readers/${readerId}") {
+        rest.delete("/library/readers/${readerId}") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isNoContent() } }
     }
 
     private fun getReadersFeedbacks(currentUser: ReaderDTO): Array<FeedbackDTO> {
-        val response = rest.get("/api/library/readers/${currentUser.id}/feedbacks") {
+        val response = rest.get("/library/readers/${currentUser.id}/feedbacks") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
         }

@@ -1,5 +1,12 @@
 package com.koldyr.library.controllers
 
+import java.io.BufferedReader
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.lang.ClassLoader.getSystemResourceAsStream
+import java.time.LocalDate
+import java.time.LocalDateTime
+import javax.sql.DataSource
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.controllers.TestDbInitializer.dbInitialized
@@ -29,13 +36,6 @@ import org.springframework.test.annotation.IfProfileValue
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
-import java.io.BufferedReader
-import java.io.InputStream
-import java.io.InputStreamReader
-import java.lang.ClassLoader.getSystemResourceAsStream
-import java.time.LocalDate
-import java.time.LocalDateTime
-import javax.sql.DataSource
 
 object TestDbInitializer {
     @JvmStatic
@@ -89,7 +89,7 @@ abstract class LibraryControllerTest {
     }
 
     protected fun login(credentials: CredentialsDTO): String {
-        return rest.post("/api/library/login") {
+        return rest.post("/library/login") {
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(credentials)
         }
@@ -102,7 +102,7 @@ abstract class LibraryControllerTest {
         val year = RandomUtils.nextInt(1900, 2000)
         val author = AuthorDTO(null, "a${index}_name", "a${index}_last", LocalDate.of(year, 1, 1))
 
-        val authorHeader = rest.post("/api/library/authors") {
+        val authorHeader = rest.post("/library/authors") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
@@ -113,7 +113,7 @@ abstract class LibraryControllerTest {
                 }
                 .andReturn().response.getHeader(LOCATION)
 
-        val regex = Regex("/api/library/authors/(\\d+)")
+        val regex = Regex("/library/authors/(\\d+)")
         val matchResult = regex.find(authorHeader!!)
         author.id = matchResult?.groups?.get(1)?.value?.toInt()
 
@@ -121,7 +121,7 @@ abstract class LibraryControllerTest {
     }
 
     protected fun findAllAuthors(): List<AuthorDTO> {
-        val response = rest.get("/api/library/authors") {
+        val response = rest.get("/library/authors") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isOk() } }
@@ -142,7 +142,7 @@ abstract class LibraryControllerTest {
         reader.note = "r${index}_note"
         reader.password = RandomStringUtils.randomAscii(10)
 
-        val readerHeader = rest.post("/api/library/registration") {
+        val readerHeader = rest.post("/library/registration") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
@@ -150,11 +150,11 @@ abstract class LibraryControllerTest {
         }
                 .andExpect {
                     status { isCreated() }
-                    header { string(LOCATION, matchesRegex("/api/library/readers/[\\d]+")) }
+                    header { string(LOCATION, matchesRegex("/library/readers/[\\d]+")) }
                 }
                 .andReturn().response.getHeader(LOCATION)
 
-        val regex = Regex("/api/library/readers/(\\d+)")
+        val regex = Regex("/library/readers/(\\d+)")
         val matchResult = regex.find(readerHeader!!)
         reader.id = matchResult?.groups?.get(1)?.value?.toInt()
 
@@ -162,7 +162,7 @@ abstract class LibraryControllerTest {
     }
 
     protected fun findAllReaders(): List<ReaderDTO> {
-        val response = rest.get("/api/library/readers") {
+        val response = rest.get("/library/readers") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isOk() } }
@@ -173,7 +173,7 @@ abstract class LibraryControllerTest {
     }
 
     protected fun getCurrentUser(): ReaderDTO {
-        val response = rest.get("/api/library/readers/me") {
+        val response = rest.get("/library/readers/me") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isOk() } }
@@ -191,7 +191,7 @@ abstract class LibraryControllerTest {
         val publicationDate = LocalDate.of(year, 1, 1)
         val book = BookDTO(null, "title $index", author.id, genres, "house $index", publicationDate, "cover $index", "note $index", count)
 
-        val location: String? = rest.post("/api/library/books") {
+        val location: String? = rest.post("/library/books") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
@@ -200,18 +200,18 @@ abstract class LibraryControllerTest {
                 .andDo { print() }
                 .andExpect {
                     status { isCreated() }
-                    header { string(LOCATION, matchesRegex("/api/library/books/[\\d]+")) }
+                    header { string(LOCATION, matchesRegex("/library/books/[\\d]+")) }
                 }
                 .andReturn().response.getHeader(LOCATION)
 
-        val regex = Regex("/api/library/books/(\\d+)")
+        val regex = Regex("/library/books/(\\d+)")
         val matchResult = regex.find(location!!)
         book.id = matchResult?.groups?.get(1)?.value?.toInt()
         return book
     }
 
     protected fun findAllBooks(): List<BookDTO> {
-        val response = rest.get("/api/library/books") {
+        val response = rest.get("/library/books") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isOk() } }
@@ -227,7 +227,7 @@ abstract class LibraryControllerTest {
         order.readerId = readerId
         order.notes = "reader '$readerId' took '$bookId' book"
 
-        val response = rest.post("/api/library/books/take") {
+        val response = rest.post("/library/books/take") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
@@ -244,7 +244,7 @@ abstract class LibraryControllerTest {
     }
 
     protected fun getOrdersForReader(reader: ReaderDTO): List<OrderDTO> {
-        val response = rest.get("/api/library/readers/${reader.id}/orders") {
+        val response = rest.get("/library/readers/${reader.id}/orders") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isOk() } }
@@ -261,7 +261,7 @@ abstract class LibraryControllerTest {
         val rate = RandomUtils.nextInt(0, 10)
         val feedback = FeedbackDTO(null, reader.id, book.id, LocalDateTime.now(), "feedback of reader '${reader.id}' for book '${book.id}'", rate)
 
-        rest.post("/api/library/books/feedback") {
+        rest.post("/library/books/feedback") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
@@ -270,7 +270,7 @@ abstract class LibraryControllerTest {
                 .andDo { print() }
                 .andExpect {
                     status { isCreated() }
-                    header { string(LOCATION, matchesRegex("/api/library/books/[\\d]+/feedbacks")) }
+                    header { string(LOCATION, matchesRegex("/library/books/[\\d]+/feedbacks")) }
                 }
     }
 

@@ -1,5 +1,7 @@
 package com.koldyr.library.controllers
 
+import java.net.URI
+import java.util.Objects.isNull
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
@@ -24,8 +26,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
-import java.net.URI
-import java.util.Objects.isNull
 
 
 /**
@@ -33,7 +33,7 @@ import java.util.Objects.isNull
  * @created: 2021-09-25
  */
 @RestController
-@RequestMapping("/api/library/books")
+@RequestMapping("/library/books")
 class BookController(private val bookService: BookService) {
 
     @GetMapping(produces = [APPLICATION_JSON_VALUE])
@@ -46,7 +46,7 @@ class BookController(private val bookService: BookService) {
     fun create(@RequestBody book: BookDTO): ResponseEntity<Unit> {
         val bookId = bookService.create(book)
 
-        val uri = URI.create("/api/library/books/${bookId}")
+        val uri = URI.create("/library/books/${bookId}")
         return created(uri).build()
     }
 
@@ -93,7 +93,7 @@ class BookController(private val bookService: BookService) {
 
         bookService.feedbackBook(feedback)
 
-        val uri = URI.create("/api/library/books/${feedback.bookId}/feedbacks")
+        val uri = URI.create("/library/books/${feedback.bookId}/feedbacks")
         return created(uri).build()
     }
 

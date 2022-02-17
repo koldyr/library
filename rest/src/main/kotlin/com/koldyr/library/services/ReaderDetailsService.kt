@@ -13,10 +13,9 @@ import org.springframework.stereotype.Service
 class ReaderDetailsService(private val readerRepository: ReaderRepository) : UserDetailsService {
 
     override fun loadUserByUsername(email: String): UserDetails {
-        val reader = readerRepository.findByMail(email)
-                .orElseThrow { UsernameNotFoundException("Reader with email '$email' is not found") }
-
-        return mapUserDetails(reader)
+        return readerRepository.findByMail(email)
+            .map(this::mapUserDetails)
+            .orElseThrow { UsernameNotFoundException("Reader with email '$email' is not found") }
     }
     
     private fun mapUserDetails(reader: Reader): ReaderDetails {

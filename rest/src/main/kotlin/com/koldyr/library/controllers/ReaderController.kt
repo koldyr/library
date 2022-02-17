@@ -3,7 +3,6 @@ package com.koldyr.library.controllers
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.ReaderDTO
-import com.koldyr.library.model.Reader
 import com.koldyr.library.services.ReaderService
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
@@ -23,14 +22,14 @@ import org.springframework.web.bind.annotation.RestController
  * @created: 2021-09-25
  */
 @RestController
-@RequestMapping("/api/library/readers")
+@RequestMapping("/library/readers")
 class ReaderController(private val readerService: ReaderService) {
 
     @GetMapping(produces = [APPLICATION_JSON_VALUE])
     fun readers(): Collection<ReaderDTO> = readerService.findAll()
 
     @PutMapping("/{readerId}", consumes = [APPLICATION_JSON_VALUE])
-    fun update(@PathVariable readerId: Int, @RequestBody reader: Reader): ResponseEntity<Unit> {
+    fun update(@PathVariable readerId: Int, @RequestBody reader: ReaderDTO): ResponseEntity<Unit> {
         readerService.update(readerId, reader)
         return ok().build()
     }
