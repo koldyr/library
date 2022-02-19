@@ -20,10 +20,6 @@ class ReaderDetails(reader: Reader, private val authorities: Set<GrantedPrivileg
         return id
     }
 
-    fun getRoles(): Set<String> {
-        return authorities.map { it.role }.toSet()
-    }
-
     override fun getAuthorities(): Collection<GrantedAuthority> {
         return authorities
     }
@@ -54,5 +50,9 @@ class ReaderDetails(reader: Reader, private val authorities: Set<GrantedPrivileg
 
     fun hasAuthority(authority: String): Boolean {
         return authorities.any { it.authority == authority }
+    }
+
+    fun hasRole(role: String): Boolean {
+        return authorities.any { it.role == role }
     }
 }

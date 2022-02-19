@@ -1,9 +1,8 @@
 package com.koldyr.library.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType.*
+import javax.persistence.FetchType.EAGER
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.JoinTable
@@ -15,7 +14,6 @@ import javax.persistence.Table
 class Role {
     @Id
     @Column(name = "ROLE_ID")
-    @JsonIgnore
     var id: Int? = null
 
     @Column(name = "ROLE_NAME", nullable = false, unique = true)
@@ -26,7 +24,6 @@ class Role {
             name = "T_ROLE_PRIVILEGES",
             joinColumns = [JoinColumn(name = "role_id", referencedColumnName = "ROLE_ID")],
             inverseJoinColumns = [JoinColumn(name = "privilege_id", referencedColumnName = "PRIVILEGE_ID")])
-    @JsonIgnore
     var privileges: Set<Privilege> = setOf()
 
     override fun equals(other: Any?): Boolean {

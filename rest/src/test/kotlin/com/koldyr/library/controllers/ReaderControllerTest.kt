@@ -31,12 +31,13 @@ class ReaderControllerTest : LibraryControllerTest() {
         var readerFromServer: ReaderDTO = getReader(reader.id!!)
         assertEquals(reader, readerFromServer)
 
-        reader.firstName = "r1_fname_new"
-        reader.lastName = "r1_lname_new"
-        reader.mail = "r1_mail_new"
-        reader.address = "r1_address_new"
-        reader.phoneNumber = "r1_phone_new"
-        reader.note = "r1_note_new"
+        val index = (1 until 10).random()
+        reader.firstName = "r1_fname_$index"
+        reader.lastName = "r1_lname_$index"
+        reader.mail = "r1_mail_$index"
+        reader.address = "r1_address_$index"
+        reader.phoneNumber = "r1_phone_$index"
+        reader.note = "r1_note_$index"
 
         updateReader(reader)
 
@@ -56,6 +57,33 @@ class ReaderControllerTest : LibraryControllerTest() {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isNotFound() } }
+    }
+
+    @Test
+    fun roles() {
+        val reader: ReaderDTO = createReader()
+        assertNotNull(reader.id)
+
+        var readerFromServer: ReaderDTO = getReader(reader.id!!)
+        assertEquals(reader, readerFromServer)
+        assertEquals(1, readerFromServer.roles.size)
+        assertEquals("reader", readerFromServer.roles.first())
+
+        val index = (10 until 20).random()
+        reader.firstName = "r1_fname_$index"
+        reader.lastName = "r1_lname_$index"
+        reader.mail = "r1_mail_$index"
+        reader.address = "r1_address_$index"
+        reader.phoneNumber = "r1_phone_$index"
+        reader.note = "r1_note_$index"
+        reader.roles = mutableSetOf("librarian")
+
+        updateReader(reader)
+
+        readerFromServer = getReader(reader.id!!)
+        assertEquals(reader, readerFromServer)
+        assertEquals(1, readerFromServer.roles.size)
+        assertEquals("librarian", readerFromServer.roles.first())
     }
 
     @Test

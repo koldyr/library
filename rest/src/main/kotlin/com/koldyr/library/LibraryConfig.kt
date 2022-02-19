@@ -10,6 +10,7 @@ import com.koldyr.library.mapper.BookConverter
 import com.koldyr.library.mapper.GenreConverter
 import com.koldyr.library.mapper.OrderConverter
 import com.koldyr.library.mapper.ReaderConverter
+import com.koldyr.library.mapper.RoleConverter
 import com.koldyr.library.model.Author
 import com.koldyr.library.model.Book
 import com.koldyr.library.model.Feedback
@@ -20,6 +21,7 @@ import com.koldyr.library.persistence.BookRepository
 import com.koldyr.library.persistence.GenreRepository
 import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
+import com.koldyr.library.persistence.RoleRepository
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
@@ -64,6 +66,9 @@ class LibraryConfig {
     @Autowired
     lateinit var genreRepository: GenreRepository
 
+    @Autowired
+    lateinit var roleRepository: RoleRepository
+
     @Bean
     fun mapper(): MapperFacade {
         val mapperFactory: MapperFactory = DefaultMapperFactory.Builder().build()
@@ -95,6 +100,7 @@ class LibraryConfig {
         converterFactory.registerConverter(ReaderConverter(readerRepository))
         converterFactory.registerConverter(OrderConverter(orderRepository))
         converterFactory.registerConverter(GenreConverter(genreRepository))
+        converterFactory.registerConverter(RoleConverter(roleRepository))
 
         return mapperFactory.mapperFacade
     }

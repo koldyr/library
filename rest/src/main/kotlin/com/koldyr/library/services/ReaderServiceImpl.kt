@@ -18,6 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import org.springframework.util.CollectionUtils
 import org.springframework.web.server.ResponseStatusException
 
 /**
@@ -48,12 +49,13 @@ open class ReaderServiceImpl(
         if (readerRepository.findByMail(reader.mail!!).isPresent) {
             throw ResponseStatusException(BAD_REQUEST, "Reader with mail '${reader.mail}' already exists")
         }
-        
+
         reader.id = null
         val entity = mapper.map(reader, Reader::class.java)
-        
-        entity.roles.clear()
-        entity.roles.add(roleRepository.findAll().sortedBy { it.id }.first() )
+
+        if (CollectionUtils.isEmpty(entity.roles)) {
+            entity.roles.add(roleRepository.findByName("reader").get())
+        }
         entity.password = encoder.encode(reader.password)
 
         val saved = readerRepository.save(entity)
@@ -63,19 +65,25 @@ open class ReaderServiceImpl(
     @PreAuthorize("hasAuthority('read_reader')")
     override fun findById(readeId: Int): ReaderDTO {
         return readerRepository.findById(readeId)
-                .map(this::mapReader)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readeId' is not found") }
+            .map(this::mapReader)
+            .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readeId' is not found") }
     }
 
     @PreAuthorize("hasAuthority('modify_reader')")
     override fun update(readeId: Int, reader: ReaderDTO) {
         val persisted = readerRepository.findById(readeId)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readeId' is not found") }
+            .orElseThrow { ResponseStatusException(NOT_FOUND, "Reader with id '$readeId' is not found") }
 
+        val roles = persisted.roles
         reader.id = persisted.id
         reader.password = persisted.password
-        reader.roles = persisted.roles
         mapper.map(reader, persisted)
+
+        if (hasRole("supervisor") && reader.roles.size > 0) {
+            roles.clear()
+            persisted.roles.forEach { roles.add(it) }
+        }
+        persisted.roles = roles
 
         readerRepository.save(persisted);
     }
@@ -96,8 +104,8 @@ open class ReaderServiceImpl(
         }
 
         return orders
-                .filter { if (returned!!) nonNull(it.returned) else isNull(it.returned) }
-                .map(this::mapOrder)
+            .filter { if (returned!!) nonNull(it.returned) else isNull(it.returned) }
+            .map(this::mapOrder)
     }
 
     @PreAuthorize("hasAuthority('read_feedback')")

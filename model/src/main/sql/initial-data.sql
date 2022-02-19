@@ -68,13 +68,6 @@ values (22, 'WESTERN');
 insert into T_GENRE (GENRE_ID, GENRE_NAME)
 values (23, 'SCIENCE');
 
-insert into T_BOOK_GENRE (BOOK_ID, GENRE_ID)
-values (CURRVAL('SEQ_BOOK'), 2);
-insert into T_BOOK_GENRE (BOOK_ID, GENRE_ID)
-values (CURRVAL('SEQ_BOOK'), 21);
-insert into T_BOOK_GENRE (BOOK_ID, GENRE_ID)
-values (CURRVAL('SEQ_BOOK'), 18);
-
 insert into T_ROLE (ROLE_ID, ROLE_NAME)
 values (0, 'reader');
 insert into T_ROLE (ROLE_ID, ROLE_NAME)
@@ -103,23 +96,7 @@ values (8, 'modify_feedback');
 insert into T_PRIVILEGE (PRIVILEGE_ID, PRIVILEGE_NAME)
 values (9, 'read_feedback');
 
---koldyr has roles: reader,librarian,supervisor
-insert into T_READER_ROLES (READER_ID, ROLE_ID)
-values (1, 0);
-insert into T_READER_ROLES (READER_ID, ROLE_ID)
-values (1, 1);
-insert into T_READER_ROLES (READER_ID, ROLE_ID)
-values (1, 2);
-
---lemming has roles: reader
-insert into T_READER_ROLES (READER_ID, ROLE_ID)
-values (2, 0);
-
---shurshun has roles: librarian
-insert into T_READER_ROLES (READER_ID, ROLE_ID)
-values (3, 1);
-
---READER has PRIVILEGE:
+--READER has PRIVILEGES:
 insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
 values (0, 0);--modify_reader
 insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
@@ -137,7 +114,7 @@ values (0, 8);-- make_feedback
 insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
 values (0, 9);-- read_feedback
 
---LIBRARIAN has PRIVILEGE:
+--LIBRARIAN has PRIVILEGES:
 insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
 values (1, 0);--modify_reader
 insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
@@ -151,7 +128,7 @@ values (1, 6);-- read_order
 insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
 values (1, 9);-- read_feedback
 
---SUPERVISOR has PRIVILEGE:
+--SUPERVISOR has PRIVILEGES:
 insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
 values (2, 0);--modify_reader
 insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
@@ -173,3 +150,23 @@ values (2, 8);-- make_feedback
 insert into T_ROLE_PRIVILEGES (ROLE_ID, PRIVILEGE_ID)
 values (2, 9);-- read_feedback
 
+--koldyr has roles: librarian,supervisor
+insert into T_READER_ROLES (READER_ID, ROLE_ID)
+values (1, 1);
+insert into T_READER_ROLES (READER_ID, ROLE_ID)
+values (1, 2);
+
+--lemming has roles: reader
+insert into T_READER_ROLES (READER_ID, ROLE_ID)
+values (2, 0);
+
+--shurshun has roles: librarian
+insert into T_READER_ROLES (READER_ID, ROLE_ID)
+values (3, 1);
+
+insert into T_BOOK_GENRE (BOOK_ID, GENRE_ID)
+values (CURRVAL('SEQ_BOOK'), 2);
+insert into T_BOOK_GENRE (BOOK_ID, GENRE_ID)
+values (CURRVAL('SEQ_BOOK'), 21);
+insert into T_BOOK_GENRE (BOOK_ID, GENRE_ID)
+values (CURRVAL('SEQ_BOOK'), 18);

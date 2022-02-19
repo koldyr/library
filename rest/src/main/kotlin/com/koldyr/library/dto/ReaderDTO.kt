@@ -1,7 +1,5 @@
 package com.koldyr.library.dto
 
-import com.koldyr.library.model.Role
-
 data class ReaderDTO(
     var id: Int?,
     var firstName: String? = null,
@@ -12,7 +10,7 @@ data class ReaderDTO(
     var address: String? = null
     var phoneNumber: String? = null
     var note: String? = null
-    var roles: MutableSet<Role> = mutableSetOf()
+    var roles: MutableSet<String> = mutableSetOf()
 
     constructor() : this(null, null, null, null)
 }
