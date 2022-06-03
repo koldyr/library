@@ -5,14 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.HttpMethod.POST
+import org.springframework.http.HttpMethod.*
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
-import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
-import org.springframework.security.config.http.SessionCreationPolicy.STATELESS
+import org.springframework.security.config.http.SessionCreationPolicy.*
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -31,10 +30,6 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Autowired
     lateinit var readerDetailsService: UserDetailsService
 
-    override fun configure(web: WebSecurity) {
-        web.ignoring().antMatchers("/library/login", "/library/registration")
-    }
-
     override fun configure(auth: AuthenticationManagerBuilder) {
         auth
             .userDetailsService(readerDetailsService)
@@ -49,6 +44,7 @@ class SecurityConfiguration : WebSecurityConfigurerAdapter() {
             .cors()
             .and()
             .authorizeRequests()
+            .antMatchers("/swagger-ui/*", "/v3/api-docs", "/v3/api-docs/*").permitAll()
             .antMatchers(POST, "/library/login", "/library/registration").permitAll()
             .anyRequest().authenticated()
             .and()
