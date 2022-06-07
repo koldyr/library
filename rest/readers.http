@@ -1,5 +1,5 @@
 ### Register User
-POST http://localhost/library/registration
+POST http://{{server}}/library/registration
 Content-Type: application/json
 
 {
@@ -13,25 +13,25 @@ Content-Type: application/json
 }
 
 ### User Login
-POST http://localhost/library/login
+POST http://{{server}}/library/login
 Content-Type: application/json
 
 {
   "username": "me@koldyr.com",
-  "password": "koldyr"
+  "password": "xxx"
 }
 
 ### Get All Readers
-GET http://localhost/library/readers
+GET http://{{server}}/library/readers
 Authorization: Bearer {{token}}
 
 ### Get Specific Reader
-GET http://localhost/api/library/readers/1
+GET http://{{server}}/api/library/readers/1
 Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Update Reader
-PUT http://localhost/library/readers/3
+PUT http://{{server}}/library/readers/3
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
@@ -46,15 +46,15 @@ Accept: application/json
 }
 
 ### Delete Reader
-DELETE http://localhost/library/readers/1
+DELETE http://{{server}}/library/readers/1
 Authorization: Bearer {{token}}
 
 ### Reader Orders
-GET http://localhost/library/readers/1/orders?returned=false
+GET http://{{server}}/library/readers/1/orders?returned=false
 Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Reader Feedbacks
-GET http://localhost/library/readers/1/feedbacks
+GET http://{{server}}/library/readers/1/feedbacks
 Authorization: Bearer {{token}}
 Accept: application/json
