@@ -1,17 +1,17 @@
 package com.koldyr.library.services
 
+import java.time.LocalDate
+import java.util.Objects.*
+import javax.persistence.criteria.Path
+import javax.persistence.criteria.Predicate
+import kotlin.reflect.full.declaredMemberProperties
+import org.apache.commons.lang3.ObjectUtils.*
+import org.springframework.data.jpa.domain.Specification
+import org.springframework.stereotype.Component
 import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.model.Book
 import com.koldyr.library.model.Genre
 import com.koldyr.library.model.GenreNames
-import org.apache.commons.lang3.ObjectUtils.isNotEmpty
-import org.springframework.data.jpa.domain.Specification
-import org.springframework.stereotype.Component
-import java.time.LocalDate
-import java.util.Objects.nonNull
-import javax.persistence.criteria.Path
-import javax.persistence.criteria.Predicate
-import kotlin.reflect.full.declaredMemberProperties
 
 /**
  * Description of class PredicateBuilder
@@ -64,7 +64,6 @@ class PredicateBuilder {
             }
 
             builder.and(*filters.toTypedArray())
-
         }
     }
 
