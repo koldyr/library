@@ -1,19 +1,19 @@
 package com.koldyr.library.model
 
 import java.time.LocalDate
-import javax.persistence.CascadeType
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.FetchType.EAGER
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.SEQUENCE
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.JoinTable
-import javax.persistence.ManyToMany
-import javax.persistence.ManyToOne
-import javax.persistence.SequenceGenerator
-import javax.persistence.Table
+import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.JoinTable
+import jakarta.persistence.ManyToMany
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.SequenceGenerator
+import jakarta.persistence.Table
 
 /**
  * Description of class Book
@@ -25,7 +25,7 @@ import javax.persistence.Table
 class Book() {
 
     @Id
-    @GeneratedValue(strategy = SEQUENCE, generator = "BookIds")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "BookIds")
     @Column(name = "BOOK_ID")
     var id: Int? = null
 
@@ -39,7 +39,7 @@ class Book() {
     @Column(columnDefinition = "DATE")
     var publicationDate: LocalDate? = null
 
-    @ManyToMany(cascade = [CascadeType.PERSIST], fetch = EAGER)
+    @ManyToMany(cascade = [CascadeType.PERSIST], fetch = FetchType.EAGER)
     @JoinTable(
         name = "T_BOOK_GENRE",
         joinColumns = [JoinColumn(name = "book_id", referencedColumnName = "book_id")],

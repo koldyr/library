@@ -2,8 +2,8 @@ package com.koldyr.library.services
 
 import java.time.LocalDate
 import java.util.Objects.*
-import javax.persistence.criteria.Path
-import javax.persistence.criteria.Predicate
+import jakarta.persistence.criteria.Path
+import jakarta.persistence.criteria.Predicate
 import kotlin.reflect.full.declaredMemberProperties
 import org.apache.commons.lang3.ObjectUtils.*
 import org.springframework.data.jpa.domain.Specification

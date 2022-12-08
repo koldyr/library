@@ -1,20 +1,20 @@
 package com.koldyr.library
 
-import com.koldyr.library.security.SecurityFilter
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod.*
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter
 import org.springframework.security.config.http.SessionCreationPolicy.*
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.web.SecurityFilterChain
+import com.koldyr.library.security.SecurityFilter
 
 /**
  * Description of class SecurityConfiguration
@@ -22,49 +22,43 @@ import org.springframework.security.crypto.password.PasswordEncoder
  */
 @EnableWebSecurity
 @Configuration
-class SecurityConfiguration : WebSecurityConfigurerAdapter() {
+@EnableMethodSecurity(prePostEnabled = true)
+class SecurityConfiguration {
 
     @Value("\${spring.security.secret}")
     lateinit var secret: String
 
-    @Autowired
-    lateinit var readerDetailsService: UserDetailsService
-
-    override fun configure(auth: AuthenticationManagerBuilder) {
-        auth
-            .userDetailsService(readerDetailsService)
-            .passwordEncoder(passwordEncoder())
-    }
-
-    @Throws(Exception::class)
-    override fun configure(http: HttpSecurity) {
-        http
-            .headers().disable()
-            .csrf().disable()
-            .cors()
-            .and()
-            .authorizeRequests()
-            .antMatchers("/swagger-ui/*", "/v3/api-docs", "/v3/api-docs/*").permitAll()
-            .antMatchers(POST, "/library/login", "/library/registration").permitAll()
-            .anyRequest().authenticated()
-            .and()
-            .addFilter(securityFilter())
-            .sessionManagement().sessionCreationPolicy(STATELESS)
-    }
-
     @Bean
     @Throws(java.lang.Exception::class)
-    override fun authenticationManagerBean(): AuthenticationManager {
-        return super.authenticationManagerBean()
+    fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager {
+        return authenticationConfiguration.authenticationManager
     }
 
     @Bean
-    fun securityFilter(): SecurityFilter {
-        return SecurityFilter(secret, authenticationManagerBean(), readerDetailsService)
+    fun securityFilter(authenticationManager: AuthenticationManager, readerDetailsService: UserDetailsService): SecurityFilter {
+        return SecurityFilter(secret, authenticationManager, readerDetailsService)
     }
 
     @Bean
     fun passwordEncoder(): PasswordEncoder {
         return BCryptPasswordEncoder()
+    }
+
+    @Bean
+    @Throws(Exception::class)
+    fun filterChain(http: HttpSecurity, securityFilter: SecurityFilter): SecurityFilterChain {
+        http
+            .headers().disable()
+            .csrf().disable()
+            .cors()
+            .and()
+            .authorizeHttpRequests()
+            .requestMatchers("/swagger-ui/*", "/v3/api-docs", "/v3/api-docs/*").permitAll()
+            .requestMatchers(POST, "/library/login", "/library/registration").permitAll()
+            .anyRequest().authenticated()
+            .and()
+            .addFilter(securityFilter)
+            .sessionManagement().sessionCreationPolicy(STATELESS)
+        return http.build()
     }
 }

@@ -3,15 +3,9 @@ package com.koldyr.library.services
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.Date
-import javax.persistence.EntityNotFoundException
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
-import com.koldyr.library.dto.CredentialsDTO
-import com.koldyr.library.dto.ReaderDTO
-import com.koldyr.library.persistence.ReaderRepository
-import ma.glasnost.orika.MapperFacade
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus.UNAUTHORIZED
+import org.springframework.http.HttpStatus.*
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException
@@ -19,6 +13,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
+import ma.glasnost.orika.MapperFacade
+import com.koldyr.library.dto.CredentialsDTO
+import com.koldyr.library.dto.ReaderDTO
+import com.koldyr.library.persistence.ReaderRepository
 
 @Service("authenticationService")
 class AuthenticationServiceImpl(

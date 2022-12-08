@@ -5,7 +5,7 @@ server:
     include-stacktrace: on_param
 spring:
   datasource:
-    url: jdbc:h2:./db/library;DB_CLOSE_ON_EXIT=FALSE;AUTO_SERVER=TRUE
+    url: jdbc:h2:./db/library;AUTO_SERVER=TRUE
     username: sa
     password: xxx
   jpa:

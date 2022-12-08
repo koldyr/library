@@ -1,5 +1,20 @@
 package com.koldyr.library
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.EnableAspectJAutoProxy
+import org.springframework.http.HttpHeaders.*
+import org.springframework.http.HttpMethod.*
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import io.swagger.v3.oas.models.Components
+import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.info.Info
+import io.swagger.v3.oas.models.info.License
+import ma.glasnost.orika.MapperFacade
+import ma.glasnost.orika.MapperFactory
+import ma.glasnost.orika.impl.DefaultMapperFactory
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
@@ -22,26 +37,6 @@ import com.koldyr.library.persistence.GenreRepository
 import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
 import com.koldyr.library.persistence.RoleRepository
-import io.swagger.v3.oas.models.Components
-import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.oas.models.info.Info
-import io.swagger.v3.oas.models.info.License
-import ma.glasnost.orika.MapperFacade
-import ma.glasnost.orika.MapperFactory
-import ma.glasnost.orika.impl.DefaultMapperFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.EnableAspectJAutoProxy
-import org.springframework.http.HttpHeaders.AUTHORIZATION
-import org.springframework.http.HttpMethod.DELETE
-import org.springframework.http.HttpMethod.GET
-import org.springframework.http.HttpMethod.HEAD
-import org.springframework.http.HttpMethod.PATCH
-import org.springframework.http.HttpMethod.POST
-import org.springframework.http.HttpMethod.PUT
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
 /**
  * Description of class LibraryConfig
@@ -118,7 +113,7 @@ class LibraryConfig {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/**")
                     .allowedOrigins("*")
-                    .allowedMethods(GET.name, HEAD.name, POST.name, PUT.name, DELETE.name, PATCH.name)
+                    .allowedMethods(GET.name(), HEAD.name(), POST.name(), PUT.name(), DELETE.name(), PATCH.name())
                     .exposedHeaders(AUTHORIZATION)
             }
         }

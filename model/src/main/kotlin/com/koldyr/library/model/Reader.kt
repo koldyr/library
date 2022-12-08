@@ -1,18 +1,19 @@
 package com.koldyr.library.model
 
-import javax.persistence.Basic
-import javax.persistence.CascadeType.PERSIST
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.FetchType.EAGER
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.SEQUENCE
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.JoinTable
-import javax.persistence.ManyToMany
-import javax.persistence.SequenceGenerator
-import javax.persistence.Table
+import jakarta.persistence.Basic
+import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.JoinTable
+import jakarta.persistence.ManyToMany
+import jakarta.persistence.SequenceGenerator
+import jakarta.persistence.Table
+
 
 /**
  * Description of class Reader
@@ -25,7 +26,7 @@ import javax.persistence.Table
 class Reader : Cloneable {
 
     @Id
-    @GeneratedValue(strategy = SEQUENCE, generator = "ReaderIds")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "ReaderIds")
     @Column(name = "READER_ID")
     var id: Int? = null
 
@@ -45,7 +46,7 @@ class Reader : Cloneable {
     @Basic(optional = false)
     var password: String = ""
 
-    @ManyToMany(cascade = [PERSIST], fetch = EAGER)
+    @ManyToMany(cascade = [CascadeType.PERSIST], fetch = FetchType.EAGER)
     @JoinTable(
             name = "T_READER_ROLES",
             joinColumns = [JoinColumn(name = "reader_id", referencedColumnName = "reader_id")],

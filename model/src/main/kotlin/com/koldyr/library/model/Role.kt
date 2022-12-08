@@ -1,13 +1,13 @@
 package com.koldyr.library.model
 
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.FetchType.EAGER
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.JoinTable
-import javax.persistence.ManyToMany
-import javax.persistence.Table
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.JoinTable
+import jakarta.persistence.ManyToMany
+import jakarta.persistence.Table
 
 @Entity
 @Table(name = "T_ROLE")
@@ -19,11 +19,12 @@ class Role {
     @Column(name = "ROLE_NAME", nullable = false, unique = true)
     var name: String = "reader"
 
-    @ManyToMany(fetch = EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
-            name = "T_ROLE_PRIVILEGES",
-            joinColumns = [JoinColumn(name = "role_id", referencedColumnName = "ROLE_ID")],
-            inverseJoinColumns = [JoinColumn(name = "privilege_id", referencedColumnName = "PRIVILEGE_ID")])
+        name = "T_ROLE_PRIVILEGES",
+        joinColumns = [JoinColumn(name = "role_id", referencedColumnName = "ROLE_ID")],
+        inverseJoinColumns = [JoinColumn(name = "privilege_id", referencedColumnName = "PRIVILEGE_ID")]
+    )
     var privileges: Set<Privilege> = setOf()
 
     override fun equals(other: Any?): Boolean {
