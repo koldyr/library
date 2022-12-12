@@ -18,7 +18,7 @@ Content-Type: application/json
 
 {
   "username": "me@koldyr.com",
-  "password": "koldyr"
+  "password": {{testUserPwd}}
 }
 
 ### Get All Readers
