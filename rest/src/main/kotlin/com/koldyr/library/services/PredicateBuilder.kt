@@ -27,9 +27,9 @@ class PredicateBuilder {
 
         return Specification<Book> { book, _, builder ->
             val filters: MutableList<Predicate> = mutableListOf()
-            
-            if (nonNull(criteria.title)) {
-                val predicate = builder.like(builder.lower(book.get("title")), "%${criteria.title?.lowercase()}%")
+
+            criteria.title?.also {
+                val predicate = builder.like(builder.lower(book.get("title")), "%${it.lowercase()}%")
                 filters.add(predicate)
             }
 
@@ -43,23 +43,23 @@ class PredicateBuilder {
                 }
             }
 
-            if (nonNull(criteria.publisher)) {
+            criteria.publisher?.also {
                 val publishingHouse = book.get<String>("publishingHouse")
-                val predicate = builder.like(builder.lower(publishingHouse), "%${criteria.publisher?.lowercase()}%")
+                val predicate = builder.like(builder.lower(publishingHouse), "%${it.lowercase()}%")
                 filters.add(predicate)
             }
 
-            if (nonNull(criteria.note)) {
+            criteria.note?.also {
                 val note = book.get<String>("note")
-                val predicate = builder.like(builder.lower(note), "%${criteria.note?.lowercase()}%")
+                val predicate = builder.like(builder.lower(note), "%${it.lowercase()}%")
                 filters.add(predicate)
             }
 
             if (nonNull(criteria.publishYearFrom) || nonNull(criteria.publishYearTill)) {
-                val yearFrom: Int = if (criteria.publishYearFrom == null) 1000 else criteria.publishYearFrom!!
-                val yearTo: Int = if (criteria.publishYearTill == null) 9999 else (criteria.publishYearTill!! + 1)
+                val yearFrom: Int = criteria.publishYearFrom ?: 1000
+                val yearTo: Int = criteria.publishYearTill ?: 9999
                 val publicationDate: Path<LocalDate> = book.get("publicationDate")
-                val predicate = builder.between(publicationDate, LocalDate.of(yearFrom, 1, 1), LocalDate.of(yearTo, 1, 1))
+                val predicate = builder.between(publicationDate, LocalDate.of(yearFrom, 1, 1), LocalDate.of(yearTo + 1, 1, 1))
                 filters.add(predicate)
             }
 
