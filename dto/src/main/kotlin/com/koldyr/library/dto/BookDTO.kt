@@ -4,6 +4,8 @@ import java.time.LocalDate
 
 /**
  * Description of class BookDTO
+ * 
+ * @author: d.halitski@gmail.com
  * @created: 2021-09-28
  */
 data class BookDTO (

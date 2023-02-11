@@ -18,10 +18,12 @@ import com.koldyr.library.security.SecurityFilter
 
 /**
  * Description of class SecurityConfiguration
+ * 
+ * @author: d.halitski@gmail.com
  * @created: 2022-02-09
  */
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfiguration {
 
@@ -53,7 +55,7 @@ class SecurityConfiguration {
             .cors()
             .and()
             .authorizeHttpRequests()
-            .requestMatchers("/swagger-ui/*", "/v3/api-docs", "/v3/api-docs/*").permitAll()
+            .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs.**", "/v3/api-docs/**", "/error/**", "/favicon.ico").permitAll()
             .requestMatchers(POST, "/library/login", "/library/registration").permitAll()
             .anyRequest().authenticated()
             .and()

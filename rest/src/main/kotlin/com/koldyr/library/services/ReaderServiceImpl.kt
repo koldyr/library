@@ -2,15 +2,6 @@ package com.koldyr.library.services
 
 import java.util.Objects.isNull
 import java.util.Objects.nonNull
-import com.koldyr.library.dto.FeedbackDTO
-import com.koldyr.library.dto.OrderDTO
-import com.koldyr.library.dto.ReaderDTO
-import com.koldyr.library.model.Feedback
-import com.koldyr.library.model.Reader
-import com.koldyr.library.persistence.BookRepository
-import com.koldyr.library.persistence.ReaderRepository
-import com.koldyr.library.persistence.RoleRepository
-import ma.glasnost.orika.MapperFacade
 import org.apache.commons.lang3.StringUtils.isEmpty
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -20,6 +11,15 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.CollectionUtils
 import org.springframework.web.server.ResponseStatusException
+import ma.glasnost.orika.MapperFacade
+import com.koldyr.library.dto.FeedbackDTO
+import com.koldyr.library.dto.OrderDTO
+import com.koldyr.library.dto.ReaderDTO
+import com.koldyr.library.model.Feedback
+import com.koldyr.library.model.Reader
+import com.koldyr.library.persistence.BookRepository
+import com.koldyr.library.persistence.ReaderRepository
+import com.koldyr.library.persistence.RoleRepository
 
 /**
  * Description of class ReaderServiceImpl
@@ -92,7 +92,7 @@ open class ReaderServiceImpl(
     override fun delete(readerId: Int) = readerRepository.deleteById(readerId)
 
     override fun currentReader(): ReaderDTO {
-        return findById(getLoggedUserId())
+        return mapReader(getLoggedUser())
     }
 
     @PreAuthorize("hasAuthority('read_order')")

@@ -4,6 +4,8 @@ import java.time.LocalDateTime
 
 /**
  * Description of class ErrorResponse
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2022-02-12
  */
 data class ErrorResponse(

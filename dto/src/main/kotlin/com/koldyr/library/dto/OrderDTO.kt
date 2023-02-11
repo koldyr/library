@@ -4,6 +4,8 @@ import java.time.LocalDateTime
 
 /**
  * Description of class OrderDTO
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2021-10-06
  */
 data class OrderDTO(

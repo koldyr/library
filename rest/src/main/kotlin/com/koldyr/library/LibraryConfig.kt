@@ -4,14 +4,23 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
-import org.springframework.http.HttpHeaders.*
-import org.springframework.http.HttpMethod.*
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.HttpMethod.DELETE
+import org.springframework.http.HttpMethod.GET
+import org.springframework.http.HttpMethod.HEAD
+import org.springframework.http.HttpMethod.PATCH
+import org.springframework.http.HttpMethod.POST
+import org.springframework.http.HttpMethod.PUT
+import org.springframework.web.servlet.HandlerExceptionResolver
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.info.Contact
 import io.swagger.v3.oas.models.info.Info
 import io.swagger.v3.oas.models.info.License
+import io.swagger.v3.oas.models.security.SecurityRequirement
+import io.swagger.v3.oas.models.security.SecurityScheme
 import ma.glasnost.orika.MapperFacade
 import ma.glasnost.orika.MapperFactory
 import ma.glasnost.orika.impl.DefaultMapperFactory
@@ -37,9 +46,12 @@ import com.koldyr.library.persistence.GenreRepository
 import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
 import com.koldyr.library.persistence.RoleRepository
+import com.koldyr.library.services.InternalExceptionResolver
 
 /**
  * Description of class LibraryConfig
+ * 
+ * @author: d.halitski@gmail.com
  * @created: 2021-09-28
  */
 @Configuration
@@ -101,15 +113,13 @@ class LibraryConfig {
     }
 
     @Bean
-    fun api(): OpenAPI {
-        return OpenAPI()
-            .components(Components())
-            .info(apiInfo())
-    }
-
-    @Bean
     fun corsConfigurer(): WebMvcConfigurer {
         return object : WebMvcConfigurer {
+
+            override fun extendHandlerExceptionResolvers(resolvers: MutableList<HandlerExceptionResolver>) {
+                resolvers.add(InternalExceptionResolver())
+            }
+
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/**")
                     .allowedOrigins("*")
@@ -119,15 +129,43 @@ class LibraryConfig {
         }
     }
 
+    @Bean
+    fun api(): OpenAPI {
+        val securitySchemeName = "Bearer Auth"
+        return OpenAPI()
+            .components(
+                Components()
+                    .addSecuritySchemes(
+                        securitySchemeName,
+                        SecurityScheme()
+                            .name(securitySchemeName)
+                            .type(SecurityScheme.Type.HTTP)
+                            .scheme("bearer")
+                            .bearerFormat("JWT")
+                            .`in`(SecurityScheme.In.HEADER)
+                    )
+            )
+            .addSecurityItem(SecurityRequirement().addList(securitySchemeName))
+            .info(apiInfo())
+    }
+
     private fun apiInfo(): Info {
-        val license = License()
-            .name("Apache 2.0")
-            .url("http://www.apache.org/licenses/LICENSE-2.0")
         return Info()
             .title("Library")
             .description("RESTfull back end for Library SPA")
             .termsOfService("http://koldyr.com/library/tos")
-            .license(license)
+            .license(
+                License()
+                    .name("Apache 2.0")
+                    .url("http://www.apache.org/licenses/LICENSE-2.0")
+            )
+            .contact(
+                Contact()
+                    .name("Denis Halitsky")
+                    .email("me@koldyr.com")
+                    .url("http://koldyr.com")
+
+            )
     }
 }
 

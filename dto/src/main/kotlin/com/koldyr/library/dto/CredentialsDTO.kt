@@ -2,6 +2,8 @@ package com.koldyr.library.dto
 
 /**
  * Description of class CredentialsDTO
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2022-02-09
  */
 class CredentialsDTO {

@@ -5,10 +5,11 @@ server:
     include-stacktrace: on_param
 spring:
   datasource:
-    url: jdbc:h2:./db/library;AUTO_SERVER=TRUE
-    username: sa
+    url: jdbc:postgresql://localhost:5432/library
+    username: xxx
     password: xxx
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
   security:
     secret: kdskliojfsdl32r3hhkjdfdf
@@ -34,10 +35,11 @@ spring:
     activate:
       on-profile: int-test
   datasource:
-    url: jdbc:h2:mem:test;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
+    url: jdbc:h2:mem:test;DB_CLOSE_ON_EXIT=FALSE;IGNORECASE=true
+    username: xxx
     password: xxx
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
     generate-ddl: true
 
@@ -48,5 +50,5 @@ logging:
 
 library:
   test:
-    user: me@koldyr.com
+    user: xxx
     password: xxx

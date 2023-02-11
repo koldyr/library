@@ -1,52 +1,44 @@
 package com.koldyr.library.dto
 
-import com.koldyr.library.model.Reader
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
+import com.koldyr.library.model.Reader
 
-class ReaderDetails(reader: Reader, private val authorities: Set<GrantedPrivilege>) : UserDetails {
+/**
+ * Description of class GrantedPrivilege
+ *
+ * @author: d.halitski@gmail.com
+ * @created: 2021-10-28
+ */
+class ReaderDetails(val reader: Reader) : UserDetails {
 
-    private var id: Int
-    private var name: String
-    private var password: String
+    private val authorities: Set<GrantedPrivilege>
 
     init {
-        this.id = reader.id!!
-        this.name = reader.mail
-        this.password = reader.password
+        val authorities: MutableSet<GrantedPrivilege> = mutableSetOf()
+        for (role in reader.roles) {
+            for (privilege in role.privileges) {
+                authorities.add(GrantedPrivilege(role.name, privilege.value))
+            }
+        }
+        this.authorities = authorities
     }
 
-    fun getReaderId(): Int {
-        return id
-    }
+    fun getReaderId(): Int = reader.id!!
 
-    override fun getAuthorities(): Collection<GrantedAuthority> {
-        return authorities
-    }
+    override fun getAuthorities(): Collection<GrantedAuthority> = authorities
 
-    override fun getPassword(): String {
-        return password
-    }
+    override fun getPassword(): String = reader.password
 
-    override fun getUsername(): String {
-        return name
-    }
+    override fun getUsername(): String = reader.mail
 
-    override fun isAccountNonExpired(): Boolean {
-        return true
-    }
+    override fun isAccountNonExpired(): Boolean = true
 
-    override fun isAccountNonLocked(): Boolean {
-        return true
-    }
+    override fun isAccountNonLocked(): Boolean = true
 
-    override fun isCredentialsNonExpired(): Boolean {
-        return true
-    }
+    override fun isCredentialsNonExpired(): Boolean = true
 
-    override fun isEnabled(): Boolean {
-        return true
-    }
+    override fun isEnabled(): Boolean = true
 
     fun hasAuthority(authority: String): Boolean {
         return authorities.any { it.authority == authority }
