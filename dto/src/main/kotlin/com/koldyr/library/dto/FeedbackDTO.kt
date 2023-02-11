@@ -4,6 +4,8 @@ import java.time.LocalDateTime
 
 /**
  * Description of class FeedbackDTO
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2021-10-07
  */
 data class FeedbackDTO(

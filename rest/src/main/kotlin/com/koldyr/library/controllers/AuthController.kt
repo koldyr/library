@@ -1,13 +1,6 @@
 package com.koldyr.library.controllers
 
 import java.net.URI
-import com.koldyr.library.dto.CredentialsDTO
-import com.koldyr.library.dto.ReaderDTO
-import com.koldyr.library.services.AuthenticationService
-import com.koldyr.library.services.ReaderService
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
@@ -16,9 +9,18 @@ import org.springframework.http.ResponseEntity.ok
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
+import com.koldyr.library.dto.CredentialsDTO
+import com.koldyr.library.dto.ReaderDTO
+import com.koldyr.library.services.AuthenticationService
+import com.koldyr.library.services.ReaderService
 
 /**
  * Description of class AuthController
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2022-02-09
  */
 @Tag(name = "Authentication", description = "Users system authentication")

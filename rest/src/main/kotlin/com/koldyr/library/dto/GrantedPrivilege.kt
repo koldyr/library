@@ -4,6 +4,8 @@ import org.springframework.security.core.GrantedAuthority
 
 /**
  * Description of class GrantedPrivilege
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2021-10-28
  */
 class GrantedPrivilege(

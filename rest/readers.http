@@ -18,7 +18,7 @@ Content-Type: application/json
 
 {
   "username": "me@koldyr.com",
-  "password": {{testUserPwd}}
+  "password": "{{testUserPwd}}"
 }
 
 ### Get All Readers
@@ -26,7 +26,7 @@ GET http://{{server}}/library/readers
 Authorization: Bearer {{token}}
 
 ### Get Specific Reader
-GET http://{{server}}/api/library/readers/1
+GET http://{{server}}/library/readers/1
 Authorization: Bearer {{token}}
 Accept: application/json
 

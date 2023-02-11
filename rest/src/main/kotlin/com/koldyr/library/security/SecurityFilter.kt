@@ -5,7 +5,7 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.ServletException
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.http.HttpHeaders.*
+import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
@@ -17,6 +17,8 @@ import com.auth0.jwt.algorithms.Algorithm
 
 /**
  * Description of class SecurityFilter
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2022-02-09
  */
 open class SecurityFilter(
@@ -34,9 +36,8 @@ open class SecurityFilter(
 
     @Throws(IOException::class, ServletException::class)
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
-        val header: String? = request.getHeader(AUTHORIZATION)
-        if (header != null) {
-            val authentication = getAuthentication(header)
+        request.getHeader(AUTHORIZATION)?.let {
+            val authentication = getAuthentication(it)
             SecurityContextHolder.getContext().authentication = authentication
         }
 

@@ -1,0 +1,17 @@
+databaseChangeLog:
+  - changeSet:
+      id: R000.01
+      author: Denis Halitsky
+      comment: "Create DB schema and tables"
+      changes:
+        - sqlFile:
+            path: "../schema.sql"
+            relativeToChangelogFile: true
+  - changeSet:
+      id: R000.02
+      author: Denis Halitsky
+      comment: "Load initial data"
+      changes:
+        - sqlFile:
+            path: "../initial-data.sql"
+            relativeToChangelogFile: true

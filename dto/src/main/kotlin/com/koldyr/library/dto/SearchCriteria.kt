@@ -2,6 +2,8 @@ package com.koldyr.library.dto
 
 /**
  * Description of class SearchCriteria
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2021-10-07
  */
 data class SearchCriteria(

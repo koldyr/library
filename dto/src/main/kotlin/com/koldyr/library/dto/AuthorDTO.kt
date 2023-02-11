@@ -4,6 +4,8 @@ import java.time.LocalDate
 
 /**
  * Description of class AuthorDTO
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2021-10-07
  */
 data class AuthorDTO (

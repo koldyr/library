@@ -1,13 +1,8 @@
 package com.koldyr.library.controllers
 
-import com.koldyr.library.dto.FeedbackDTO
-import com.koldyr.library.dto.OrderDTO
-import com.koldyr.library.dto.ReaderDTO
-import com.koldyr.library.services.ReaderService
-import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import org.springframework.http.MediaType.*
 import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.noContent
-import org.springframework.http.ResponseEntity.ok
+import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -16,9 +11,15 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import com.koldyr.library.dto.FeedbackDTO
+import com.koldyr.library.dto.OrderDTO
+import com.koldyr.library.dto.ReaderDTO
+import com.koldyr.library.services.ReaderService
 
 /**
  * Description of class ReaderController
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2021-09-25
  */
 @RestController
