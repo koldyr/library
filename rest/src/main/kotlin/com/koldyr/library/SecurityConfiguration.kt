@@ -55,7 +55,7 @@ class SecurityConfiguration {
             .cors()
             .and()
             .authorizeHttpRequests()
-            .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**", "/error/**", "/favicon.ico").permitAll()
+            .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs.**", "/v3/api-docs/**", "/error/**", "/favicon.ico").permitAll()
             .requestMatchers(POST, "/library/login", "/library/registration").permitAll()
             .anyRequest().authenticated()
             .and()
