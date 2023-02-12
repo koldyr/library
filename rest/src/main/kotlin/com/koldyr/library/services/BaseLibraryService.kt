@@ -27,17 +27,11 @@ open class BaseLibraryService(
         return dto
     }
 
-    protected fun getLoggedUser(): Reader {
-        return getReaderDetails().reader
-    }
+    protected fun getLoggedUser(): Reader = getReaderDetails().reader
 
-    protected fun hasAuthority(authority: String): Boolean {
-        return getReaderDetails().hasAuthority(authority)
-    }
+    protected fun hasAuthority(authority: String): Boolean = getReaderDetails().hasAuthority(authority)
 
-    protected fun hasRole(role: String): Boolean {
-        return getReaderDetails().hasRole(role)
-    }
+    protected fun hasRole(role: String): Boolean = getReaderDetails().hasRole(role)
 
     protected fun getReaderDetails(): ReaderDetails {
         val authentication = SecurityContextHolder.getContext().authentication

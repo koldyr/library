@@ -7,17 +7,6 @@ import java.lang.ClassLoader.getSystemResourceAsStream
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.sql.DataSource
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
-import com.koldyr.library.controllers.TestDbInitializer.dbInitialized
-import com.koldyr.library.controllers.TestDbInitializer.token
-import com.koldyr.library.dto.AuthorDTO
-import com.koldyr.library.dto.BookDTO
-import com.koldyr.library.dto.CredentialsDTO
-import com.koldyr.library.dto.FeedbackDTO
-import com.koldyr.library.dto.OrderDTO
-import com.koldyr.library.dto.ReaderDTO
-import com.koldyr.library.model.GenreNames
 import org.apache.commons.lang3.RandomStringUtils
 import org.apache.commons.lang3.RandomUtils
 import org.h2.tools.RunScript
@@ -36,6 +25,17 @@ import org.springframework.test.annotation.IfProfileValue
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.koldyr.library.controllers.TestDbInitializer.dbInitialized
+import com.koldyr.library.controllers.TestDbInitializer.token
+import com.koldyr.library.dto.AuthorDTO
+import com.koldyr.library.dto.BookDTO
+import com.koldyr.library.dto.CredentialsDTO
+import com.koldyr.library.dto.FeedbackDTO
+import com.koldyr.library.dto.OrderDTO
+import com.koldyr.library.dto.ReaderDTO
+import com.koldyr.library.model.GenreNames
 
 object TestDbInitializer {
     @JvmStatic
@@ -80,8 +80,8 @@ abstract class LibraryControllerTest {
     }
 
     private fun insertSupervisor() {
-        getSystemResourceAsStream("initial-data.sql").use { stream: InputStream? ->
-            BufferedReader(InputStreamReader(stream!!)).use { reader: BufferedReader ->
+        getSystemResourceAsStream("initial-data.sql")?.use { stream: InputStream ->
+            BufferedReader(InputStreamReader(stream)).use { reader: BufferedReader ->
                 RunScript.execute(dataSource.connection, reader)
                 logger.info("DB initialized")
             }

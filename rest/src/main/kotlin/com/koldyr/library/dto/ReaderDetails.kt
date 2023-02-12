@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails
 import com.koldyr.library.model.Reader
 
 /**
- * Description of class GrantedPrivilege
+ * Description of class ReaderDetails
  *
  * @author: d.halitski@gmail.com
  * @created: 2021-10-28
@@ -24,8 +24,6 @@ class ReaderDetails(val reader: Reader) : UserDetails {
         this.authorities = authorities
     }
 
-    fun getReaderId(): Int = reader.id!!
-
     override fun getAuthorities(): Collection<GrantedAuthority> = authorities
 
     override fun getPassword(): String = reader.password
@@ -40,11 +38,7 @@ class ReaderDetails(val reader: Reader) : UserDetails {
 
     override fun isEnabled(): Boolean = true
 
-    fun hasAuthority(authority: String): Boolean {
-        return authorities.any { it.authority == authority }
-    }
+    fun hasAuthority(authority: String): Boolean = authorities.any { it.authority == authority }
 
-    fun hasRole(role: String): Boolean {
-        return authorities.any { it.role == role }
-    }
+    fun hasRole(role: String): Boolean = authorities.any { it.role == role }
 }

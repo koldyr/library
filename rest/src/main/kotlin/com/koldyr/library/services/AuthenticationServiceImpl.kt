@@ -2,14 +2,12 @@ package com.koldyr.library.services
 
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.Date
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus.*
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.BadCredentialsException
-import org.springframework.security.authentication.DisabledException
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken.unauthenticated
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
@@ -37,20 +35,18 @@ class AuthenticationServiceImpl(
 
     override fun login(login: CredentialsDTO): String {
         try {
-            val token = UsernamePasswordAuthenticationToken(login.username, login.password, listOf())
+            val token = unauthenticated(login.username, login.password)
             val authentication = authenticationManager.authenticate(token)
 
             return "Bearer " + generateToken(authentication)
-        } catch (e: DisabledException) {
-            throw ResponseStatusException(UNAUTHORIZED, "user is disabled")
-        } catch (e: BadCredentialsException) {
-            throw ResponseStatusException(UNAUTHORIZED, "username or password invalid")
+        } catch (e: AuthenticationException) {
+            throw ResponseStatusException(FORBIDDEN, e.message)
         }
     }
 
     private fun generateToken(authentication: Authentication): String {
         val tokenLive = LocalDateTime.now().plusMinutes(expiration.toLong())
-        val expiration = Date.from(tokenLive.atZone(ZoneId.systemDefault()).toInstant())
+        val expiration = tokenLive.atZone(ZoneId.systemDefault()).toInstant()
         
         val user = authentication.principal as ReaderDetails
         val roles = user.reader.roles.map { it.name }.toTypedArray()

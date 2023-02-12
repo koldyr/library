@@ -10,9 +10,12 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RestController
 import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import com.koldyr.library.dto.CredentialsDTO
+import com.koldyr.library.dto.ErrorResponse
 import com.koldyr.library.dto.ReaderDTO
 import com.koldyr.library.services.AuthenticationService
 import com.koldyr.library.services.ReaderService
@@ -23,9 +26,12 @@ import com.koldyr.library.services.ReaderService
  * @author: d.halitski@gmail.com
  * @created: 2022-02-09
  */
-@Tag(name = "Authentication", description = "Users system authentication")
-@ApiResponse(responseCode = "500", description = "Internal error occurred")
 @RestController
+@Tag(name = "Authentication", description = "Users system authentication")
+@ApiResponse(
+    responseCode = "500", description = "Internal error occurred",
+    content = [Content(schema = Schema(implementation = ErrorResponse::class), mediaType = APPLICATION_JSON_VALUE)]
+)
 class AuthController(
     private val readerService: ReaderService,
     private val authenticationService: AuthenticationService
