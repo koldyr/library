@@ -70,7 +70,7 @@ class ReaderServiceImpl(
 
         val roles = persisted.roles
         reader.id = persisted.id
-        reader.password = persisted.password
+        reader.mail = persisted.mail
         mapper.map(reader, persisted)
 
         if (hasRole("supervisor") && reader.roles.size > 0) {
