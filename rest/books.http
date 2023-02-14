@@ -4,7 +4,7 @@ Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Get Book
-GET http://{{server}}/library/books/1
+GET http://{{server}}/library/books/2
 Authorization: Bearer {{token}}
 Accept: application/json
 
@@ -15,14 +15,14 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "title": "b5_title",
-  "authorId": 4,
-  "genre": "MYSTERY",
-  "publishingHouse": "b5_house",
-  "publicationDate": "2021-05-09",
+  "title": "b6_title",
+  "authorId": 1,
+  "genres": ["MYSTERY"],
+  "publishingHouse": "b6_house",
+  "publicationDate": "2021-06-09",
   "bookCover": null,
-  "note": "b5_note",
-  "count": 10
+  "note": "b6_note",
+  "count": 6
 }
 
 ### Update Book
@@ -34,7 +34,7 @@ Accept: application/json
 {
   "title": "b1_title",
   "authorId": 1,
-  "genre": "CRIME",
+  "genres": ["CRIME"],
   "publishingHouse": "b1_house",
   "publicationDate": "2021-09-09",
   "bookCover": null,

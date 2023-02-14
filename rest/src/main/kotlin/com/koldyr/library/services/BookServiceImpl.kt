@@ -13,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import ma.glasnost.orika.MapperFacade
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
@@ -23,7 +22,6 @@ import com.koldyr.library.model.Book
 import com.koldyr.library.model.Feedback
 import com.koldyr.library.model.Order
 import com.koldyr.library.persistence.AuthorRepository
-import com.koldyr.library.persistence.BookRepository
 import com.koldyr.library.persistence.FeedbackRepository
 import com.koldyr.library.persistence.OrderRepository
 
@@ -33,14 +31,12 @@ import com.koldyr.library.persistence.OrderRepository
  */
 @Service
 @Transactional
-open class BookServiceImpl(
-    bookRepository: BookRepository,
-    mapper: MapperFacade,
+class BookServiceImpl(
     private val authorRepository: AuthorRepository,
     private val orderRepository: OrderRepository,
     private val feedbackRepository: FeedbackRepository,
     private val predicateBuilder: PredicateBuilder,
-) : BookService, BaseLibraryService(bookRepository, mapper) {
+) : BookService, BaseLibraryService() {
 
     @PreAuthorize("hasAuthority('read_book')")
     override fun findAll(available: Boolean): List<BookDTO> {
@@ -85,7 +81,7 @@ open class BookServiceImpl(
     @PreAuthorize("hasAuthority('modify_feedback')")
     override fun feedbackBook(feedback: FeedbackDTO): Int {
         feedback.date = LocalDateTime.now()
-        feedback.readerId = getLoggedUser().id
+        feedback.readerId = currentUser().id
 
         val newFeedback = mapper.map(feedback, Feedback::class.java)
         newFeedback.id = null
@@ -104,7 +100,7 @@ open class BookServiceImpl(
         val feedback = feedbackRepository.findById(feedbackId)
                 .orElseThrow { throw ResponseStatusException(NOT_FOUND, "Feedback with id '${feedbackId}' is not found") }
 
-        if (feedback.reader!!.id == getLoggedUser().id || hasAuthority("modify_feedback")) {
+        if (feedback.reader!!.id == currentUser().id || hasAuthority("modify_feedback")) {
             feedbackRepository.delete(feedback)
         }
     }
@@ -119,7 +115,7 @@ open class BookServiceImpl(
 
         order.id = null
         order.ordered = LocalDateTime.now()
-        order.readerId = getLoggedUser().id
+        order.readerId = currentUser().id
 
         val newOrder = mapper.map(order, Order::class.java)
 
@@ -137,8 +133,8 @@ open class BookServiceImpl(
         val persisted = orderRepository.findById(order.id!!)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Order with id '${order.id}' is not found") }
 
-        if (persisted.reader!!.id != getLoggedUser().id) {
-            throw ResponseStatusException(BAD_REQUEST, "You can not return order with id '${order.id}', only reader ${getLoggedUser().id}")
+        if (persisted.reader!!.id != currentUser().id) {
+            throw ResponseStatusException(BAD_REQUEST, "You can not return order with id '${order.id}', only reader ${currentUser().id}")
         }
         if (nonNull(persisted.returned)) {
             throw ResponseStatusException(BAD_REQUEST, "You can not return already returned order '${order.id}'")

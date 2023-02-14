@@ -1,24 +1,20 @@
 package com.koldyr.library.services
 
-import com.koldyr.library.dto.AuthorDTO
-import com.koldyr.library.model.Author
-import com.koldyr.library.persistence.AuthorRepository
-import com.koldyr.library.persistence.BookRepository
-import ma.glasnost.orika.MapperFacade
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+import com.koldyr.library.dto.AuthorDTO
+import com.koldyr.library.model.Author
+import com.koldyr.library.persistence.AuthorRepository
 
 @Service
 @Transactional
 open class AuthorServiceImpl(
-    bookRepository: BookRepository,
-    mapper: MapperFacade,
     private val authorRepository: AuthorRepository,
-) : AuthorService, BaseLibraryService(bookRepository, mapper) {
+) : AuthorService, BaseLibraryService() {
 
     @PreAuthorize("hasAuthority('read_author')")
     override fun findAll(): List<AuthorDTO> = authorRepository.findAll().map { mapper.map(it, AuthorDTO::class.java) }

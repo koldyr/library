@@ -12,9 +12,14 @@ spring:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
   security:
-    secret: kdskliojfsdl32r3hhkjdfdf
+    secret: 2c71790a-875e-469c-bab6-b66af9ac2641
     token:
       exp: 10 #minutes
+    oauth2:
+      resourceserver:
+        jwt:
+          jws-algorithms: HS256
+          jwk-set-uri: http://koldyr.com/.well-known/jwk.json
   jackson:
     default-property-inclusion: non_null
 
@@ -42,13 +47,11 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
     generate-ddl: true
+  test:
+    user: xxx
+    password: xxx
 
 logging:
   level:
     org.springframework.test: ERROR
     org.springframework.boot.test: ERROR
-
-library:
-  test:
-    user: xxx
-    password: xxx

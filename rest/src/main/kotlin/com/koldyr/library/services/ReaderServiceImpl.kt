@@ -11,14 +11,11 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.util.CollectionUtils
 import org.springframework.web.server.ResponseStatusException
-import ma.glasnost.orika.MapperFacade
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.ReaderDTO
 import com.koldyr.library.model.Feedback
 import com.koldyr.library.model.Reader
-import com.koldyr.library.persistence.BookRepository
-import com.koldyr.library.persistence.ReaderRepository
 import com.koldyr.library.persistence.RoleRepository
 
 /**
@@ -27,13 +24,10 @@ import com.koldyr.library.persistence.RoleRepository
  */
 @Service
 @Transactional
-open class ReaderServiceImpl(
-    bookRepository: BookRepository,
-    mapper: MapperFacade,
-    private val readerRepository: ReaderRepository,
+class ReaderServiceImpl(
     private val roleRepository: RoleRepository,
     private val encoder: PasswordEncoder
-) : ReaderService, BaseLibraryService(bookRepository, mapper) {
+) : ReaderService, BaseLibraryService() {
 
     @PreAuthorize("hasAuthority('read_reader')")
     override fun findAll(): List<ReaderDTO> = readerRepository.findAll().map(this::mapReader)
@@ -92,7 +86,7 @@ open class ReaderServiceImpl(
     override fun delete(readerId: Int) = readerRepository.deleteById(readerId)
 
     override fun currentReader(): ReaderDTO {
-        return mapReader(getLoggedUser())
+        return mapReader(currentUser())
     }
 
     @PreAuthorize("hasAuthority('read_order')")
