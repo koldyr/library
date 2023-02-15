@@ -28,7 +28,7 @@ class PredicateBuilder {
         }
 
         return Specification<Book> { book, _, builder ->
-            val filters: MutableList<Predicate> = mutableListOf()
+            val filters = mutableListOf<Predicate>()
 
             criteria.title?.also {
                 val predicate = builder.like(builder.lower(book.get("title")), "%${it.lowercase()}%")
@@ -36,7 +36,7 @@ class PredicateBuilder {
             }
 
             if (isNotEmpty(criteria.genres)) {
-                val values: List<GenreNames> = criteria.genres!!.filter { nonNull(it) }.map { GenreNames.valueOf(it.uppercase()) }
+                val values = criteria.genres!!.filter { nonNull(it) }.map { GenreNames.valueOf(it.uppercase()) }
                 if (values.isNotEmpty()) {
                     val genres = book.join<Book, Genre>("genres")
                     val name = genres.get<String>("name")
@@ -61,7 +61,9 @@ class PredicateBuilder {
                 val yearFrom: Int = criteria.publishYearFrom ?: 1000
                 val yearTo: Int = criteria.publishYearTill ?: 9999
                 val publicationDate: Path<LocalDate> = book.get("publicationDate")
-                val predicate = builder.between(publicationDate, LocalDate.of(yearFrom, 1, 1), LocalDate.of(yearTo + 1, 1, 1))
+                val dateFrom = LocalDate.of(yearFrom, 1, 1)
+                val dateTill = LocalDate.of(yearTo + 1, 1, 1)
+                val predicate = builder.between(publicationDate, dateFrom, dateTill)
                 filters.add(predicate)
             }
 

@@ -100,7 +100,7 @@ class BookServiceImpl(
 
     override fun deleteFeedback(feedbackId: Int) {
         val feedback = feedbackRepository.findById(feedbackId)
-                .orElseThrow { throw ResponseStatusException(NOT_FOUND, "Feedback with id '${feedbackId}' is not found") }
+            .orElseThrow { throw ResponseStatusException(NOT_FOUND, "Feedback with id '${feedbackId}' is not found") }
 
         if (feedback.reader!!.id == currentUser().id || hasAuthority("modify_feedback")) {
             feedbackRepository.delete(feedback)
@@ -133,7 +133,7 @@ class BookServiceImpl(
     @PreAuthorize("hasAuthority('order_book')")
     override fun returnBook(order: OrderDTO) {
         val persisted = orderRepository.findById(order.id!!)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Order with id '${order.id}' is not found") }
+            .orElseThrow { ResponseStatusException(NOT_FOUND, "Order with id '${order.id}' is not found") }
 
         if (persisted.reader!!.id != currentUser().id) {
             throw ResponseStatusException(BAD_REQUEST, "You can not return order with id '${order.id}', only reader ${currentUser().id}")
@@ -177,11 +177,7 @@ class BookServiceImpl(
         return createPageResult(booksPage)
     }
 
-    override fun bookOrders(bookId: Int): Collection<OrderDTO> {
-        return orderRepository
-                .findOrdersByBookId(bookId)
-                .map(this::mapOrder)
-    }
+    override fun bookOrders(bookId: Int): Collection<OrderDTO> = orderRepository.findOrdersByBookId(bookId).map(this::mapOrder)
 
     private fun createPageable(criteria: SearchCriteria): Pageable {
         val page: Int = if (criteria.page == null) 0 else criteria.page!!.index
@@ -207,13 +203,8 @@ class BookServiceImpl(
         mapper.map(source, target)
     }
 
-    private fun mapBook(book: Book): BookDTO {
-        return mapper.map(book, BookDTO::class.java)
-    }
+    private fun mapBook(book: Book): BookDTO = mapper.map(book, BookDTO::class.java)
 
-    private fun find(bookId: Int): Book {
-        return bookRepository.findById(bookId)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '$bookId' is not found") }
-    }
+    private fun find(bookId: Int): Book = bookRepository.findById(bookId).orElseThrow { ResponseStatusException(NOT_FOUND, "Book with id '$bookId' is not found") }
 }
 

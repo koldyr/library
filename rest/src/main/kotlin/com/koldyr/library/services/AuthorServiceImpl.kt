@@ -28,7 +28,7 @@ class AuthorServiceImpl(
 
     @PreAuthorize("hasAuthority('read_author')")
     override fun search(search: String): List<AuthorDTO> {
-        val filter: Specification<Author> = createFilter(search)
+        val filter = createFilter(search)
         return authorRepository.findAll(filter).map { mapper.map(it, AuthorDTO::class.java) }
     }
 
@@ -57,18 +57,15 @@ class AuthorServiceImpl(
     }
 
     @PreAuthorize("hasAuthority('modify_author')")
-    override fun delete(authorId: Int) {
-        authorRepository.deleteById(authorId)
-    }
+    override fun delete(authorId: Int) = authorRepository.deleteById(authorId)
 
-    private fun find(authorId: Int): Author {
-        return authorRepository.findById(authorId)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Author with id '$authorId' is not found") }
-    }
+    private fun find(authorId: Int): Author = authorRepository
+        .findById(authorId)
+        .orElseThrow { ResponseStatusException(NOT_FOUND, "Author with id '$authorId' is not found") }
 
     private fun createFilter(search: String): Specification<Author> {
-        val value = search.lowercase()
         return Specification<Author> { author, _, builder ->
+            val value = search.lowercase()
             builder.or(
                     builder.like(builder.lower(author.get("firstName")), "%$value%"),
                     builder.like(builder.lower(author.get("lastName")), "%$value%")
