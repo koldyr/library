@@ -25,6 +25,10 @@ Content-Type: application/json
 GET http://{{server}}/library/readers
 Authorization: Bearer {{token}}
 
+### Get All Readers
+GET http://{{server}}/library/readers
+Authorization: Bearer {{token}}
+
 ### Get Specific Reader
 GET http://{{server}}/library/readers/1
 Authorization: Bearer {{token}}
