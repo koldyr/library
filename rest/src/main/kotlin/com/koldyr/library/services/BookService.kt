@@ -8,6 +8,8 @@ import com.koldyr.library.dto.SearchCriteria
 
 /**
  * Description of class BookService
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2021-09-28
  */
 interface BookService {

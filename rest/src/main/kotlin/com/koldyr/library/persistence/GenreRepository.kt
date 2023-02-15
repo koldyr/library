@@ -1,12 +1,14 @@
 package com.koldyr.library.persistence
 
-import com.koldyr.library.model.Genre
+import java.util.Optional
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
-import java.util.Optional
+import com.koldyr.library.model.Genre
 
 /**
  * Description of class GenreRepository
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2022-02-14
  */
 @Repository("genreRepository")

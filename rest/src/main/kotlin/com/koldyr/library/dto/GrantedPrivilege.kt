@@ -33,6 +33,6 @@ class GrantedPrivilege(
     }
 
     override fun toString(): String {
-        return "GrantedPrivilege(role='$role', privilege='$privilege')"
+        return "$role:$privilege"
     }
 }

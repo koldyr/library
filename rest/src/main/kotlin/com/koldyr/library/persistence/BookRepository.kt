@@ -1,14 +1,16 @@
 package com.koldyr.library.persistence
 
-import com.koldyr.library.model.Book
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import com.koldyr.library.model.Book
 
 /**
  * Description of class BookRepository
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2021-09-25
  */
 @Repository("bookRepository")

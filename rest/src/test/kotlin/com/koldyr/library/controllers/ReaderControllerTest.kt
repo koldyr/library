@@ -4,18 +4,18 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
-import com.koldyr.library.controllers.TestDbInitializer.token
-import com.koldyr.library.dto.BookDTO
-import com.koldyr.library.dto.FeedbackDTO
-import com.koldyr.library.dto.OrderDTO
-import com.koldyr.library.dto.ReaderDTO
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.koldyr.library.controllers.TestDbInitializer.token
+import com.koldyr.library.dto.BookDTO
+import com.koldyr.library.dto.FeedbackDTO
+import com.koldyr.library.dto.OrderDTO
+import com.koldyr.library.dto.ReaderDTO
 
 /**
  * Description of class ReaderControllerTest
@@ -28,6 +28,7 @@ class ReaderControllerTest : LibraryControllerTest() {
         val reader: ReaderDTO = createReader()
         assertNotNull(reader.id)
 
+        val initialEmail = reader.mail
         var readerFromServer: ReaderDTO = getReader(reader.id!!)
         assertEquals(reader, readerFromServer)
 
@@ -41,6 +42,7 @@ class ReaderControllerTest : LibraryControllerTest() {
 
         updateReader(reader)
 
+        reader.mail = initialEmail
         readerFromServer = getReader(reader.id!!)
         assertEquals(reader, readerFromServer)
 
@@ -63,6 +65,7 @@ class ReaderControllerTest : LibraryControllerTest() {
     fun roles() {
         val reader: ReaderDTO = createReader()
         assertNotNull(reader.id)
+        val initialEmail = reader.mail
 
         var readerFromServer: ReaderDTO = getReader(reader.id!!)
         assertEquals(reader, readerFromServer)
@@ -81,6 +84,8 @@ class ReaderControllerTest : LibraryControllerTest() {
         updateReader(reader)
 
         readerFromServer = getReader(reader.id!!)
+
+        reader.mail = initialEmail
         assertEquals(reader, readerFromServer)
         assertEquals(1, readerFromServer.roles.size)
         assertEquals("librarian", readerFromServer.roles.first())

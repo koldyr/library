@@ -4,6 +4,8 @@ import com.koldyr.library.dto.AuthorDTO
 
 /**
  * Description of class AuthorService
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2021-10-06
  */
 interface AuthorService {

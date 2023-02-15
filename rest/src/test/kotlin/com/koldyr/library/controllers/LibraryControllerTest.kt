@@ -61,10 +61,10 @@ abstract class LibraryControllerTest {
     @Autowired
     lateinit var rest: MockMvc
 
-    @Value("\${library.test.user}")
+    @Value("\${spring.test.user}")
     protected val userName: String = ""
 
-    @Value("\${library.test.password}")
+    @Value("\${spring.test.password}")
     protected val password: String = ""
 
     @BeforeEach

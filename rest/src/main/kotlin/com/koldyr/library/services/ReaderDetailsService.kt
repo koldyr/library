@@ -7,6 +7,12 @@ import org.springframework.stereotype.Service
 import com.koldyr.library.dto.ReaderDetails
 import com.koldyr.library.persistence.ReaderRepository
 
+/**
+ * Description of class ReaderDetailsService
+ *
+ * @author: d.halitski@gmail.com
+ * @created: 2021-11-09
+ */
 @Service
 class ReaderDetailsService(
     private val readerRepository: ReaderRepository
