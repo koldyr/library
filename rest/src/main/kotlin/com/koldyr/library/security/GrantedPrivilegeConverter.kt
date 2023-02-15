@@ -5,7 +5,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.core.convert.converter.Converter
 import org.springframework.security.core.GrantedAuthority
 import org.springframework.security.oauth2.jwt.Jwt
-import org.springframework.util.StringUtils
 import com.koldyr.library.dto.GrantedPrivilege
 
 /**
@@ -16,16 +15,18 @@ import com.koldyr.library.dto.GrantedPrivilege
  */
 class GrantedPrivilegeConverter : Converter<Jwt, Collection<GrantedAuthority>> {
 
-    private val logger = LoggerFactory.getLogger(GrantedPrivilegeConverter::class.java)
+    private val logger = LoggerFactory.getLogger(javaClass)
 
     private val wellKnownAuthoritiesClaimNames = mutableListOf("scope", "scp")
 
-    private val pattern = Pattern.compile(":")
+    private val roleDelimiter = Pattern.compile(":")
+    
+    private val authDelimiter = Pattern.compile(" ")
 
     override fun convert(source: Jwt): Collection<GrantedAuthority> {
         return getAuthorities(source)
             .map {
-                val attributes = pattern.split(it)
+                val attributes = roleDelimiter.split(it)
                 GrantedPrivilege(attributes.first(), attributes.last())
             }.toSet()
     }
@@ -42,25 +43,19 @@ class GrantedPrivilegeConverter : Converter<Jwt, Collection<GrantedAuthority>> {
     private fun getAuthorities(jwt: Jwt): Collection<String> {
         val claimName = getAuthoritiesClaimName(jwt)
         if (claimName == null) {
-            this.logger.trace("Returning no authorities since could not find any claims that might contain scopes")
+            logger.trace("Returning no authorities since could not find any claims that might contain scopes")
             return emptyList()
         }
         
-        this.logger.trace("Looking for scopes in claim {}", claimName)
-
         val authorities = jwt.getClaim<Any>(claimName)
         return if (authorities is String) {
-            if (StringUtils.hasText(authorities)) {
-                listOf(*authorities.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray())
-            } else {
+            if (authorities.isBlank()) {
                 emptyList()
+            } else {
+                authDelimiter.split(authorities).dropLastWhile { it.isEmpty() }.toList()
             }
         } else {
-            (authorities as? Collection<*>)?.let { castAuthoritiesToCollection(it) } ?: emptyList()
+            if (authorities is Collection<*>) authorities as Collection<String> else emptyList()
         }
-    }
-
-    private fun castAuthoritiesToCollection(authorities: Any): Collection<String> {
-        return authorities as Collection<String>
     }
 }

@@ -4,6 +4,14 @@ import java.util.Objects.nonNull
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import org.junit.jupiter.api.Test
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.test.web.servlet.delete
+import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.put
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.controllers.TestDbInitializer.token
 import com.koldyr.library.dto.BookDTO
@@ -15,14 +23,6 @@ import com.koldyr.library.dto.SearchCriteria
 import com.koldyr.library.dto.SortDTO
 import com.koldyr.library.model.Order
 import com.koldyr.library.persistence.OrderRepository
-import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpHeaders.AUTHORIZATION
-import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.web.servlet.delete
-import org.springframework.test.web.servlet.get
-import org.springframework.test.web.servlet.post
-import org.springframework.test.web.servlet.put
 
 /**
  * Description of class BookControllerTest
@@ -148,7 +148,7 @@ class BookControllerTest: LibraryControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
                 content { contentType(APPLICATION_JSON) }
@@ -163,7 +163,7 @@ class BookControllerTest: LibraryControllerTest() {
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(book)
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
             }
@@ -203,7 +203,7 @@ class BookControllerTest: LibraryControllerTest() {
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(searchCriteria)
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
                 content { contentType(APPLICATION_JSON) }
@@ -219,7 +219,7 @@ class BookControllerTest: LibraryControllerTest() {
         val response = rest.get("/library/books/$bookId/feedbacks") {
             header(AUTHORIZATION, token!!)
         }
-                .andDo { print() }
+//                .andDo { print() }
                 .andExpect {
                     status { isOk() }
                     content { contentType(APPLICATION_JSON) }
@@ -240,7 +240,7 @@ class BookControllerTest: LibraryControllerTest() {
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(order)
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isCreated() }
                 content { contentType(APPLICATION_JSON) }
@@ -256,7 +256,7 @@ class BookControllerTest: LibraryControllerTest() {
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(order)
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
             }

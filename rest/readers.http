@@ -3,13 +3,16 @@ POST http://{{server}}/library/registration
 Content-Type: application/json
 
 {
-  "firstName": "r4_first",
-  "lastName": "r4_last",
-  "mail": "r4_mail@server.com",
-  "password": "r4_first",
-  "address": "r4_address",
-  "phoneNumber": "r4-444-444-444",
-  "note": "r4_note"
+  "firstName": "r7_first",
+  "lastName": "r7_last",
+  "mail": "r7_mail@server.com",
+  "password": "r7_first",
+  "address": "r7_address",
+  "phoneNumber": "r7-444-444-444",
+  "note": "r7_note",
+  "roles": [
+    "librarian"
+  ]
 }
 
 ### User Login

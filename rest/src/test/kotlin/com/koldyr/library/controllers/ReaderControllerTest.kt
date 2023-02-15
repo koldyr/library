@@ -140,7 +140,7 @@ class ReaderControllerTest : LibraryControllerTest() {
         val response = rest.get("/library/readers/${readerId}") {
             header(AUTHORIZATION, token!!)
         }
-                .andDo { print() }
+//                .andDo { print() }
                 .andExpect { status { isOk() } }
                 .andReturn().response.contentAsString
 
@@ -168,7 +168,7 @@ class ReaderControllerTest : LibraryControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
         }
-                .andDo { print() }
+//                .andDo { print() }
                 .andExpect {
                     status { isOk() }
                     content { contentType(APPLICATION_JSON) }

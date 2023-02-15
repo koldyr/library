@@ -1,6 +1,7 @@
 package com.koldyr.library.services
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.security.authentication.AnonymousAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import ma.glasnost.orika.MapperFacade
@@ -45,6 +46,9 @@ open class BaseLibraryService {
 
     protected fun hasAuthority(authority: String): Boolean {
         val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication is AnonymousAuthenticationToken) {
+            return false
+        }
         return authentication.authorities
             .map { it as GrantedPrivilege }
             .any { it.privilege == authority }
@@ -52,6 +56,9 @@ open class BaseLibraryService {
 
     protected fun hasRole(role: String): Boolean {
         val authentication = SecurityContextHolder.getContext().authentication
+        if (authentication is AnonymousAuthenticationToken) {
+            return false
+        }
         return authentication.authorities
             .map { it as GrantedPrivilege }
             .any { it.role == role }

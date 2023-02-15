@@ -45,7 +45,7 @@ spring:
     password: xxx
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: true
+    show-sql: false
     generate-ddl: true
   test:
     user: xxx

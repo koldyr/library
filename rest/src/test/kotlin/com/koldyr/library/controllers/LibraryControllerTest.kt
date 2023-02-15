@@ -108,10 +108,8 @@ abstract class LibraryControllerTest {
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(author)
         }
-                .andExpect {
-                    status { isCreated() }
-                }
-                .andReturn().response.getHeader(LOCATION)
+            .andExpect { status { isCreated() } }
+            .andReturn().response.getHeader(LOCATION)
 
         val regex = Regex("/library/authors/(\\d+)")
         val matchResult = regex.find(authorHeader!!)
@@ -124,8 +122,8 @@ abstract class LibraryControllerTest {
         val response = rest.get("/library/authors") {
             header(AUTHORIZATION, token!!)
         }
-                .andExpect { status { isOk() } }
-                .andReturn().response.contentAsString
+            .andExpect { status { isOk() } }
+            .andReturn().response.contentAsString
 
         val typeRef = jacksonTypeRef<List<AuthorDTO>>()
         return mapper.readValue(response, typeRef)
@@ -148,11 +146,11 @@ abstract class LibraryControllerTest {
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(reader)
         }
-                .andExpect {
-                    status { isCreated() }
-                    header { string(LOCATION, matchesRegex("/library/readers/[\\d]+")) }
-                }
-                .andReturn().response.getHeader(LOCATION)
+            .andExpect {
+                status { isCreated() }
+                header { string(LOCATION, matchesRegex("/library/readers/[\\d]+")) }
+            }
+            .andReturn().response.getHeader(LOCATION)
 
         val regex = Regex("/library/readers/(\\d+)")
         val matchResult = regex.find(readerHeader!!)
@@ -165,8 +163,8 @@ abstract class LibraryControllerTest {
         val response = rest.get("/library/readers") {
             header(AUTHORIZATION, token!!)
         }
-                .andExpect { status { isOk() } }
-                .andReturn().response.contentAsString
+            .andExpect { status { isOk() } }
+            .andReturn().response.contentAsString
 
         val typeRef = jacksonTypeRef<List<ReaderDTO>>()
         return mapper.readValue(response, typeRef)
@@ -176,8 +174,8 @@ abstract class LibraryControllerTest {
         val response = rest.get("/library/readers/me") {
             header(AUTHORIZATION, token!!)
         }
-                .andExpect { status { isOk() } }
-                .andReturn().response.contentAsString
+            .andExpect { status { isOk() } }
+            .andReturn().response.contentAsString
 
         return mapper.readValue(response, ReaderDTO::class.java)
     }
@@ -197,12 +195,12 @@ abstract class LibraryControllerTest {
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(book)
         }
-                .andDo { print() }
-                .andExpect {
-                    status { isCreated() }
-                    header { string(LOCATION, matchesRegex("/library/books/[\\d]+")) }
-                }
-                .andReturn().response.getHeader(LOCATION)
+//                .andDo { print() }
+            .andExpect {
+                status { isCreated() }
+                header { string(LOCATION, matchesRegex("/library/books/[\\d]+")) }
+            }
+            .andReturn().response.getHeader(LOCATION)
 
         val regex = Regex("/library/books/(\\d+)")
         val matchResult = regex.find(location!!)
@@ -214,8 +212,8 @@ abstract class LibraryControllerTest {
         val response = rest.get("/library/books") {
             header(AUTHORIZATION, token!!)
         }
-                .andExpect { status { isOk() } }
-                .andReturn().response.contentAsString
+            .andExpect { status { isOk() } }
+            .andReturn().response.contentAsString
 
         val typeRef = jacksonTypeRef<List<BookDTO>>()
         return mapper.readValue(response, typeRef)
@@ -233,10 +231,8 @@ abstract class LibraryControllerTest {
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(order)
         }
-                .andExpect {
-                    status { isCreated() }
-                }
-                .andReturn().response.contentAsString
+            .andExpect { status { isCreated() } }
+            .andReturn().response.contentAsString
 
         val dto = mapper.readValue(response, OrderDTO::class.java)
         dto.ordered = null
@@ -247,8 +243,8 @@ abstract class LibraryControllerTest {
         val response = rest.get("/library/readers/${reader.id}/orders") {
             header(AUTHORIZATION, token!!)
         }
-                .andExpect { status { isOk() } }
-                .andReturn().response.contentAsString
+            .andExpect { status { isOk() } }
+            .andReturn().response.contentAsString
 
         val typeRef = jacksonTypeRef<List<OrderDTO>>()
         val orders = mapper.readValue(response, typeRef)
@@ -267,11 +263,11 @@ abstract class LibraryControllerTest {
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(feedback)
         }
-                .andDo { print() }
-                .andExpect {
-                    status { isCreated() }
-                    header { string(LOCATION, matchesRegex("/library/books/[\\d]+/feedbacks")) }
-                }
+//            .andDo { print() }
+            .andExpect {
+                status { isCreated() }
+                header { string(LOCATION, matchesRegex("/library/books/[\\d]+/feedbacks")) }
+            }
     }
 
     private fun getGenres(): Set<String> {

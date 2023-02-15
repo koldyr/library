@@ -3,10 +3,6 @@ package com.koldyr.library.controllers
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
-import com.koldyr.library.controllers.TestDbInitializer.token
-import com.koldyr.library.dto.AuthorDTO
-import com.koldyr.library.dto.BookDTO
 import org.apache.commons.lang3.RandomUtils
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders.AUTHORIZATION
@@ -14,6 +10,10 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.koldyr.library.controllers.TestDbInitializer.token
+import com.koldyr.library.dto.AuthorDTO
+import com.koldyr.library.dto.BookDTO
 
 
 /**
@@ -61,7 +61,7 @@ class AuthorControllerTest : LibraryControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
         }
-                .andDo { print() }
+//                .andDo { print() }
                 .andExpect {
                     status { isOk() }
                     content { contentType(APPLICATION_JSON) }
@@ -94,7 +94,7 @@ class AuthorControllerTest : LibraryControllerTest() {
             header(AUTHORIZATION, token!!)
             param("search", firstName!!)
         }
-                .andDo { print() }
+//                .andDo { print() }
                 .andExpect {
                     status { isOk() }
                     content { contentType(APPLICATION_JSON) }
@@ -111,7 +111,7 @@ class AuthorControllerTest : LibraryControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
         }
-                .andDo { print() }
+//                .andDo { print() }
                 .andExpect {
                     status { isOk() }
                     content { contentType(APPLICATION_JSON) }
@@ -128,7 +128,7 @@ class AuthorControllerTest : LibraryControllerTest() {
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(author)
         }
-                .andDo { print() }
+//                .andDo { print() }
                 .andExpect {
                     status { isOk() }
                 }

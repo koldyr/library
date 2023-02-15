@@ -47,9 +47,15 @@ class ReaderServiceImpl(
         reader.id = null
         val entity = mapper.map(reader, Reader::class.java)
 
-        if (entity.roles.isEmpty()) {
+        if (hasRole("supervisor")) {//only supervisor is able to specify desired roles for user
+            if (entity.roles.isEmpty()) {
+                entity.roles.add(roleRepository.findByName("reader").get())
+            }
+        } else {//by default registered user has only reader rights
+            entity.roles.clear()
             entity.roles.add(roleRepository.findByName("reader").get())
         }
+
         entity.password = encoder.encode(reader.password)
 
         val saved = readerRepository.save(entity)
