@@ -94,9 +94,9 @@ class BookServiceImpl(
     }
 
     @PreAuthorize("hasAuthority('read_feedback')")
-    override fun bookFeedbacks(bookId: Int): List<FeedbackDTO> {
-        return feedbackRepository.findAllByBookId(bookId).map { mapper.map(it, FeedbackDTO::class.java) }
-    }
+    override fun bookFeedbacks(bookId: Int): List<FeedbackDTO> = feedbackRepository
+        .findAllByBookId(bookId)
+        .map { mapper.map(it, FeedbackDTO::class.java) }
 
     override fun deleteFeedback(feedbackId: Int) {
         val feedback = feedbackRepository.findById(feedbackId)

@@ -4,8 +4,8 @@ import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
 import org.hamcrest.Matchers
 import org.hamcrest.Matchers.containsString
 import org.junit.jupiter.api.Test
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.HttpHeaders.WWW_AUTHENTICATE
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
@@ -108,7 +108,7 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
 //            .andDo { print() }
             .andExpect {
                 status { isUnauthorized() }
-                header { string(HttpHeaders.WWW_AUTHENTICATE, Matchers.`is`("Bearer")) }
+                header { string(WWW_AUTHENTICATE, Matchers.`is`("Bearer")) }
             }
     }
 
@@ -120,7 +120,7 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
 //            .andDo { print() }
             .andExpect {
                 status { isUnauthorized() }
-                header { string(HttpHeaders.WWW_AUTHENTICATE, Matchers.`is`("Bearer")) }
+                header { string(WWW_AUTHENTICATE, Matchers.`is`("Bearer")) }
             }
     }
 
@@ -132,18 +132,18 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
         book.note = randomAlphabetic(10)
 
         val reader = createReader()
-        val token = login(CredentialsDTO(reader.mail, reader.password))
+        val readerToken = login(CredentialsDTO(reader.mail, reader.password))
 
         rest.put("/library/books/${book.id}") {
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
-            header(AUTHORIZATION, token)
+            header(AUTHORIZATION, readerToken)
             content = mapper.writeValueAsString(book)
         }
 //            .andDo { print() }
             .andExpect {
                 status { isForbidden() }
-                header { string(HttpHeaders.WWW_AUTHENTICATE, containsString("insufficient_scope")) }
+                header { string(WWW_AUTHENTICATE, containsString("insufficient_scope")) }
             }
     }
 

@@ -15,7 +15,7 @@ class ReaderDetails(val reader: Reader) : UserDetails {
     private val authorities: Set<GrantedPrivilege>
 
     init {
-        val authorities: MutableSet<GrantedPrivilege> = mutableSetOf()
+        val authorities = mutableSetOf<GrantedPrivilege>()
         for (role in reader.roles) {
             for (privilege in role.privileges) {
                 authorities.add(GrantedPrivilege(role.name, privilege.value))
@@ -37,8 +37,4 @@ class ReaderDetails(val reader: Reader) : UserDetails {
     override fun isCredentialsNonExpired(): Boolean = true
 
     override fun isEnabled(): Boolean = true
-
-    fun hasAuthority(authority: String): Boolean = authorities.any { it.authority == authority }
-
-    fun hasRole(role: String): Boolean = authorities.any { it.role == role }
 }

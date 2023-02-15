@@ -19,5 +19,5 @@
     <logger name="org.springframework.boot.test" level="warn"/>
     <logger name="org.springframework.test" level="warn"/>
     <logger name="org.springframework.context.support.PostProcessorRegistrationDelegate" level="error"/>
-    <logger name="com.koldyr.library" level="debug"/>
+    <logger name="com.koldyr.library" level="trace"/>
 </configuration>
