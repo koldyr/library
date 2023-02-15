@@ -27,6 +27,8 @@ import com.koldyr.library.persistence.OrderRepository
 
 /**
  * Description of class BookServiceImpl
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2021-09-28
  */
 @Service

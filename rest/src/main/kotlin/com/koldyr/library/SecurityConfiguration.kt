@@ -18,8 +18,8 @@ import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.security.web.SecurityFilterChain
+import com.koldyr.library.security.GrantedPrivilegeConverter
 
 /**
  * Description of class SecurityConfiguration
@@ -31,7 +31,6 @@ import org.springframework.security.web.SecurityFilterChain
 @EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfiguration {
-
 
     @Bean
     @Throws(java.lang.Exception::class)
@@ -47,35 +46,29 @@ class SecurityConfiguration {
     fun jwtDecoder(
         @Value("\${spring.security.secret}") secret: String,
         @Value("\${spring.security.oauth2.resourceserver.jwt.jws-algorithms}") algorithm: String
-    ): JwtDecoder {
-        return NimbusJwtDecoder
-            .withSecretKey(EncryptionKey(secret.toByteArray(), 1))
-            .macAlgorithm(MacAlgorithm.from(algorithm))
-            .build()
-    }
+    ): JwtDecoder = NimbusJwtDecoder
+        .withSecretKey(EncryptionKey(secret.toByteArray(), 1))
+        .macAlgorithm(MacAlgorithm.from(algorithm))
+        .build()
 
     @Bean
     fun authenticationConverter(): JwtAuthenticationConverter = JwtAuthenticationConverter()
         .also {
-            val grantedAuthoritiesConverter = JwtGrantedAuthoritiesConverter()
-            grantedAuthoritiesConverter.setAuthorityPrefix("")
-            it.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter)
+            it.setJwtGrantedAuthoritiesConverter(GrantedPrivilegeConverter())
         }
-
 
     @Bean
     @Throws(Exception::class)
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
         http
-            .headers().disable()
-            .csrf().disable()
-            .cors()
-            .and()
-            .authorizeHttpRequests()
-            .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs.**", "/v3/api-docs/**", "/error/**", "/favicon.ico").permitAll()
-            .requestMatchers(POST, "/library/login", "/library/registration").permitAll()
-            .anyRequest().authenticated()
-            .and()
+            .headers { it.disable() }
+            .csrf { it.disable() }
+            .cors {}
+            .authorizeHttpRequests {
+                it.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs.**", "/v3/api-docs/**", "/error/**", "/favicon.ico").permitAll()
+                    .requestMatchers(POST, "/library/login", "/library/registration").permitAll()
+                    .anyRequest().authenticated()
+            }
             .oauth2ResourceServer { it.jwt() }
         return http.build()
     }

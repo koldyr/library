@@ -1,11 +1,11 @@
 package com.koldyr.library.services
 
 import java.time.LocalDate
-import java.util.Objects.*
+import java.util.Objects.nonNull
 import jakarta.persistence.criteria.Path
 import jakarta.persistence.criteria.Predicate
 import kotlin.reflect.full.declaredMemberProperties
-import org.apache.commons.lang3.ObjectUtils.*
+import org.apache.commons.lang3.ObjectUtils.isNotEmpty
 import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Component
 import com.koldyr.library.dto.SearchCriteria
@@ -15,6 +15,8 @@ import com.koldyr.library.model.GenreNames
 
 /**
  * Description of class PredicateBuilder
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2022-02-10
  */
 @Component

@@ -10,9 +10,16 @@ import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.model.Author
 import com.koldyr.library.persistence.AuthorRepository
 
+
+/**
+ * Description of class AuthorServiceImpl
+ *
+ * @author: d.halitski@gmail.com
+ * @created: 2021-10-08
+ */
 @Service
 @Transactional
-open class AuthorServiceImpl(
+class AuthorServiceImpl(
     private val authorRepository: AuthorRepository,
 ) : AuthorService, BaseLibraryService() {
 

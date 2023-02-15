@@ -5,6 +5,7 @@ import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UsernameNotFoundException
 import ma.glasnost.orika.MapperFacade
 import com.koldyr.library.dto.BookDTO
+import com.koldyr.library.dto.GrantedPrivilege
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.model.Order
 import com.koldyr.library.model.Reader
@@ -44,11 +45,15 @@ open class BaseLibraryService {
 
     protected fun hasAuthority(authority: String): Boolean {
         val authentication = SecurityContextHolder.getContext().authentication
-        return authentication.authorities.any { it.authority.equals(authority) }
+        return authentication.authorities
+            .map { it as GrantedPrivilege }
+            .any { it.privilege == authority }
     }
 
     protected fun hasRole(role: String): Boolean {
         val authentication = SecurityContextHolder.getContext().authentication
-        return authentication.authorities.any { it.authority.equals(role) }
+        return authentication.authorities
+            .map { it as GrantedPrivilege }
+            .any { it.role == role }
     }
 }

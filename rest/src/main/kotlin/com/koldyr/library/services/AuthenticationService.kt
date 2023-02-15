@@ -5,6 +5,8 @@ import com.koldyr.library.dto.ReaderDTO
 
 /**
  * Description of class AuthenticationService
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2022-02-09
  */
 interface AuthenticationService {

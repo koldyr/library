@@ -19,9 +19,16 @@ import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import ma.glasnost.orika.MapperFacade
 import com.koldyr.library.dto.CredentialsDTO
+import com.koldyr.library.dto.GrantedPrivilege
 import com.koldyr.library.dto.ReaderDTO
 import com.koldyr.library.dto.ReaderDetails
 
+/**
+ * Description of class AuthenticationServiceImpl
+ *
+ * @author: d.halitski@gmail.com
+ * @created: 2022-02-12
+ */
 @Service("authenticationService")
 class AuthenticationServiceImpl(
     @Value("\${spring.security.token.exp}") val expiration: String,
@@ -54,7 +61,9 @@ class AuthenticationServiceImpl(
     private fun generateToken(authentication: Authentication): String {
         val tokenLive = LocalDateTime.now().plusMinutes(expiration.toLong())
         val expiration = Date.from(tokenLive.atZone(ZoneId.systemDefault()).toInstant())
-        val roles = authentication.authorities.map { it.authority }.toTypedArray()
+        val roles = authentication.authorities
+            .map { it as GrantedPrivilege }
+            .map { it.role + ":" + it.privilege }
 
         val claimsSet = JWTClaimsSet.Builder()
             .subject(authentication.name)

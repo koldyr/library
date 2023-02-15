@@ -1,16 +1,18 @@
 package com.koldyr.library.persistence
 
-import com.koldyr.library.model.Feedback
-import com.koldyr.library.model.Order
-import com.koldyr.library.model.Reader
+import java.util.*
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
-import java.util.*
+import com.koldyr.library.model.Feedback
+import com.koldyr.library.model.Order
+import com.koldyr.library.model.Reader
 
 /**
  * Description of class ReaderRepository
+ *
+ * @author: d.halitski@gmail.com
  * @created: 2021-09-25
  */
 @Repository("readerRepository")
