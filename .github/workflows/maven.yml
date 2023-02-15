@@ -19,4 +19,4 @@ jobs:
       - name: Build All
         run: mvn -B package -DskipTests --file pom.xml
       - name: Test All
-        run: mvn -B test -Dspring.profiles.active=int-test -Dlibrary.test.password=${{ secrets.LIBRARY_TEST_PASSWORD }} -Dspring.datasource.password=${{ secrets.DS_PASSWORD }} -Dlibrary.test.user=${{ secrets.TEST_USER }} -Dlibrary.test.password=${{ secrets.TEST_USER_PWD }} --file pom.xml
+        run: mvn -B test -Dspring.profiles.active=int-test -Dspring.datasource.user=${{ secrets.DS_USER }} -Dspring.datasource.password=${{ secrets.DS_PASSWORD }} -Dspring.test.user=${{ secrets.TEST_USER }} -Dspring.test.password=${{ secrets.TEST_USER_PWD }} --file pom.xml
