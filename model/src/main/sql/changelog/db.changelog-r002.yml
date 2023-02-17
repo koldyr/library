@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: R002.00
+      author: Denis Halitsky
+      comment: "Change roles for koldyr"
+      changes:
+        - sqlFile:
+            path: "../changes/r002.sql"
+            relativeToChangelogFile: true
+        - tagDatabase:
+          tag:  r002

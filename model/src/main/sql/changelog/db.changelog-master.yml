@@ -4,3 +4,13 @@ databaseChangeLog:
       author: Denis Halitsky
       file: db.changelog-r000.yml
       relativeToChangelogFile: true
+  - include:
+      id: r001
+      author: Denis Halitsky
+      file: db.changelog-r001.yml
+      relativeToChangelogFile: true
+  - include:
+      id: r002
+      author: Denis Halitsky
+      file: db.changelog-r002.yml
+      relativeToChangelogFile: true

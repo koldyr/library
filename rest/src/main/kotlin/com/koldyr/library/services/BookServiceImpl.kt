@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
@@ -104,6 +105,8 @@ class BookServiceImpl(
 
         if (feedback.reader!!.id == currentUser().id || hasAuthority("modify_feedback")) {
             feedbackRepository.delete(feedback)
+        } else {
+            throw ResponseStatusException(FORBIDDEN, "You don't have access to feedback with id '${feedbackId}'")
         }
     }
 

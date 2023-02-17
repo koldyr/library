@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: R001.00
+      author: Denis Halitsky
+      comment: "Remove some privileges from roles"
+      changes:
+        - sqlFile:
+            path: "../changes/r001.sql"
+            relativeToChangelogFile: true
