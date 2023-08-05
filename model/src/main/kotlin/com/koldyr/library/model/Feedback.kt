@@ -7,7 +7,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToOne
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 
@@ -25,10 +25,10 @@ class Feedback {
     @Column(name = "FEEDBACK_ID")
     var id: Int? = null
 
-    @OneToOne @JoinColumn(name = "READER_ID")
+    @ManyToOne @JoinColumn(name = "READER_ID")
     var reader: Reader? = null
 
-    @OneToOne @JoinColumn(name = "BOOK_ID")
+    @ManyToOne @JoinColumn(name = "BOOK_ID")
     var book: Book? = null
 
     var date: LocalDateTime = LocalDateTime.now()

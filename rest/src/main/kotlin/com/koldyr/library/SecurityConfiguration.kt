@@ -69,7 +69,7 @@ class SecurityConfiguration {
                     .requestMatchers(POST, "/library/login", "/library/registration").permitAll()
                     .anyRequest().authenticated()
             }
-            .oauth2ResourceServer { it.jwt() }
+            .oauth2ResourceServer { it.jwt { } }
         return http.build()
     }
 }
