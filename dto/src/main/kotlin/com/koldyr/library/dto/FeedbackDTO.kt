@@ -1,6 +1,7 @@
 package com.koldyr.library.dto
 
 import java.time.LocalDateTime
+import jakarta.validation.constraints.Size
 
 /**
  * Description of class FeedbackDTO
@@ -13,6 +14,7 @@ data class FeedbackDTO(
     var readerId: Int? = null,
     var bookId: Int? = null,
     var date: LocalDateTime? = null,
+    @field:Size(max = 4096)
     var text: String? = null,
     var rate: Int = 0
 )

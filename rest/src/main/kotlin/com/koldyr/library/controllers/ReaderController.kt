@@ -1,16 +1,5 @@
 package com.koldyr.library.controllers
 
-import org.springframework.http.MediaType.*
-import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.*
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.RestController
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.enums.ParameterIn
@@ -19,7 +8,19 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
-import com.koldyr.library.dto.ErrorResponse
+import jakarta.validation.Valid
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.noContent
+import org.springframework.http.ResponseEntity.ok
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.RestController
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.ReaderDTO
@@ -34,11 +35,9 @@ import com.koldyr.library.services.ReaderService
 @RestController
 @RequestMapping("/library/readers")
 @Tag(name = "ReaderController", description = "Reader operations")
-@ApiResponse(
-    responseCode = "500", description = "Internal error occurred",
-    content = [Content(schema = Schema(implementation = ErrorResponse::class), mediaType = APPLICATION_JSON_VALUE)]
-)
-class ReaderController(private val readerService: ReaderService) {
+class ReaderController(
+    private val readerService: ReaderService
+) : BaseController() {
 
     @Operation(
         summary = "Search for authors",
@@ -55,7 +54,7 @@ class ReaderController(private val readerService: ReaderService) {
         responses = [ApiResponse(responseCode = "200", description = "Reader updated", content = [Content()])]
     )
     @PutMapping("/{readerId}", consumes = [APPLICATION_JSON_VALUE])
-    fun update(@PathVariable("readerId") readerId: Int, @RequestBody reader: ReaderDTO): ResponseEntity<Unit> {
+    fun update(@PathVariable("readerId") readerId: Int, @RequestBody @Valid reader: ReaderDTO): ResponseEntity<Unit> {
         readerService.update(readerId, reader)
         return ok().build()
     }

@@ -1,11 +1,22 @@
 package com.koldyr.library.controllers
 
 import java.net.URI
-import java.util.Objects.*
-import org.springframework.http.HttpStatus.*
-import org.springframework.http.MediaType.*
+import java.util.Objects.isNull
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.CREATED
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.*
+import org.springframework.http.ResponseEntity.created
+import org.springframework.http.ResponseEntity.noContent
+import org.springframework.http.ResponseEntity.ok
+import org.springframework.http.ResponseEntity.status
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -16,14 +27,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.tags.Tag
 import com.koldyr.library.dto.BookDTO
-import com.koldyr.library.dto.ErrorResponse
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.PageResultDTO
@@ -39,11 +43,9 @@ import com.koldyr.library.services.BookService
 @RestController
 @RequestMapping("/library/books")
 @Tag(name = "BookController", description = "Book operations")
-@ApiResponse(
-    responseCode = "500", description = "Internal error occurred",
-    content = [Content(schema = Schema(implementation = ErrorResponse::class), mediaType = APPLICATION_JSON_VALUE)]
-)
-class BookController(private val bookService: BookService) {
+class BookController(
+    private val bookService: BookService
+) : BaseController() {
 
     @Operation(
         summary = "List of books for current user reader",
@@ -63,14 +65,14 @@ class BookController(private val bookService: BookService) {
         )]
     )
     @PostMapping("/search", consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
-    fun searchBooks(@RequestBody(required = false) criteria: SearchCriteria?): PageResultDTO<BookDTO> = bookService.findBooks(criteria)
+    fun searchBooks(@RequestBody(required = false) @Valid criteria: SearchCriteria?): PageResultDTO<BookDTO> = bookService.findBooks(criteria)
 
     @Operation(
         summary = "Create new book",
         responses = [ApiResponse(responseCode = "201", description = "Book created", content = [Content()])]
     )
     @PostMapping(consumes = [APPLICATION_JSON_VALUE])
-    fun create(@RequestBody book: BookDTO): ResponseEntity<Unit> {
+    fun create(@RequestBody @Valid book: BookDTO): ResponseEntity<Unit> {
         val bookId = bookService.create(book)
 
         val uri = URI.create("/library/books/${bookId}")
@@ -92,7 +94,7 @@ class BookController(private val bookService: BookService) {
         responses = [ApiResponse(responseCode = "200", description = "Book updated", content = [Content()])]
     )
     @PutMapping("/{bookId}", consumes = [APPLICATION_JSON_VALUE])
-    fun update(@PathVariable("bookId") bookId: Int, @RequestBody book: BookDTO): ResponseEntity<Unit> {
+    fun update(@PathVariable("bookId") bookId: Int, @RequestBody @Valid book: BookDTO): ResponseEntity<Unit> {
         bookService.update(bookId, book)
         return ok().build()
     }
@@ -115,7 +117,7 @@ class BookController(private val bookService: BookService) {
         )]
     )
     @PostMapping("/take", consumes = [APPLICATION_JSON_VALUE])
-    fun takeBook(@RequestBody order: OrderDTO): ResponseEntity<OrderDTO> {
+    fun takeBook(@RequestBody @Valid order: OrderDTO): ResponseEntity<OrderDTO> {
         if (isNull(order.bookId)) {
             throw ResponseStatusException(BAD_REQUEST, "Book id must be provided")
         }
@@ -129,7 +131,7 @@ class BookController(private val bookService: BookService) {
         responses = [ApiResponse(responseCode = "200", description = "Book returned", content = [Content()])]
     )
     @PostMapping("/return", consumes = [APPLICATION_JSON_VALUE])
-    fun returnBook(@RequestBody order: OrderDTO): ResponseEntity<Unit> {
+    fun returnBook(@RequestBody @Valid order: OrderDTO): ResponseEntity<Unit> {
         if (isNull(order.id)) {
             throw ResponseStatusException(BAD_REQUEST, "Order id must be provided")
         }
@@ -143,7 +145,7 @@ class BookController(private val bookService: BookService) {
         responses = [ApiResponse(responseCode = "201", description = "Feedback created", content = [Content()])]
     )
     @PostMapping("/feedback", consumes = [APPLICATION_JSON_VALUE])
-    fun feedbackBook(@RequestBody feedback: FeedbackDTO): ResponseEntity<Unit> {
+    fun feedbackBook(@RequestBody @Valid feedback: FeedbackDTO): ResponseEntity<Unit> {
         if (isNull(feedback.bookId)) {
             throw ResponseStatusException(BAD_REQUEST, "Book id must be provided")
         }

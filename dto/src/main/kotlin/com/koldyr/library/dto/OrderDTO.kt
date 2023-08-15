@@ -1,6 +1,7 @@
 package com.koldyr.library.dto
 
 import java.time.LocalDateTime
+import jakarta.validation.constraints.Size
 
 /**
  * Description of class OrderDTO
@@ -14,6 +15,7 @@ data class OrderDTO(
     var readerId: Int? = null,
     var ordered: LocalDateTime? = null,
     var returned: LocalDateTime? = null,
+    @field:Size(max = 255)
     var notes: String? = null,
     var book: BookDTO? = null
 )

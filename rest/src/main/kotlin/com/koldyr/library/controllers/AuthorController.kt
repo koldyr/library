@@ -1,6 +1,15 @@
 package com.koldyr.library.controllers
 
 import java.net.URI
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
+import io.swagger.v3.oas.annotations.enums.ParameterIn
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.created
@@ -15,17 +24,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.enums.ParameterIn
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.tags.Tag
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
-import com.koldyr.library.dto.ErrorResponse
 import com.koldyr.library.services.AuthorService
 import com.koldyr.library.services.BookService
 
@@ -38,13 +38,9 @@ import com.koldyr.library.services.BookService
 @RestController
 @RequestMapping("/library/authors")
 @Tag(name = "AuthorController", description = "Author operations")
-@ApiResponse(
-    responseCode = "500", description = "Internal error occurred",
-    content = [Content(schema = Schema(implementation = ErrorResponse::class), mediaType = APPLICATION_JSON_VALUE)]
-)
 class AuthorController(
     private val authorService: AuthorService, private val bookService: BookService
-) {
+) : BaseController() {
 
     @Operation(
         summary = "Search for authors",
@@ -76,7 +72,7 @@ class AuthorController(
         responses = [ApiResponse(responseCode = "201", description = "Author created", content = [Content()])]
     )
     @PostMapping(consumes = [APPLICATION_JSON_VALUE])
-    fun create(@RequestBody author: AuthorDTO): ResponseEntity<Unit> {
+    fun create(@RequestBody @Valid author: AuthorDTO): ResponseEntity<Unit> {
         val authorId: Int = authorService.create(author)
 
         val uri = URI.create("/library/authors/$authorId")
@@ -98,7 +94,7 @@ class AuthorController(
         ]
     )
     @PutMapping("/{authorId}", consumes = [APPLICATION_JSON_VALUE])
-    fun update(@PathVariable("authorId") authorId: Int, @RequestBody author: AuthorDTO): ResponseEntity<Unit> {
+    fun update(@PathVariable("authorId") authorId: Int, @RequestBody @Valid author: AuthorDTO): ResponseEntity<Unit> {
         authorService.update(authorId, author)
         return ok().build()
     }
