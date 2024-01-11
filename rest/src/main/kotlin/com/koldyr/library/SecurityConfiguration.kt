@@ -66,7 +66,7 @@ class SecurityConfiguration {
             .cors {}
             .authorizeHttpRequests {
                 it.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs.**", "/v3/api-docs/**", "/error/**", "/favicon.ico").permitAll()
-                    .requestMatchers(POST, "/library/login", "/library/registration").permitAll()
+                    .requestMatchers(POST, "/api/v1/login", "/api/v1/registration").permitAll()
                     .anyRequest().authenticated()
             }
             .oauth2ResourceServer { it.jwt { } }

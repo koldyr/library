@@ -36,7 +36,7 @@ import com.koldyr.library.services.BookService
  * @created: 2021-10-06
  */
 @RestController
-@RequestMapping("/library/authors")
+@RequestMapping("/api/v1/authors")
 @Tag(name = "AuthorController", description = "Author operations")
 class AuthorController(
     private val authorService: AuthorService, private val bookService: BookService
@@ -75,7 +75,7 @@ class AuthorController(
     fun create(@RequestBody @Valid author: AuthorDTO): ResponseEntity<Unit> {
         val authorId: Int = authorService.create(author)
 
-        val uri = URI.create("/library/authors/$authorId")
+        val uri = URI.create("/api/v1/authors/$authorId")
         return created(uri).build()
     }
 

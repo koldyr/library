@@ -29,7 +29,7 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
         user.firstName = randomAlphabetic(10)
         user.lastName = randomAlphabetic(10)
 
-        rest.post("/library/registration") {
+        rest.post("/api/v1/registration") {
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
             content = mapper.writeValueAsString(user)
@@ -50,7 +50,7 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
         user.firstName = randomAlphabetic(10)
         user.lastName = randomAlphabetic(10)
 
-        rest.post("/library/registration") {
+        rest.post("/api/v1/registration") {
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
             content = mapper.writeValueAsString(user)
@@ -68,7 +68,7 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
     fun wrongPassword() {
         val login = CredentialsDTO(userName, "12345")
 
-        rest.post("/library/login") {
+        rest.post("/api/v1/login") {
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(login)
         }
@@ -86,7 +86,7 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
         val username = randomAlphabetic(5) + "@mail.com"
         val login = CredentialsDTO(username, randomAlphabetic(10))
 
-        rest.post("/library/login") {
+        rest.post("/api/v1/login") {
             contentType = APPLICATION_JSON
             content = mapper.writeValueAsString(login)
         }
@@ -101,7 +101,7 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
 
     @Test
     fun wrongToken() {
-        rest.get("/library/readers/me") {
+        rest.get("/api/v1/readers/me") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, randomAlphabetic(20))
         }
@@ -114,7 +114,7 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
 
     @Test
     fun noToken() {
-        rest.get("/library/readers/me") {
+        rest.get("/api/v1/readers/me") {
             accept = APPLICATION_JSON
         }
 //            .andDo { print() }
@@ -134,7 +134,7 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
         val reader = createReader()
         val readerToken = login(CredentialsDTO(reader.mail, reader.password))
 
-        rest.put("/library/books/${book.id}") {
+        rest.put("/api/v1/books/${book.id}") {
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
             header(AUTHORIZATION, readerToken)

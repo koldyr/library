@@ -1,15 +1,15 @@
 ### Get Authors
-GET http://{{server}}/library/authors
+GET http://{{server}}/api/v1/authors
 Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Get Author
-GET http://{{server}}/library/authors/1
+GET http://{{server}}/api/v1/authors/1
 Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Create Author
-POST http://{{server}}/library/authors
+POST http://{{server}}/api/v1/authors
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
@@ -21,7 +21,7 @@ Accept: application/json
 }
 
 ### Update Author
-PUT http://{{server}}/library/authors/3
+PUT http://{{server}}/api/v1/authors/3
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
@@ -33,9 +33,9 @@ Accept: application/json
 }
 
 ### Delete Author
-DELETE http://{{server}}/library/authors/2
+DELETE http://{{server}}/api/v1/authors/2
 Authorization: Bearer {{token}}
 
 ### Get all Author's books
-GET http://{{server}}/library/authors/4/books
+GET http://{{server}}/api/v1/authors/4/books
 Authorization: Bearer {{token}}

@@ -4,6 +4,7 @@ import java.util.Objects.nonNull
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpHeaders.AUTHORIZATION
@@ -12,7 +13,6 @@ import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.controllers.TestDbInitializer.token
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
@@ -56,7 +56,7 @@ class BookControllerTest: LibraryControllerTest() {
 
         deleteBook(book.id!!)
 
-        rest.get("/library/books/${book.id}") {
+        rest.get("/api/v1/books/${book.id}") {
             header(AUTHORIZATION, token!!)
         }
             .andExpect { status { isNotFound() } }
@@ -144,7 +144,7 @@ class BookControllerTest: LibraryControllerTest() {
     }
 
     private fun readBook(bookId: Int): BookDTO {
-        val body: String = rest.get("/library/books/$bookId") {
+        val body: String = rest.get("/api/v1/books/$bookId") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
         }
@@ -158,7 +158,7 @@ class BookControllerTest: LibraryControllerTest() {
     }
 
     private fun updateBook(book: BookDTO) {
-        rest.put("/library/books/${book.id}") {
+        rest.put("/api/v1/books/${book.id}") {
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(book)
@@ -170,7 +170,7 @@ class BookControllerTest: LibraryControllerTest() {
     }
 
     private fun deleteBook(bookId: Int) {
-        rest.delete("/library/books/$bookId") {
+        rest.delete("/api/v1/books/$bookId") {
             header(AUTHORIZATION, token!!)
         }
             .andExpect {
@@ -179,7 +179,7 @@ class BookControllerTest: LibraryControllerTest() {
     }
 
     private fun assertBooks(book: BookDTO) {
-        val response = rest.get("/library/books") {
+        val response = rest.get("/api/v1/books") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
         }
@@ -197,7 +197,7 @@ class BookControllerTest: LibraryControllerTest() {
     }
 
     private fun searchBooks(searchCriteria: SearchCriteria): List<BookDTO> {
-        val response = rest.post("/library/books/search") {
+        val response = rest.post("/api/v1/books/search") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
@@ -216,7 +216,7 @@ class BookControllerTest: LibraryControllerTest() {
     }
 
     private fun getBookFeedbacks(bookId: Int): Array<FeedbackDTO> {
-        val response = rest.get("/library/books/$bookId/feedbacks") {
+        val response = rest.get("/api/v1/books/$bookId/feedbacks") {
             header(AUTHORIZATION, token!!)
         }
 //                .andDo { print() }
@@ -234,7 +234,7 @@ class BookControllerTest: LibraryControllerTest() {
         order.bookId = book.id
         order.notes = "taken"
 
-        val response = rest.post("/library/books/take") {
+        val response = rest.post("/api/v1/books/take") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
@@ -250,7 +250,7 @@ class BookControllerTest: LibraryControllerTest() {
     }
 
     private fun returnBook(order: OrderDTO) {
-        rest.post("/library/books/return") {
+        rest.post("/api/v1/books/return") {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)

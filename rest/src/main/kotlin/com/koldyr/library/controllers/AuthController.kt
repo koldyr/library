@@ -44,10 +44,10 @@ class AuthController(
             )
         ]
     )
-    @PostMapping(path = ["/library/registration"], consumes = [APPLICATION_JSON_VALUE])
+    @PostMapping(path = ["/api/v1/registration"], consumes = [APPLICATION_JSON_VALUE])
     fun create(@RequestBody reader: ReaderDTO): ResponseEntity<Void> {
         val readerId = readerService.create(reader)
-        return created(URI.create("/library/readers/$readerId")).build()
+        return created(URI.create("/api/v1/readers/$readerId")).build()
     }
 
     @Operation(
@@ -62,7 +62,7 @@ class AuthController(
             )
         ]
     )
-    @PostMapping(path = ["/library/login"], consumes = [APPLICATION_JSON_VALUE])
+    @PostMapping(path = ["/api/v1/login"], consumes = [APPLICATION_JSON_VALUE])
     fun login(@RequestBody credentials: CredentialsDTO): ResponseEntity<Unit> {
         val token = authenticationService.login(credentials)
         return ok().header(AUTHORIZATION, token).build()

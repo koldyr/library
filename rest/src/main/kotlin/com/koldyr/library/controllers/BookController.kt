@@ -41,7 +41,7 @@ import com.koldyr.library.services.BookService
  * @created: 2021-09-25
  */
 @RestController
-@RequestMapping("/library/books")
+@RequestMapping("/api/v1/books")
 @Tag(name = "BookController", description = "Book operations")
 class BookController(
     private val bookService: BookService
@@ -75,7 +75,7 @@ class BookController(
     fun create(@RequestBody @Valid book: BookDTO): ResponseEntity<Unit> {
         val bookId = bookService.create(book)
 
-        val uri = URI.create("/library/books/${bookId}")
+        val uri = URI.create("/api/v1/books/${bookId}")
         return created(uri).build()
     }
 
@@ -152,7 +152,7 @@ class BookController(
 
         bookService.feedbackBook(feedback)
 
-        val uri = URI.create("/library/books/${feedback.bookId}/feedbacks")
+        val uri = URI.create("/api/v1/books/${feedback.bookId}/feedbacks")
         return created(uri).build()
     }
 

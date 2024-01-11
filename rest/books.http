@@ -1,15 +1,15 @@
 ### Get Books
-GET http://{{server}}/library/books
+GET http://{{server}}/api/v1/books
 Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Get Book
-GET http://{{server}}/library/books/2
+GET http://{{server}}/api/v1/books/2
 Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Create Book
-POST http://{{server}}/library/books
+POST http://{{server}}/api/v1/books
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
@@ -26,7 +26,7 @@ Accept: application/json
 }
 
 ### Update Book
-PUT http://{{server}}/library/books/1
+PUT http://{{server}}/api/v1/books/1
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
@@ -43,15 +43,15 @@ Accept: application/json
 }
 
 ### Delete Book
-DELETE http://{{server}}/library/books/1
+DELETE http://{{server}}/api/v1/books/1
 Authorization: Bearer {{token}}
 
 ### Get all Books of Author
-GET http://{{server}}/library/authors/1/books
+GET http://{{server}}/api/v1/authors/1/books
 Authorization: Bearer {{token}}
 
 ### Search Books
-POST http://{{server}}/library/books/search
+POST http://{{server}}/api/v1/books/search
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
@@ -65,7 +65,7 @@ Accept: application/json
 }
 
 ### Take Book
-POST http://{{server}}/library/books/take
+POST http://{{server}}/api/v1/books/take
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
@@ -77,7 +77,7 @@ Accept: application/json
 }
 
 ### Return Book
-POST http://{{server}}/library/books/return
+POST http://{{server}}/api/v1/books/return
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
@@ -88,7 +88,7 @@ Accept: application/json
 }
 
 ### Feedback on Book
-POST http://{{server}}/library/books/feedback
+POST http://{{server}}/api/v1/books/feedback
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
@@ -101,9 +101,9 @@ Accept: application/json
 }
 
 ### Get all Feedbacks for Book
-GET http://{{server}}/library/books/5/feedbacks
+GET http://{{server}}/api/v1/books/5/feedbacks
 Authorization: Bearer {{token}}
 
 ### Get all Feedbacks for Book
-GET http://{{server}}/library/books/3/orders
+GET http://{{server}}/api/v1/books/3/orders
 Authorization: Bearer {{token}}

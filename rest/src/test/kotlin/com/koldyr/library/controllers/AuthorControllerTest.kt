@@ -3,6 +3,7 @@ package com.koldyr.library.controllers
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import org.apache.commons.lang3.RandomUtils
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders.AUTHORIZATION
@@ -10,7 +11,6 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.controllers.TestDbInitializer.token
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
@@ -42,7 +42,7 @@ class AuthorControllerTest : LibraryControllerTest() {
 
         deleteAuthor(author.id!!)
 
-        rest.get("/library/authors/${author.id}") {
+        rest.get("/api/v1/authors/${author.id}") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isNotFound() } }
@@ -57,7 +57,7 @@ class AuthorControllerTest : LibraryControllerTest() {
         books.add(createBook(author))
         books.add(createBook(author))
 
-        val body: String = rest.get("/library/authors/${author.id}/books") {
+        val body: String = rest.get("/api/v1/authors/${author.id}/books") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
         }
@@ -89,7 +89,7 @@ class AuthorControllerTest : LibraryControllerTest() {
         val author = authors[RandomUtils.nextInt(0, authors.size - 1)]
         val firstName = author.firstName
 
-        val body: String = rest.get("/library/authors") {
+        val body: String = rest.get("/api/v1/authors") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
             param("search", firstName!!)
@@ -107,7 +107,7 @@ class AuthorControllerTest : LibraryControllerTest() {
     }
 
     private fun getAuthor(authorId: Int): AuthorDTO {
-        val body: String = rest.get("/library/authors/$authorId") {
+        val body: String = rest.get("/api/v1/authors/$authorId") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
         }
@@ -123,7 +123,7 @@ class AuthorControllerTest : LibraryControllerTest() {
     }
 
     private fun updateAuthor(author: AuthorDTO) {
-        rest.put("/library/authors/${author.id}") {
+        rest.put("/api/v1/authors/${author.id}") {
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(author)
@@ -135,7 +135,7 @@ class AuthorControllerTest : LibraryControllerTest() {
     }
 
     private fun deleteAuthor(authorId: Int) {
-        rest.delete("/library/authors/$authorId") {
+        rest.delete("/api/v1/authors/$authorId") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect {

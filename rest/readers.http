@@ -1,5 +1,5 @@
 ### Register User
-POST http://{{server}}/library/registration
+POST http://{{server}}/api/v1/registration
 Content-Type: application/json
 
 {
@@ -16,7 +16,7 @@ Content-Type: application/json
 }
 
 ### User Login
-POST http://{{server}}/library/login
+POST http://{{server}}/api/v1/login
 Content-Type: application/json
 
 {
@@ -25,20 +25,20 @@ Content-Type: application/json
 }
 
 ### Get All Readers
-GET http://{{server}}/library/readers
+GET http://{{server}}/api/v1/readers
 Authorization: Bearer {{token}}
 
 ### Get All Readers
-GET http://{{server}}/library/readers
+GET http://{{server}}/api/v1/readers
 Authorization: Bearer {{token}}
 
 ### Get Specific Reader
-GET http://{{server}}/library/readers/1
+GET http://{{server}}/api/v1/readers/1
 Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Update Reader
-PUT http://{{server}}/library/readers/3
+PUT http://{{server}}/api/v1/readers/3
 Authorization: Bearer {{token}}
 Content-Type: application/json
 Accept: application/json
@@ -53,15 +53,15 @@ Accept: application/json
 }
 
 ### Delete Reader
-DELETE http://{{server}}/library/readers/1
+DELETE http://{{server}}/api/v1/readers/1
 Authorization: Bearer {{token}}
 
 ### Reader Orders
-GET http://{{server}}/library/readers/1/orders?returned=false
+GET http://{{server}}/api/v1/readers/1/orders?returned=false
 Authorization: Bearer {{token}}
 Accept: application/json
 
 ### Reader Feedbacks
-GET http://{{server}}/library/readers/1/feedbacks
+GET http://{{server}}/api/v1/readers/1/feedbacks
 Authorization: Bearer {{token}}
 Accept: application/json

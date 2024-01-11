@@ -33,7 +33,7 @@ import com.koldyr.library.services.ReaderService
  * @created: 2021-09-25
  */
 @RestController
-@RequestMapping("/library/readers")
+@RequestMapping("/api/v1/readers")
 @Tag(name = "ReaderController", description = "Reader operations")
 class ReaderController(
     private val readerService: ReaderService

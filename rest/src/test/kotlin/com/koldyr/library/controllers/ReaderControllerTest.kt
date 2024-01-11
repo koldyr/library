@@ -4,13 +4,13 @@ import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
+import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import org.junit.jupiter.api.Test
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
-import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.library.controllers.TestDbInitializer.token
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
@@ -55,7 +55,7 @@ class ReaderControllerTest : LibraryControllerTest() {
 
         deleteReader(reader.id!!)
 
-        rest.get("/library/readers/${reader.id}") {
+        rest.get("/api/v1/readers/${reader.id}") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isNotFound() } }
@@ -137,7 +137,7 @@ class ReaderControllerTest : LibraryControllerTest() {
     }
 
     private fun getReader(readerId: Int): ReaderDTO {
-        val response = rest.get("/library/readers/${readerId}") {
+        val response = rest.get("/api/v1/readers/${readerId}") {
             header(AUTHORIZATION, token!!)
         }
 //                .andDo { print() }
@@ -148,7 +148,7 @@ class ReaderControllerTest : LibraryControllerTest() {
     }
 
     private fun updateReader(reader: ReaderDTO) {
-        rest.put("/library/readers/${reader.id}") {
+        rest.put("/api/v1/readers/${reader.id}") {
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
             content = mapper.writeValueAsString(reader)
@@ -157,14 +157,14 @@ class ReaderControllerTest : LibraryControllerTest() {
     }
 
     private fun deleteReader(readerId: Int) {
-        rest.delete("/library/readers/${readerId}") {
+        rest.delete("/api/v1/readers/${readerId}") {
             header(AUTHORIZATION, token!!)
         }
                 .andExpect { status { isNoContent() } }
     }
 
     private fun getReadersFeedbacks(currentUser: ReaderDTO): Array<FeedbackDTO> {
-        val response = rest.get("/library/readers/${currentUser.id}/feedbacks") {
+        val response = rest.get("/api/v1/readers/${currentUser.id}/feedbacks") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, token!!)
         }
