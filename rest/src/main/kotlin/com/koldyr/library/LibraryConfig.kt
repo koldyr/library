@@ -1,5 +1,15 @@
 package com.koldyr.library
 
+import io.swagger.v3.oas.models.Components
+import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.info.Contact
+import io.swagger.v3.oas.models.info.Info
+import io.swagger.v3.oas.models.info.License
+import io.swagger.v3.oas.models.security.SecurityRequirement
+import io.swagger.v3.oas.models.security.SecurityScheme
+import ma.glasnost.orika.MapperFacade
+import ma.glasnost.orika.MapperFactory
+import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -11,19 +21,8 @@ import org.springframework.http.HttpMethod.HEAD
 import org.springframework.http.HttpMethod.PATCH
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpMethod.PUT
-import org.springframework.web.servlet.HandlerExceptionResolver
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import io.swagger.v3.oas.models.Components
-import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.oas.models.info.Contact
-import io.swagger.v3.oas.models.info.Info
-import io.swagger.v3.oas.models.info.License
-import io.swagger.v3.oas.models.security.SecurityRequirement
-import io.swagger.v3.oas.models.security.SecurityScheme
-import ma.glasnost.orika.MapperFacade
-import ma.glasnost.orika.MapperFactory
-import ma.glasnost.orika.impl.DefaultMapperFactory
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
 import com.koldyr.library.dto.FeedbackDTO
@@ -46,11 +45,10 @@ import com.koldyr.library.persistence.GenreRepository
 import com.koldyr.library.persistence.OrderRepository
 import com.koldyr.library.persistence.ReaderRepository
 import com.koldyr.library.persistence.RoleRepository
-import com.koldyr.library.services.InternalExceptionResolver
 
 /**
  * Description of class LibraryConfig
- * 
+ *
  * @author: d.halitski@gmail.com
  * @created: 2021-09-28
  */
@@ -115,10 +113,6 @@ class LibraryConfig {
     @Bean
     fun corsConfigurer(): WebMvcConfigurer {
         return object : WebMvcConfigurer {
-
-            override fun extendHandlerExceptionResolvers(resolvers: MutableList<HandlerExceptionResolver>) {
-                resolvers.add(InternalExceptionResolver())
-            }
 
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/**")
