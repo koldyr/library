@@ -53,6 +53,8 @@ class Book() {
 
     var count: Int = 0
 
+    var archived: Boolean = false
+
     constructor(id: Int) : this() {
         this.id = id
     }

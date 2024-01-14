@@ -44,9 +44,9 @@ class BookServiceImpl(
     @PreAuthorize("hasAuthority('read_book')")
     override fun findAll(available: Boolean): List<BookDTO> {
         if (available) {
-            return bookRepository.findAvailable().map(this::mapBook)
+            return bookRepository.findAllAvailableBooks().map(this::mapBook)
         }
-        return bookRepository.findAll().map(this::mapBook)
+        return bookRepository.findAllBooks().map(this::mapBook)
     }
 
     @PreAuthorize("hasAuthority('modify_book')")
@@ -160,7 +160,7 @@ class BookServiceImpl(
         if (!authorRepository.existsById(authorId)) {
             throw ResponseStatusException(NOT_FOUND, "Author with id '$authorId' is not found")
         }
-        return bookRepository.findBooksByAuthorId(authorId).map(this::mapBook)
+        return bookRepository.findAllByAuthorId(authorId).map(this::mapBook)
     }
 
     @PreAuthorize("hasAuthority('read_book')")

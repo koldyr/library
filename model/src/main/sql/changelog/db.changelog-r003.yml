@@ -1,0 +1,21 @@
+databaseChangeLog:
+  - changeSet:
+      id: R003.00
+      author: Denis Halitsky
+      comment: "Added archived attribute to book"
+      changes:
+        - sqlFile:
+            path: "../changes/r003.sql"
+            relativeToChangelogFile: true
+        - tagDatabase:
+          tag:  r003
+  - changeSet:
+      id: R003.01
+      author: Denis Halitsky
+      comment: "Added indexes to some tables"
+      changes:
+        - sqlFile:
+            path: "../changes/r003.1.sql"
+            relativeToChangelogFile: true
+        - tagDatabase:
+          tag:  r003.1

@@ -15,11 +15,15 @@ import com.koldyr.library.model.Book
  */
 @Repository("bookRepository")
 interface BookRepository : JpaRepository<Book, Int>, JpaSpecificationExecutor<Book> {
-    fun findBooksByAuthorId(authorId: Int): List<Book>
 
-    @Query("from Book b where b.count > 0")
-    fun findAvailable(): List<Book>
+    @Query("from Book b where b.archived = :archived")
+    fun findAllBooks(@Param("archived") archived: Boolean = false): List<Book>
 
-    @Query("from Book b where b.count > 0 and b.author.id = :authorId")
+    fun findAllByAuthorId(authorId: Int): List<Book>
+
+    @Query("from Book b where b.count > 0 and not b.archived")
+    fun findAllAvailableBooks(): List<Book>
+
+    @Query("from Book b where b.count > 0 and b.author.id = :authorId and not b.archived")
     fun findAvailableForAuthor(@Param("authorId") authorId: Int): List<Book>
 }

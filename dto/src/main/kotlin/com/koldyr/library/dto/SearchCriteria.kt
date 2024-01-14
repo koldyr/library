@@ -11,16 +11,24 @@ import jakarta.validation.constraints.Size
 data class SearchCriteria(
     @field:Size(max = 255)
     var title: String? = null,
+
     @field:Size(max = 255)
     var author: String? = null,
+
     var genres: Set<String>? = null,
+
     @field:Size(max = 255)
     var publisher: String? = null,
+
     var publishYearFrom: Int? = null,
+
     var publishYearTill: Int? = null,
+
     @field:Size(max = 255)
     var note: String? = null,
+
     var page: PageDTO? = null,
+
     var sort: SortDTO? = null
 )
 

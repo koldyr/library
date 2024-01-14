@@ -14,6 +14,11 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
+    properties:
+      hibernate.jdbc.batch_size: 100
+      hibernate.jdbc.fetch_size: 100
+      hibernate.order_inserts: true
+      hibernate.generate_statistics: false
   security:
     secret: 2c71790a-875e-469c-bab6-b66af9ac2641
     token:
