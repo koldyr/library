@@ -7,6 +7,7 @@ import java.lang.ClassLoader.getSystemResourceAsStream
 import java.time.LocalDate
 import java.time.LocalDateTime
 import javax.sql.DataSource
+import kotlin.text.Charsets.UTF_8
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import org.apache.commons.lang3.RandomStringUtils
@@ -31,7 +32,6 @@ import com.koldyr.library.controllers.TestDbInitializer.dbInitialized
 import com.koldyr.library.controllers.TestDbInitializer.token
 import com.koldyr.library.dto.AuthorDTO
 import com.koldyr.library.dto.BookDTO
-import com.koldyr.library.dto.CredentialsDTO
 import com.koldyr.library.dto.FeedbackDTO
 import com.koldyr.library.dto.OrderDTO
 import com.koldyr.library.dto.ReaderDTO
@@ -75,7 +75,7 @@ abstract class LibraryControllerTest {
         }
 
         if (token == null) {
-            token = login(CredentialsDTO(userName, password))
+            token = login(userName, password)
         }
     }
 
@@ -88,10 +88,11 @@ abstract class LibraryControllerTest {
         }
     }
 
-    protected fun login(credentials: CredentialsDTO): String {
+    protected fun login(userName: String, password: String): String {
         return rest.post("/api/v1/login") {
-            contentType = APPLICATION_JSON
-            content = mapper.writeValueAsString(credentials)
+            headers {
+                setBasicAuth(userName, password, UTF_8)
+            }
         }
             .andExpect { status { isOk() } }
             .andReturn().response.getHeader(AUTHORIZATION)!!

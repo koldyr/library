@@ -10,7 +10,6 @@ import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
-import com.koldyr.library.dto.CredentialsDTO
 import com.koldyr.library.dto.ReaderDTO
 
 /**
@@ -66,11 +65,12 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
 
     @Test
     fun wrongPassword() {
-        val login = CredentialsDTO(userName, "12345")
+        val password = "12345"
 
         rest.post("/api/v1/login") {
-            contentType = APPLICATION_JSON
-            content = mapper.writeValueAsString(login)
+            headers {
+                setBasicAuth(userName, password, Charsets.UTF_8)
+            }
         }
 //            .andDo { print() }
             .andExpect {
@@ -83,12 +83,13 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
 
     @Test
     fun wrongUser() {
-        val username = randomAlphabetic(5) + "@mail.com"
-        val login = CredentialsDTO(username, randomAlphabetic(10))
+        val userName = randomAlphabetic(5) + "@mail.com"
+        val password = randomAlphabetic(10)
 
         rest.post("/api/v1/login") {
-            contentType = APPLICATION_JSON
-            content = mapper.writeValueAsString(login)
+            headers {
+                setBasicAuth(userName, password, Charsets.UTF_8)
+            }
         }
 //            .andDo { print() }
             .andExpect {
@@ -102,8 +103,9 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
     @Test
     fun wrongToken() {
         rest.get("/api/v1/readers/me") {
-            accept = APPLICATION_JSON
-            header(AUTHORIZATION, randomAlphabetic(20))
+            headers {
+                setBasicAuth(randomAlphabetic(20))
+            }
         }
 //            .andDo { print() }
             .andExpect {
@@ -132,7 +134,7 @@ class ReaderControllerSecurityTest : LibraryControllerTest() {
         book.note = randomAlphabetic(10)
 
         val reader = createReader()
-        val readerToken = login(CredentialsDTO(reader.mail, reader.password))
+        val readerToken = login(reader.mail!!, reader.password!!)
 
         rest.put("/api/v1/books/${book.id}") {
             contentType = APPLICATION_JSON

@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.constraints.Size
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.LOCATION
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
@@ -15,8 +16,8 @@ import org.springframework.http.ResponseEntity.created
 import org.springframework.http.ResponseEntity.ok
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RestController
-import com.koldyr.library.dto.CredentialsDTO
 import com.koldyr.library.dto.ErrorResponse
 import com.koldyr.library.dto.ReaderDTO
 import com.koldyr.library.services.AuthenticationService
@@ -62,8 +63,8 @@ class AuthController(
             )
         ]
     )
-    @PostMapping(path = ["/api/v1/login"], consumes = [APPLICATION_JSON_VALUE])
-    fun login(@RequestBody credentials: CredentialsDTO): ResponseEntity<Unit> {
+    @PostMapping(path = ["/api/v1/login"])
+    fun login(@RequestHeader(AUTHORIZATION) @Size(max = 256) credentials: String): ResponseEntity<Unit> {
         val token = authenticationService.login(credentials)
         return ok().header(AUTHORIZATION, token).build()
     }

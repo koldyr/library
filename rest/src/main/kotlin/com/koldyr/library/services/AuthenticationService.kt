@@ -1,7 +1,5 @@
 package com.koldyr.library.services
 
-import com.koldyr.library.dto.CredentialsDTO
-
 /**
  * Description of class AuthenticationService
  *
@@ -9,5 +7,5 @@ import com.koldyr.library.dto.CredentialsDTO
  * @created: 2022-02-09
  */
 interface AuthenticationService {
-    fun login(login: CredentialsDTO): String
+    fun login(login: String): String
 }

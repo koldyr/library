@@ -2,21 +2,21 @@ package com.koldyr.library.services
 
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.Date
+import java.util.*
+import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.JWSHeader
+import com.nimbusds.jose.crypto.MACSigner
+import com.nimbusds.jwt.JWTClaimsSet
+import com.nimbusds.jwt.SignedJWT
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken.unauthenticated
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.stereotype.Service
 import org.springframework.web.server.ResponseStatusException
-import com.nimbusds.jose.JWSAlgorithm
-import com.nimbusds.jose.JWSHeader
-import com.nimbusds.jose.crypto.MACSigner
-import com.nimbusds.jwt.JWTClaimsSet
-import com.nimbusds.jwt.SignedJWT
-import com.koldyr.library.dto.CredentialsDTO
 import com.koldyr.library.dto.GrantedPrivilege
 
 /**
@@ -37,15 +37,29 @@ class AuthenticationServiceImpl(
 
     private val header = JWSHeader.Builder(JWSAlgorithm.parse(algorithm)).contentType("text/plain").build()
     
-    override fun login(login: CredentialsDTO): String {
+    override fun login(login: String): String {
         try {
-            val token = unauthenticated(login.username, login.password)
-            val authentication = authenticationManager.authenticate(token)
+            val (userName, password) = getCredentials(login)
+            val unauthenticatedToken = unauthenticated(userName, password)
+            val authentication = authenticationManager.authenticate(unauthenticatedToken)
 
             return "Bearer " + generateToken(authentication)
+        } catch (e: IllegalArgumentException) {
+            throw ResponseStatusException(BAD_REQUEST, e.message)
         } catch (e: AuthenticationException) {
             throw ResponseStatusException(UNAUTHORIZED, e.message)
         }
+    }
+
+    private fun getCredentials(credentials: String): Pair<String, String> {
+        if (!credentials.contains("Basic")) {
+            throw IllegalArgumentException("Wrong authentication schema")
+        }
+        var userNamePassword = credentials.substringAfter("Basic ")
+        userNamePassword = String(Base64.getDecoder().decode(userNamePassword), Charsets.UTF_8)
+        val userName = userNamePassword.substringBefore(":")
+        val password = userNamePassword.substringAfter(":")
+        return Pair(userName, password)
     }
 
     private fun generateToken(authentication: Authentication): String {

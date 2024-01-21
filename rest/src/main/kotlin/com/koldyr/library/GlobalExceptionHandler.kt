@@ -2,6 +2,8 @@ package com.koldyr.library
 
 import java.time.Instant
 import jakarta.persistence.EntityNotFoundException
+import jakarta.servlet.http.HttpServletRequest
+import jakarta.validation.ConstraintViolationException
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataAccessException
@@ -48,7 +50,7 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
         request as ServletWebRequest
         if (errors.size == 1) {
-            request.response?.sendError(BAD_REQUEST.value(), errors.first)
+            request.response?.sendError(BAD_REQUEST.value(), errors.first())
         }
 
         val uri = request.request.requestURI
@@ -69,7 +71,7 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
 
         request as ServletWebRequest
         if (errors.size == 1) {
-            request.response?.sendError(BAD_REQUEST.value(), errors.first.error)
+            request.response?.sendError(BAD_REQUEST.value(), errors.first().error)
         }
 
         val uri = request.request.requestURI
@@ -77,9 +79,20 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         return badRequest().body(model)
     }
 
+    @ExceptionHandler(ConstraintViolationException::class)
+    fun handleConstraintViolationException(ex: ConstraintViolationException, request: HttpServletRequest): ResponseEntity<Any> {
+        val errors = ex.constraintViolations.map { error ->
+            error.message
+        }
+
+        val uri = request.requestURI
+        val model = buildModel(BAD_REQUEST, uri, errors)
+        return badRequest().body(model)
+    }
+
     @ExceptionHandler(EntityNotFoundException::class)
-    fun handleEntityExceptions(ex: EntityNotFoundException, request: WebRequest): ResponseEntity<Any> {
-        val uri = (request as ServletWebRequest).request.requestURI
+    fun handleEntityExceptions(ex: EntityNotFoundException, request: HttpServletRequest): ResponseEntity<Any> {
+        val uri = request.requestURI
         val message = ex.message!!
         val model = buildModel(NOT_FOUND, uri, message)
         return ResponseEntity.status(NOT_FOUND).body(model)
@@ -90,13 +103,13 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
         AuthenticationException::class,
         ResponseStatusException::class
     ])
-    fun handleIgnoredExceptions(ex: Exception, request: WebRequest): Any? {
+    fun handleIgnoredExceptions(ex: Exception, request: HttpServletRequest): Any? {
         throw ex
     }
 
     @ExceptionHandler(Throwable::class)
     @ResponseStatus(INTERNAL_SERVER_ERROR)
-    fun handleAllExceptions(ex: Throwable, request: WebRequest): Map<String, Any> {
+    fun handleAllExceptions(ex: Throwable, request: HttpServletRequest): Map<String, Any> {
         LOGGER.error(ex.message, ex)
 
         val message = when (ex) {
@@ -111,7 +124,7 @@ class GlobalExceptionHandler : ResponseEntityExceptionHandler() {
             }
         }
 
-        val uri = (request as ServletWebRequest).request.requestURI
+        val uri = request.requestURI
         val model = buildModel(INTERNAL_SERVER_ERROR, uri, message)
         return model
     }
