@@ -8,7 +8,7 @@ databaseChangeLog:
             path: "../changes/r003.sql"
             relativeToChangelogFile: true
         - tagDatabase:
-          tag:  r003
+          tag: r003
   - changeSet:
       id: R003.01
       author: Denis Halitsky
@@ -18,4 +18,14 @@ databaseChangeLog:
             path: "../changes/r003.1.sql"
             relativeToChangelogFile: true
         - tagDatabase:
-          tag:  r003.1
+          tag: r003.1
+  - changeSet:
+      id: R003.02
+      author: Denis Halitsky
+      comment: "Removed genre field from book table"
+      changes:
+        - sqlFile:
+            path: "../changes/r003.2.sql"
+            relativeToChangelogFile: true
+        - tagDatabase:
+          tag: r003
